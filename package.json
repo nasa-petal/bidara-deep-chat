@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "deep-chat-dev": "^9.0.105",
-    "svelte": "^3.32.3"
+    "svelte": "^4.2.8"
   },
   "scripts": {
     "build": "rollup -c",
