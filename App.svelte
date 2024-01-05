@@ -91,7 +91,7 @@
       initialMessages={initialMessages}
       chatStyle={{
         width: "100%",
-        height: "100dvh",
+        height: "100vh",
         backgroundColor: "white",
         border: "none",
         fontSize: "16px",
