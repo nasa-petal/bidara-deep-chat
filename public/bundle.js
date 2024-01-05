@@ -13014,9 +13014,9 @@ var app = (function () {
     				default: { shared: { bubble: { maxWidth: "75%" } } }
     			});
 
-    			add_location(deep_chat, file, 65, 4, 3599);
+    			add_location(deep_chat, file, 67, 4, 3661);
     			attr_dev(main, "class", "svelte-u93l4o");
-    			add_location(main, file, 33, 2, 1851);
+    			add_location(main, file, 35, 2, 1913);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -13075,7 +13075,15 @@ var app = (function () {
     	const initialMessages = [
     		{
     			role: "ai",
-    			text: "Hi, I'm **BIDARA**, bio-inspired design and research assisant. I'm an OpenAI [GPT-4](https://openai.com/research/gpt-4) [assistant](https://platform.openai.com/docs/assistants/how-it-works), that was instructed by [NASA's PeTaL initiative](https://www1.grc.nasa.gov/research-and-engineering/vine/petal/) to help others understand, learn from, and emulate the strategies used by living things to create sustainable designs and technologies using the [Biomimicry Institute's design process](https://toolbox.biomimicry.org/methods/process/).\n\nBefore we begin, please be advised:\n\n- Do not share any sensitive information in your conversations including but not limited to, personal information, sensitive or non-public government/company data, ITAR, CUI, export controlled, or trade secrets.\n- While OpenAI has safeguards in place, BIDARA may occasionally generate incorrect or misleading information and produce offensive or biased content.\n\nHow can I assist you today?"
+    			text: "Hi, I'm **BIDARA**, bio-inspired design and research assisant. I'm an OpenAI [GPT-4](https://openai.com/research/gpt-4) [assistant](https://platform.openai.com/docs/assistants/how-it-works), that was instructed by [NASA's PeTaL initiative](https://www1.grc.nasa.gov/research-and-engineering/vine/petal/) to help others understand, learn from, and emulate the strategies used by living things to create sustainable designs and technologies using the [Biomimicry Institute's design process](https://toolbox.biomimicry.org/methods/process/)."
+    		},
+    		{
+    			role: "ai",
+    			text: "Before we begin, please be advised:\n\n‣ **Do not share any sensitive information** in your conversations including but not limited to, personal information, sensitive or non-public government/company data, ITAR, CUI, export controlled, or trade secrets.  \n‣ While OpenAI has safeguards in place, BIDARA may occasionally generate incorrect or misleading information and produce offensive or biased content."
+    		},
+    		{
+    			role: "ai",
+    			text: "How can I assist you today?"
     		}
     	];
 
