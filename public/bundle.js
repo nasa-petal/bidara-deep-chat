@@ -13004,7 +13004,6 @@ var app = (function () {
     			set_custom_element_data(deep_chat, "chatstyle", deep_chat_chatstyle_value = {
     				width: "100%",
     				height: "100dvh",
-    				position: "absolute",
     				backgroundColor: "white",
     				border: "none",
     				fontSize: "16px",
