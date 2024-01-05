@@ -91,8 +91,7 @@
       initialMessages={initialMessages}
       chatStyle={{
         width: "100%",
-        height: "100vh",
-        position: "fixed",
+        height: "100dvh",
         backgroundColor: "white",
         border: "none",
         fontSize: "16px",
@@ -114,9 +113,6 @@
     main {
       font-family: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
       display: grid;
-      position:fixed;
-      height:100vh;
-      width:100%;
     }
   </style>
 
