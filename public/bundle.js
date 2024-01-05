@@ -39,12 +39,6 @@ var app = (function () {
     function element(name) {
         return document.createElement(name);
     }
-    function text(data) {
-        return document.createTextNode(data);
-    }
-    function space() {
-        return text(' ');
-    }
     function attr(node, attribute, value) {
         if (value == null)
             node.removeAttribute(attribute);
@@ -61,14 +55,6 @@ var app = (function () {
     }
     function children(element) {
         return Array.from(element.childNodes);
-    }
-    function set_style(node, key, value, important) {
-        if (value == null) {
-            node.style.removeProperty(key);
-        }
-        else {
-            node.style.setProperty(key, value, important ? 'important' : '');
-        }
     }
     function custom_event(type, detail, { bubbles = false, cancelable = false } = {}) {
         const e = document.createEvent('CustomEvent');
@@ -617,29 +603,29 @@ var app = (function () {
       }]);
       return ys;
     }();
-    var qn = /*#__PURE__*/function () {
-      function Ue(e, t) {
+    var Un = /*#__PURE__*/function () {
+      function qe(e, t) {
         var _this = this;
-        _classCallCheck(this, Ue);
+        _classCallCheck(this, qe);
         var n;
-        var i = Ue.processConfig(t, e.textInput);
-        this.elementRef = Ue.createContainerElement((n = i == null ? void 0 : i.styles) == null ? void 0 : n.container), this.inputElementRef = this.createInputElement(i), this._config = i, this.elementRef.appendChild(this.inputElementRef), setTimeout(function () {
+        var i = qe.processConfig(t, e.textInput);
+        this.elementRef = qe.createContainerElement((n = i == null ? void 0 : i.styles) == null ? void 0 : n.container), this.inputElementRef = this.createInputElement(i), this._config = i, this.elementRef.appendChild(this.inputElementRef), setTimeout(function () {
           var r;
           vs.add(_this.inputElementRef, (r = e.textInput) == null ? void 0 : r.characterLimit, e._validationHandler);
         });
       }
-      _createClass(Ue, [{
+      _createClass(qe, [{
         key: "createInputElement",
         value: function createInputElement(e) {
           var i, n, r;
           var t = document.createElement("div");
-          return t.id = Ue.TEXT_INPUT_ID, t.classList.add("text-input-styling", "text-input-placeholder"), t.innerText = ((i = e == null ? void 0 : e.placeholder) == null ? void 0 : i.text) || "Ask me anything!", ge.IS_CHROMIUM && Ue.preventAutomaticScrollUpOnNewLine(t), typeof (e == null ? void 0 : e.disabled) == "boolean" && e.disabled === !0 ? (t.contentEditable = "false", t.classList.add("text-input-disabled")) : (t.contentEditable = "true", this.addEventListeners(t, e)), Object.assign(t.style, (n = e == null ? void 0 : e.styles) == null ? void 0 : n.text), Object.assign(t.style, (r = e == null ? void 0 : e.placeholder) == null ? void 0 : r.style), t;
+          return t.id = qe.TEXT_INPUT_ID, t.classList.add("text-input-styling", "text-input-placeholder"), t.innerText = ((i = e == null ? void 0 : e.placeholder) == null ? void 0 : i.text) || "Ask me anything!", ge.IS_CHROMIUM && qe.preventAutomaticScrollUpOnNewLine(t), typeof (e == null ? void 0 : e.disabled) == "boolean" && e.disabled === !0 ? (t.contentEditable = "false", t.classList.add("text-input-disabled")) : (t.contentEditable = "true", this.addEventListeners(t, e)), Object.assign(t.style, (n = e == null ? void 0 : e.styles) == null ? void 0 : n.text), Object.assign(t.style, (r = e == null ? void 0 : e.placeholder) == null ? void 0 : r.style), t;
         }
       }, {
         key: "removeTextIfPlaceholder",
         value: function removeTextIfPlaceholder() {
           var e, t, i, n;
-          this.inputElementRef.classList.contains("text-input-placeholder") && !this.inputElementRef.classList.contains("text-input-disabled") && ((e = this._config.placeholder) != null && e.style && (T.unsetStyle(this.inputElementRef, (t = this._config.placeholder) == null ? void 0 : t.style), Object.assign(this.inputElementRef.style, (n = (i = this._config) == null ? void 0 : i.styles) == null ? void 0 : n.text)), Ue.clear(this.inputElementRef), this.inputElementRef.classList.remove("text-input-placeholder"));
+          this.inputElementRef.classList.contains("text-input-placeholder") && !this.inputElementRef.classList.contains("text-input-disabled") && ((e = this._config.placeholder) != null && e.style && (T.unsetStyle(this.inputElementRef, (t = this._config.placeholder) == null ? void 0 : t.style), Object.assign(this.inputElementRef.style, (n = (i = this._config) == null ? void 0 : i.styles) == null ? void 0 : n.text)), qe.clear(this.inputElementRef), this.inputElementRef.classList.remove("text-input-placeholder"));
         }
       }, {
         key: "addEventListeners",
@@ -711,10 +697,10 @@ var app = (function () {
           return t.id = "text-input-container", Object.assign(t.style, e), t;
         }
       }]);
-      return Ue;
+      return qe;
     }();
-    qn.TEXT_INPUT_ID = "text-input";
-    var Ui = qn;
+    Un.TEXT_INPUT_ID = "text-input";
+    var qi = Un;
     var Qt = /*#__PURE__*/function () {
       function Qt() {
         _classCallCheck(this, Qt);
@@ -730,7 +716,7 @@ var app = (function () {
       }, {
         key: "focusFromParentElement",
         value: function focusFromParentElement(e) {
-          var t = e.querySelector("#".concat(Ui.TEXT_INPUT_ID));
+          var t = e.querySelector("#".concat(qi.TEXT_INPUT_ID));
           t && Qt.focusEndOfInput(t);
         }
       }]);
@@ -750,11 +736,11 @@ var app = (function () {
     function Es(s, e, t, i) {
       return "".concat(Hi(s, e, t, i), "Make sure the ").concat(e, " message is using the Response format: https://deepchat.dev/docs/connect/#Response \nYou can also augment it using the responseInterceptor property: https://deepchat.dev/docs/interceptors#responseInterceptor");
     }
-    function _s(s, e, t) {
+    function Ss(s, e, t) {
       var i = "response";
       return "".concat(Hi(s, i, e, t), "Make sure the ").concat(i, " message is using the {text: string} format, e.g: {text: \"Model Response\"}");
     }
-    function Ss(s, e) {
+    function ws(s, e) {
       var t = "request";
       return "".concat(Hi(s, t, e), "Make sure the ").concat(t, " message is using the {body: {text: string}} format, e.g: {body: {text: \"Model Response\"}}");
     }
@@ -763,13 +749,13 @@ var app = (function () {
         INVALID_KEY: "Invalid API Key",
         CONNECTION_FAILED: "Failed to connect",
         INVALID_RESPONSE: Es,
-        INVALID_MODEL_REQUEST: Ss,
-        INVALID_MODEL_RESPONSE: _s,
+        INVALID_MODEL_REQUEST: ws,
+        INVALID_MODEL_RESPONSE: Ss,
         INVALID_STREAM_EVENT: an,
         INVALID_STREAM_EVENT_MIX: "Cannot mix {text: string} and {html: string} responses.",
         NO_VALID_STREAM_EVENTS_SENT: "No valid stream events were sent.\n".concat(an)
       },
-      Un = /*#__PURE__*/function () {
+      qn = /*#__PURE__*/function () {
         function Hn() {
           _classCallCheck(this, Hn);
         }
@@ -811,13 +797,13 @@ var app = (function () {
         }]);
         return Hn;
       }();
-    Un.CODE_SNIPPET_GENERATION_JUMP = 0.5;
-    var Y = Un;
-    var Vn = /*#__PURE__*/function () {
-      function Gn() {
-        _classCallCheck(this, Gn);
+    qn.CODE_SNIPPET_GENERATION_JUMP = 0.5;
+    var Y = qn;
+    var Gn = /*#__PURE__*/function () {
+      function Vn() {
+        _classCallCheck(this, Vn);
       }
-      _createClass(Gn, null, [{
+      _createClass(Vn, null, [{
         key: "speak",
         value: function speak(e, t) {
           if (window.SpeechSynthesisUtterance) {
@@ -838,13 +824,13 @@ var app = (function () {
               n && (i.voice = n);
             }
             t(i);
-          }, Gn.LOAD_VOICES_MS);
+          }, Vn.LOAD_VOICES_MS);
         }
       }]);
-      return Gn;
+      return Vn;
     }();
-    Vn.LOAD_VOICES_MS = 200;
-    var Nt = Vn;
+    Gn.LOAD_VOICES_MS = 200;
+    var Nt = Gn;
     var ke = /*#__PURE__*/function () {
       function ke() {
         _classCallCheck(this, ke);
@@ -1006,7 +992,7 @@ var app = (function () {
       }]);
       return Te;
     }();
-    var ws = "deep-chat-temporary-message",
+    var _s = "deep-chat-temporary-message",
       Ms = "deep-chat-suggestion-button",
       Ri = {
         "deep-chat-button": {
@@ -1050,7 +1036,7 @@ var app = (function () {
         key: "isElementTemporary",
         value: function isElementTemporary(e) {
           var t;
-          return e ? (t = e.bubbleElement.children[0]) == null ? void 0 : t.classList.contains(ws) : !1;
+          return e ? (t = e.bubbleElement.children[0]) == null ? void 0 : t.classList.contains(_s) : !1;
         }
       }, {
         key: "doesElementContainDeepChatClass",
@@ -1460,14 +1446,14 @@ var app = (function () {
     var Re = f.getBreak = function (e, t) {
       return t = $n(e, t), t < e.length && e[t].type === "list_item_close" ? "" : "\n";
     };
-    function Vi() {
+    function Gi() {
       this.rules = Kn({}, f), this.getBreak = f.getBreak;
     }
-    Vi.prototype.renderInline = function (s, e, t) {
+    Gi.prototype.renderInline = function (s, e, t) {
       for (var i = this.rules, n = s.length, r = 0, o = ""; n--;) o += i[s[r].type](s, r++, e, t, this);
       return o;
     };
-    Vi.prototype.render = function (s, e, t) {
+    Gi.prototype.render = function (s, e, t) {
       for (var i = this.rules, n = s.length, r = -1, o = ""; ++r < n;) s[r].type === "inline" ? o += this.renderInline(s[r].children, e, t) : o += i[s[r].type](s, r, e, t, this);
       return o;
     };
@@ -1693,14 +1679,14 @@ var app = (function () {
         }
       }
     }
-    function qs(s) {
+    function Us(s) {
       var e = s.tokens,
         t,
         i,
         n;
       for (i = 0, n = e.length; i < n; i++) t = e[i], t.type === "inline" && s.inline.parse(t.content, s.options, s.env, t.children);
     }
-    function Us(s) {
+    function qs(s) {
       var e,
         t,
         i,
@@ -1755,7 +1741,7 @@ var app = (function () {
       }
     }
     var cn = " \n()[]'\".,!?-";
-    function _i(s) {
+    function Si(s) {
       return s.replace(/([-()\[\]{}+?*.$\^|,:#<!\\])/g, "\\$1");
     }
     function Hs(s) {
@@ -1773,11 +1759,11 @@ var app = (function () {
         h,
         p = s.tokens;
       if (s.env.abbreviations) {
-        for (s.env.abbrRegExp || (h = "(^|[" + cn.split("").map(_i).join("") + "])(" + Object.keys(s.env.abbreviations).map(function (g) {
+        for (s.env.abbrRegExp || (h = "(^|[" + cn.split("").map(Si).join("") + "])(" + Object.keys(s.env.abbreviations).map(function (g) {
           return g.substr(1);
         }).sort(function (g, m) {
           return m.length - g.length;
-        }).map(_i).join("|") + ")($|[" + cn.split("").map(_i).join("") + "])", s.env.abbrRegExp = new RegExp(h, "g")), d = s.env.abbrRegExp, t = 0, i = p.length; t < i; t++) if (p[t].type === "inline") {
+        }).map(Si).join("|") + ")($|[" + cn.split("").map(Si).join("") + "])", s.env.abbrRegExp = new RegExp(h, "g")), d = s.env.abbrRegExp, t = 0, i = p.length; t < i; t++) if (p[t].type === "inline") {
           for (n = p[t].children, e = n.length - 1; e >= 0; e--) if (r = n[e], r.type === "text") {
             for (l = 0, o = r.content, d.lastIndex = 0, c = r.level, a = []; u = d.exec(o);) d.lastIndex > l && a.push({
               type: "text",
@@ -1804,8 +1790,8 @@ var app = (function () {
         }
       }
     }
-    var Vs = /\+-|\.\.|\?\?\?\?|!!!!|,,|--/,
-      Gs = /\((c|tm|r|p)\)/ig,
+    var Gs = /\+-|\.\.|\?\?\?\?|!!!!|,,|--/,
+      Vs = /\((c|tm|r|p)\)/ig,
       Ws = {
         c: "©",
         r: "®",
@@ -1813,14 +1799,14 @@ var app = (function () {
         tm: "™"
       };
     function Ks(s) {
-      return s.indexOf("(") < 0 ? s : s.replace(Gs, function (e, t) {
+      return s.indexOf("(") < 0 ? s : s.replace(Vs, function (e, t) {
         return Ws[t.toLowerCase()];
       });
     }
     function Js(s) {
       var e, t, i, n, r;
       if (s.options.typographer) {
-        for (r = s.tokens.length - 1; r >= 0; r--) if (s.tokens[r].type === "inline") for (n = s.tokens[r].children, e = n.length - 1; e >= 0; e--) t = n[e], t.type === "text" && (i = t.content, i = Ks(i), Vs.test(i) && (i = i.replace(/\+-/g, "±").replace(/\.{2,}/g, "…").replace(/([?!])…/g, "$1..").replace(/([?!]){4,}/g, "$1$1$1").replace(/,{2,}/g, ",").replace(/(^|[^-])---([^-]|$)/mg, "$1—$2").replace(/(^|\s)--(\s|$)/mg, "$1–$2").replace(/(^|[^-\s])--([^-\s]|$)/mg, "$1–$2")), t.content = i);
+        for (r = s.tokens.length - 1; r >= 0; r--) if (s.tokens[r].type === "inline") for (n = s.tokens[r].children, e = n.length - 1; e >= 0; e--) t = n[e], t.type === "text" && (i = t.content, i = Ks(i), Gs.test(i) && (i = i.replace(/\+-/g, "±").replace(/\.{2,}/g, "…").replace(/([?!])…/g, "$1..").replace(/([?!]){4,}/g, "$1$1$1").replace(/,{2,}/g, ",").replace(/(^|[^-])---([^-]|$)/mg, "$1—$2").replace(/(^|\s)--(\s|$)/mg, "$1–$2").replace(/(^|[^-\s])--([^-\s]|$)/mg, "$1–$2")), t.content = i);
       }
     }
     var $s = /['"]/,
@@ -1834,24 +1820,24 @@ var app = (function () {
       return s.substr(0, e) + t + s.substr(e + 1);
     }
     function Zs(s) {
-      var e, t, i, n, r, o, a, l, c, d, u, h, p, g, m, _, S;
+      var e, t, i, n, r, o, a, l, c, d, u, h, p, g, m, S, w;
       if (s.options.typographer) {
-        for (S = [], m = s.tokens.length - 1; m >= 0; m--) if (s.tokens[m].type === "inline") {
-          for (_ = s.tokens[m].children, S.length = 0, e = 0; e < _.length; e++) if (t = _[e], !(t.type !== "text" || $s.test(t.text))) {
-            for (a = _[e].level, p = S.length - 1; p >= 0 && !(S[p].level <= a); p--);
-            S.length = p + 1, i = t.content, r = 0, o = i.length;
+        for (w = [], m = s.tokens.length - 1; m >= 0; m--) if (s.tokens[m].type === "inline") {
+          for (S = s.tokens[m].children, w.length = 0, e = 0; e < S.length; e++) if (t = S[e], !(t.type !== "text" || $s.test(t.text))) {
+            for (a = S[e].level, p = w.length - 1; p >= 0 && !(w[p].level <= a); p--);
+            w.length = p + 1, i = t.content, r = 0, o = i.length;
             e: for (; r < o && (dn.lastIndex = r, n = dn.exec(i), !!n);) {
               if (l = !hn(i, n.index - 1), r = n.index + 1, g = n[0] === "'", c = !hn(i, r), !c && !l) {
                 g && (t.content = ze(t.content, n.index, un));
                 continue;
               }
               if (u = !c, h = !l, h) {
-                for (p = S.length - 1; p >= 0 && (d = S[p], !(S[p].level < a)); p--) if (d.single === g && S[p].level === a) {
-                  d = S[p], g ? (_[d.token].content = ze(_[d.token].content, d.pos, s.options.quotes[2]), t.content = ze(t.content, n.index, s.options.quotes[3])) : (_[d.token].content = ze(_[d.token].content, d.pos, s.options.quotes[0]), t.content = ze(t.content, n.index, s.options.quotes[1])), S.length = p;
+                for (p = w.length - 1; p >= 0 && (d = w[p], !(w[p].level < a)); p--) if (d.single === g && w[p].level === a) {
+                  d = w[p], g ? (S[d.token].content = ze(S[d.token].content, d.pos, s.options.quotes[2]), t.content = ze(t.content, n.index, s.options.quotes[3])) : (S[d.token].content = ze(S[d.token].content, d.pos, s.options.quotes[0]), t.content = ze(t.content, n.index, s.options.quotes[1])), w.length = p;
                   continue e;
                 }
               }
-              u ? S.push({
+              u ? w.push({
                 token: e,
                 pos: n.index,
                 single: g,
@@ -1862,10 +1848,10 @@ var app = (function () {
         }
       }
     }
-    var Si = [["block", Ds], ["abbr", Fs], ["references", zs], ["inline", qs], ["footnote_tail", Us], ["abbr2", Hs], ["replacements", Js], ["smartquotes", Zs]];
+    var wi = [["block", Ds], ["abbr", Fs], ["references", zs], ["inline", Us], ["footnote_tail", qs], ["abbr2", Hs], ["replacements", Js], ["smartquotes", Zs]];
     function Qn() {
       this.options = {}, this.ruler = new H();
-      for (var s = 0; s < Si.length; s++) this.ruler.push(Si[s][0], Si[s][1]);
+      for (var s = 0; s < wi.length; s++) this.ruler.push(wi[s][0], wi[s][1]);
     }
     Qn.prototype.process = function (s) {
       var e, t, i;
@@ -1972,12 +1958,12 @@ var app = (function () {
         p,
         g,
         m = s.bMarks[e] + s.tShift[e],
-        _ = s.eMarks[e];
-      if (m > _ || s.src.charCodeAt(m++) !== 62 || s.level >= s.options.maxNesting) return !1;
+        S = s.eMarks[e];
+      if (m > S || s.src.charCodeAt(m++) !== 62 || s.level >= s.options.maxNesting) return !1;
       if (i) return !0;
-      for (s.src.charCodeAt(m) === 32 && m++, l = s.blkIndent, s.blkIndent = 0, a = [s.bMarks[e]], s.bMarks[e] = m, m = m < _ ? s.skipSpaces(m) : m, r = m >= _, o = [s.tShift[e]], s.tShift[e] = m - s.bMarks[e], u = s.parser.ruler.getRules("blockquote"), n = e + 1; n < t && (m = s.bMarks[n] + s.tShift[n], _ = s.eMarks[n], !(m >= _)); n++) {
+      for (s.src.charCodeAt(m) === 32 && m++, l = s.blkIndent, s.blkIndent = 0, a = [s.bMarks[e]], s.bMarks[e] = m, m = m < S ? s.skipSpaces(m) : m, r = m >= S, o = [s.tShift[e]], s.tShift[e] = m - s.bMarks[e], u = s.parser.ruler.getRules("blockquote"), n = e + 1; n < t && (m = s.bMarks[n] + s.tShift[n], S = s.eMarks[n], !(m >= S)); n++) {
         if (s.src.charCodeAt(m++) === 62) {
-          s.src.charCodeAt(m) === 32 && m++, a.push(s.bMarks[n]), s.bMarks[n] = m, m = m < _ ? s.skipSpaces(m) : m, r = m >= _, o.push(s.tShift[n]), s.tShift[n] = m - s.bMarks[n];
+          s.src.charCodeAt(m) === 32 && m++, a.push(s.bMarks[n]), s.bMarks[n] = m, m = m < S ? s.skipSpaces(m) : m, r = m >= S, o.push(s.tShift[n]), s.tShift[n] = m - s.bMarks[n];
           continue;
         }
         if (r) break;
@@ -2052,51 +2038,51 @@ var app = (function () {
         p,
         g,
         m,
-        _,
         S,
-        V,
-        A,
+        w,
         G,
+        A,
+        V,
         X,
         oe = !0,
         Q,
         N,
         Be,
         xi;
-      if ((u = fn(s, e)) >= 0) _ = !0;else if ((u = pn(s, e)) >= 0) _ = !1;else return !1;
+      if ((u = fn(s, e)) >= 0) S = !0;else if ((u = pn(s, e)) >= 0) S = !1;else return !1;
       if (s.level >= s.options.maxNesting) return !1;
       if (m = s.src.charCodeAt(u - 1), i) return !0;
-      for (V = s.tokens.length, _ ? (d = s.bMarks[e] + s.tShift[e], g = Number(s.src.substr(d, u - d - 1)), s.tokens.push({
+      for (G = s.tokens.length, S ? (d = s.bMarks[e] + s.tShift[e], g = Number(s.src.substr(d, u - d - 1)), s.tokens.push({
         type: "ordered_list_open",
         order: g,
-        lines: G = [e, 0],
+        lines: V = [e, 0],
         level: s.level++
       })) : s.tokens.push({
         type: "bullet_list_open",
-        lines: G = [e, 0],
+        lines: V = [e, 0],
         level: s.level++
-      }), n = e, A = !1, Q = s.parser.ruler.getRules("list"); n < t && (S = s.skipSpaces(u), h = s.eMarks[n], S >= h ? p = 1 : p = S - u, p > 4 && (p = 1), p < 1 && (p = 1), r = u - s.bMarks[n] + p, s.tokens.push({
+      }), n = e, A = !1, Q = s.parser.ruler.getRules("list"); n < t && (w = s.skipSpaces(u), h = s.eMarks[n], w >= h ? p = 1 : p = w - u, p > 4 && (p = 1), p < 1 && (p = 1), r = u - s.bMarks[n] + p, s.tokens.push({
         type: "list_item_open",
         lines: X = [e, 0],
         level: s.level++
-      }), a = s.blkIndent, l = s.tight, o = s.tShift[e], c = s.parentType, s.tShift[e] = S - s.bMarks[e], s.blkIndent = r, s.tight = !0, s.parentType = "list", s.parser.tokenize(s, e, t, !0), (!s.tight || A) && (oe = !1), A = s.line - e > 1 && s.isEmpty(s.line - 1), s.blkIndent = a, s.tShift[e] = o, s.tight = l, s.parentType = c, s.tokens.push({
+      }), a = s.blkIndent, l = s.tight, o = s.tShift[e], c = s.parentType, s.tShift[e] = w - s.bMarks[e], s.blkIndent = r, s.tight = !0, s.parentType = "list", s.parser.tokenize(s, e, t, !0), (!s.tight || A) && (oe = !1), A = s.line - e > 1 && s.isEmpty(s.line - 1), s.blkIndent = a, s.tShift[e] = o, s.tight = l, s.parentType = c, s.tokens.push({
         type: "list_item_close",
         level: --s.level
-      }), n = e = s.line, X[1] = n, S = s.bMarks[e], !(n >= t || s.isEmpty(n) || s.tShift[n] < s.blkIndent));) {
+      }), n = e = s.line, X[1] = n, w = s.bMarks[e], !(n >= t || s.isEmpty(n) || s.tShift[n] < s.blkIndent));) {
         for (xi = !1, N = 0, Be = Q.length; N < Be; N++) if (Q[N](s, n, t, !0)) {
           xi = !0;
           break;
         }
         if (xi) break;
-        if (_) {
+        if (S) {
           if (u = fn(s, n), u < 0) break;
         } else if (u = pn(s, n), u < 0) break;
         if (m !== s.src.charCodeAt(u - 1)) break;
       }
       return s.tokens.push({
-        type: _ ? "ordered_list_close" : "bullet_list_close",
+        type: S ? "ordered_list_close" : "bullet_list_close",
         level: --s.level
-      }), G[1] = n, s.line = n, oe && ir(s, V), !0;
+      }), V[1] = n, s.line = n, oe && ir(s, G), !0;
     }
     function sr(s, e, t, i) {
       var n,
@@ -2202,14 +2188,14 @@ var app = (function () {
         content: s.getLines(e, o, 0, !0)
       }), !0;
     }
-    function wi(s, e) {
+    function _i(s, e) {
       var t = s.bMarks[e] + s.blkIndent,
         i = s.eMarks[e];
       return s.src.substr(t, i - t);
     }
     function ur(s, e, t, i) {
       var n, r, o, a, l, c, d, u, h, p, g;
-      if (e + 2 > t || (l = e + 1, s.tShift[l] < s.blkIndent) || (o = s.bMarks[l] + s.tShift[l], o >= s.eMarks[l]) || (n = s.src.charCodeAt(o), n !== 124 && n !== 45 && n !== 58) || (r = wi(s, e + 1), !/^[-:| ]+$/.test(r)) || (c = r.split("|"), c <= 2)) return !1;
+      if (e + 2 > t || (l = e + 1, s.tShift[l] < s.blkIndent) || (o = s.bMarks[l] + s.tShift[l], o >= s.eMarks[l]) || (n = s.src.charCodeAt(o), n !== 124 && n !== 45 && n !== 58) || (r = _i(s, e + 1), !/^[-:| ]+$/.test(r)) || (c = r.split("|"), c <= 2)) return !1;
       for (u = [], a = 0; a < c.length; a++) {
         if (h = c[a].trim(), !h) {
           if (a === 0 || a === c.length - 1) continue;
@@ -2218,7 +2204,7 @@ var app = (function () {
         if (!/^:?-+:?$/.test(h)) return !1;
         h.charCodeAt(h.length - 1) === 58 ? u.push(h.charCodeAt(0) === 58 ? "center" : "right") : h.charCodeAt(0) === 58 ? u.push("left") : u.push("");
       }
-      if (r = wi(s, e).trim(), r.indexOf("|") === -1 || (c = r.replace(/^\||\|$/g, "").split("|"), u.length !== c.length)) return !1;
+      if (r = _i(s, e).trim(), r.indexOf("|") === -1 || (c = r.replace(/^\||\|$/g, "").split("|"), u.length !== c.length)) return !1;
       if (i) return !0;
       for (s.tokens.push({
         type: "table_open",
@@ -2257,7 +2243,7 @@ var app = (function () {
         type: "tbody_open",
         lines: g = [e + 2, 0],
         level: s.level++
-      }), l = e + 2; l < t && !(s.tShift[l] < s.blkIndent || (r = wi(s, l).trim(), r.indexOf("|") === -1)); l++) {
+      }), l = e + 2; l < t && !(s.tShift[l] < s.blkIndent || (r = _i(s, l).trim(), r.indexOf("|") === -1)); l++) {
         for (c = r.replace(/^\||\|$/g, "").split("|"), s.tokens.push({
           type: "tr_open",
           level: s.level++
@@ -2301,7 +2287,7 @@ var app = (function () {
       for (t = e + 2, i = s.tokens.length - 2; t < i; t++) s.tokens[t].level === n && s.tokens[t].type === "paragraph_open" && (s.tokens[t + 2].tight = !0, s.tokens[t].tight = !0, t += 2);
     }
     function pr(s, e, t, i) {
-      var n, r, o, a, l, c, d, u, h, p, g, m, _, S;
+      var n, r, o, a, l, c, d, u, h, p, g, m, S, w;
       if (i) return s.ddIndent < 0 ? !1 : It(s, e) >= 0;
       if (d = e + 1, s.isEmpty(d) && ++d > t || s.tShift[d] < s.blkIndent || (n = It(s, d), n < 0) || s.level >= s.options.maxNesting) return !1;
       c = s.tokens.length, s.tokens.push({
@@ -2310,7 +2296,7 @@ var app = (function () {
         level: s.level++
       }), o = e, r = d;
       e: for (;;) {
-        for (S = !0, _ = !1, s.tokens.push({
+        for (w = !0, S = !1, s.tokens.push({
           type: "dt_open",
           lines: [o, o],
           level: s.level++
@@ -2328,7 +2314,7 @@ var app = (function () {
             type: "dd_open",
             lines: a = [d, 0],
             level: s.level++
-          }), m = s.tight, h = s.ddIndent, u = s.blkIndent, g = s.tShift[r], p = s.parentType, s.blkIndent = s.ddIndent = s.tShift[r] + 2, s.tShift[r] = n - s.bMarks[r], s.tight = !0, s.parentType = "deflist", s.parser.tokenize(s, r, t, !0), (!s.tight || _) && (S = !1), _ = s.line - r > 1 && s.isEmpty(s.line - 1), s.tShift[r] = g, s.tight = m, s.parentType = p, s.blkIndent = u, s.ddIndent = h, s.tokens.push({
+          }), m = s.tight, h = s.ddIndent, u = s.blkIndent, g = s.tShift[r], p = s.parentType, s.blkIndent = s.ddIndent = s.tShift[r] + 2, s.tShift[r] = n - s.bMarks[r], s.tight = !0, s.parentType = "deflist", s.parser.tokenize(s, r, t, !0), (!s.tight || S) && (w = !1), S = s.line - r > 1 && s.isEmpty(s.line - 1), s.tShift[r] = g, s.tight = m, s.parentType = p, s.blkIndent = u, s.ddIndent = h, s.tokens.push({
             type: "dd_close",
             level: --s.level
           }), a[1] = d = s.line, d >= t || s.tShift[d] < s.blkIndent) break e;
@@ -2340,7 +2326,7 @@ var app = (function () {
       return s.tokens.push({
         type: "dl_close",
         level: --s.level
-      }), l[1] = d, s.line = d, S && hr(s, c), !0;
+      }), l[1] = d, s.line = d, w && hr(s, c), !0;
     }
     function fr(s, e) {
       var t,
@@ -2377,13 +2363,13 @@ var app = (function () {
       })), !0;
     }
     var Lt = [["code", Xs], ["fences", Qs, ["paragraph", "blockquote", "list"]], ["blockquote", er, ["paragraph", "blockquote", "list"]], ["hr", tr, ["paragraph", "blockquote", "list"]], ["list", nr, ["paragraph", "blockquote"]], ["footnote", sr, ["paragraph"]], ["heading", rr, ["paragraph", "blockquote"]], ["lheading", or], ["htmlblock", dr, ["paragraph", "blockquote"]], ["table", ur, ["paragraph"]], ["deflist", pr, ["paragraph"]], ["paragraph", fr]];
-    function Gi() {
+    function Vi() {
       this.ruler = new H();
       for (var s = 0; s < Lt.length; s++) this.ruler.push(Lt[s][0], Lt[s][1], {
         alt: (Lt[s][2] || []).slice()
       });
     }
-    Gi.prototype.tokenize = function (s, e, t) {
+    Vi.prototype.tokenize = function (s, e, t) {
       for (var i = this.ruler.getRules(""), n = i.length, r = e, o = !1, a, l; r < t && (s.line = r = s.skipEmptyLines(r), !(r >= t || s.tShift[r] < s.blkIndent));) {
         for (l = 0; l < n && (a = i[l](s, r, t, !1), !a); l++);
         if (s.tight = !o, s.isEmpty(s.line - 1) && (o = !0), r = s.line, r < t && s.isEmpty(r)) {
@@ -2395,7 +2381,7 @@ var app = (function () {
     var mr = /[\n\t]/g,
       gr = /\r[\n\u0085]|[\u2424\u2028\u0085]/g,
       br = /\u00a0/g;
-    Gi.prototype.parse = function (s, e, t, i) {
+    Vi.prototype.parse = function (s, e, t, i) {
       var n,
         r = 0,
         o = 0;
@@ -2485,7 +2471,7 @@ var app = (function () {
       }
       return e || (s.pending += "\\"), s.pos++, !0;
     }
-    function _r(s, e) {
+    function Sr(s, e) {
       var t,
         i,
         n,
@@ -2506,7 +2492,7 @@ var app = (function () {
       }
       return e || (s.pending += n), s.pos += n.length, !0;
     }
-    function Sr(s, e) {
+    function wr(s, e) {
       var t,
         i,
         n,
@@ -2532,7 +2518,7 @@ var app = (function () {
         level: --s.level
       })), s.pos = s.posMax + 2, s.posMax = r, !0) : (s.pos = o, !1);
     }
-    function wr(s, e) {
+    function _r(s, e) {
       var t,
         i,
         n,
@@ -2817,16 +2803,16 @@ var app = (function () {
     var Fr = /[a-zA-Z_:][a-zA-Z0-9:._-]*/,
       Br = /[^"'=<>`\x00-\x20]+/,
       zr = /'[^']*'/,
-      qr = /"[^"]*"/,
-      Ur = ti(/(?:unquoted|single_quoted|double_quoted)/)("unquoted", Br)("single_quoted", zr)("double_quoted", qr)(),
-      Hr = ti(/(?:\s+attr_name(?:\s*=\s*attr_value)?)/)("attr_name", Fr)("attr_value", Ur)(),
-      Vr = ti(/<[A-Za-z][A-Za-z0-9]*attribute*\s*\/?>/)("attribute", Hr)(),
-      Gr = /<\/[A-Za-z][A-Za-z0-9]*\s*>/,
+      Ur = /"[^"]*"/,
+      qr = ti(/(?:unquoted|single_quoted|double_quoted)/)("unquoted", Br)("single_quoted", zr)("double_quoted", Ur)(),
+      Hr = ti(/(?:\s+attr_name(?:\s*=\s*attr_value)?)/)("attr_name", Fr)("attr_value", qr)(),
+      Gr = ti(/<[A-Za-z][A-Za-z0-9]*attribute*\s*\/?>/)("attribute", Hr)(),
+      Vr = /<\/[A-Za-z][A-Za-z0-9]*\s*>/,
       Wr = /<!---->|<!--(?:-?[^>-])(?:-?[^-])*-->/,
       Kr = /<[?].*?[?]>/,
       Jr = /<![A-Z]+\s+[^>]*>/,
       $r = /<!\[CDATA\[[\s\S]*?\]\]>/,
-      Yr = ti(/^(?:open_tag|close_tag|comment|processing|declaration|cdata)/)("open_tag", Vr)("close_tag", Gr)("comment", Wr)("processing", Kr)("declaration", Jr)("cdata", $r)();
+      Yr = ti(/^(?:open_tag|close_tag|comment|processing|declaration|cdata)/)("open_tag", Gr)("close_tag", Vr)("comment", Wr)("processing", Kr)("declaration", Jr)("cdata", $r)();
     function Zr(s) {
       var e = s | 32;
       return e >= 97 && e <= 122;
@@ -2861,7 +2847,7 @@ var app = (function () {
       }
       return e || (s.pending += "&"), s.pos++, !0;
     }
-    var Mi = [["text", yr], ["newline", xr], ["escape", Er], ["backticks", _r], ["del", Sr], ["ins", wr], ["mark", Mr], ["emphasis", Tr], ["sub", Ar], ["sup", Ir], ["links", Lr], ["footnote_inline", Rr], ["footnote_ref", Or], ["autolink", jr], ["htmltag", Xr], ["entity", to]];
+    var Mi = [["text", yr], ["newline", xr], ["escape", Er], ["backticks", Sr], ["del", wr], ["ins", _r], ["mark", Mr], ["emphasis", Tr], ["sub", Ar], ["sup", Ir], ["links", Lr], ["footnote_inline", Rr], ["footnote_ref", Or], ["autolink", jr], ["htmltag", Xr], ["entity", to]];
     function ii() {
       this.ruler = new H();
       for (var s = 0; s < Mi.length; s++) this.ruler.push(Mi[s][0], Mi[s][1]);
@@ -3021,7 +3007,7 @@ var app = (function () {
       this.src = e, this.env = t, this.options = s.options, this.tokens = [], this.inlineMode = !1, this.inline = s.inline, this.block = s.block, this.renderer = s.renderer, this.typographer = s.typographer;
     }
     function he(s, e) {
-      typeof s != "string" && (e = s, s = "default"), e && e.linkify != null && console.warn("linkify option is removed. Use linkify plugin instead:\n\nimport Remarkable from 'remarkable';\nimport linkify from 'remarkable/linkify';\nnew Remarkable().use(linkify)\n"), this.inline = new ii(), this.block = new Gi(), this.core = new Qn(), this.renderer = new Vi(), this.ruler = new H(), this.options = {}, this.configure(oo[s]), this.set(e || {});
+      typeof s != "string" && (e = s, s = "default"), e && e.linkify != null && console.warn("linkify option is removed. Use linkify plugin instead:\n\nimport Remarkable from 'remarkable';\nimport linkify from 'remarkable/linkify';\nnew Remarkable().use(linkify)\n"), this.inline = new ii(), this.block = new Vi(), this.core = new Qn(), this.renderer = new Gi(), this.ruler = new H(), this.options = {}, this.configure(oo[s]), this.set(e || {});
     }
     he.prototype.set = function (s) {
       Kn(this.options, s);
@@ -3298,11 +3284,11 @@ var app = (function () {
       }]);
       return ce;
     }();
-    var Ge = /*#__PURE__*/function () {
-      function Ge() {
-        _classCallCheck(this, Ge);
+    var Ve = /*#__PURE__*/function () {
+      function Ve() {
+        _classCallCheck(this, Ve);
       }
-      _createClass(Ge, null, [{
+      _createClass(Ve, null, [{
         key: "getPosition",
         value: function getPosition(e, t) {
           var _i5, _i6, _i7;
@@ -3326,18 +3312,18 @@ var app = (function () {
         key: "createName",
         value: function createName(e, t) {
           var i = document.createElement("div");
-          return i.classList.add("name"), i.textContent = Ge.getNameText(e, t), Ge.applyStyle(i, e, t), i;
+          return i.classList.add("name"), i.textContent = Ve.getNameText(e, t), Ve.applyStyle(i, e, t), i;
         }
       }, {
         key: "add",
         value: function add(e, t, i) {
           var n = typeof i == "boolean" ? {} : i,
-            r = Ge.createName(t, n),
-            o = Ge.getPosition(t, n);
+            r = Ve.createName(t, n),
+            o = Ve.getPosition(t, n);
           r.classList.add(o === "left" ? "left-item-position" : "right-item-position"), e.insertAdjacentElement(o === "left" ? "beforebegin" : "afterend", r);
         }
       }]);
-      return Ge;
+      return Ve;
     }();
     var Ke = /*#__PURE__*/function () {
       function Ke(e) {
@@ -3400,7 +3386,7 @@ var app = (function () {
         value:
         // prettier-ignore
         function addInnerContainerElements(e, t, i) {
-          return e.classList.add("message-bubble", v.getRoleClass(i), i === v.USER_ROLE ? "user-message-text" : "ai-message-text"), this.renderText(e, t), this._avatars && ce.add(e, i, this._avatars), this._names && Ge.add(e, i, this._names), {
+          return e.classList.add("message-bubble", v.getRoleClass(i), i === v.USER_ROLE ? "user-message-text" : "ai-message-text"), this.renderText(e, t), this._avatars && ce.add(e, i, this._avatars), this._names && Ve.add(e, i, this._names), {
             bubbleElement: e
           };
         }
@@ -3796,16 +3782,16 @@ var app = (function () {
           g.abort(), document.hidden || X();
         }
         l || document.addEventListener("visibilitychange", m);
-        var _ = mo,
-          S = 0;
-        function V() {
-          document.removeEventListener("visibilitychange", m), window.clearTimeout(S), g.abort();
+        var S = mo,
+          w = 0;
+        function G() {
+          document.removeEventListener("visibilitychange", m), window.clearTimeout(w), g.abort();
         }
         t == null || t.addEventListener("abort", function () {
-          V(), u();
+          G(), u();
         });
         var A = c !== null && c !== void 0 ? c : window.fetch,
-          G = n !== null && n !== void 0 ? n : bo;
+          V = n !== null && n !== void 0 ? n : bo;
         function X() {
           return _X.apply(this, arguments);
         }
@@ -3825,17 +3811,17 @@ var app = (function () {
                 case 4:
                   Q = _context3.sent;
                   _context3.next = 7;
-                  return G(Q);
+                  return V(Q);
                 case 7:
                   _context3.next = 9;
                   return co(Q.body, uo(ho(function (N) {
                     N ? p[yn] = N : delete p[yn];
                   }, function (N) {
-                    _ = N;
+                    S = N;
                   }, r)));
                 case 9:
                   o == null || o();
-                  V();
+                  G();
                   u();
                   _context3.next = 17;
                   break;
@@ -3843,10 +3829,10 @@ var app = (function () {
                   _context3.prev = 14;
                   _context3.t0 = _context3["catch"](1);
                   if (!g.signal.aborted) try {
-                    N = (oe = a == null ? void 0 : a(_context3.t0)) !== null && oe !== void 0 ? oe : _;
-                    window.clearTimeout(S), S = window.setTimeout(X, N);
+                    N = (oe = a == null ? void 0 : a(_context3.t0)) !== null && oe !== void 0 ? oe : S;
+                    window.clearTimeout(w), w = window.setTimeout(X, N);
                   } catch (N) {
-                    V(), h(N);
+                    G(), h(N);
                   }
                 case 17:
                 case "end":
@@ -3950,9 +3936,9 @@ var app = (function () {
               p,
               g,
               m,
-              _,
               S,
-              V,
+              w,
+              G,
               r,
               _yield$E$processReque,
               o,
@@ -4002,10 +3988,10 @@ var app = (function () {
                   return _context7.abrupt("return", ve.requestStream(i, e.streamHandlers));
                 case 18:
                   h = new Ze(i);
-                  go(((_ = e.requestSettings) == null ? void 0 : _.url) || e.url || "", {
-                    method: ((S = e.requestSettings) == null ? void 0 : S.method) || "POST",
+                  go(((S = e.requestSettings) == null ? void 0 : S.url) || e.url || "", {
+                    method: ((w = e.requestSettings) == null ? void 0 : w.method) || "POST",
                     headers: a,
-                    credentials: (V = e.requestSettings) == null ? void 0 : V.credentials,
+                    credentials: (G = e.requestSettings) == null ? void 0 : G.credentials,
                     body: n ? JSON.stringify(o) : o,
                     openWhenHidden: !0,
                     // keep stream open when browser tab not open
@@ -4033,7 +4019,7 @@ var app = (function () {
                     },
                     onmessage: function onmessage(A) {
                       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
-                        var G, X, oe, Q, N;
+                        var V, X, oe, Q, N;
                         return _regeneratorRuntime().wrap(function _callee6$(_context6) {
                           while (1) switch (_context6.prev = _context6.next) {
                             case 0:
@@ -4043,7 +4029,7 @@ var app = (function () {
                               }
                               Q = JSON.parse(A.data);
                               _context6.next = 4;
-                              return (X = (G = e.deepChat).responseInterceptor) == null ? void 0 : X.call(G, Q);
+                              return (X = (V = e.deepChat).responseInterceptor) == null ? void 0 : X.call(V, Q);
                             case 4:
                               _context6.t0 = _context6.sent;
                               if (_context6.t0) {
@@ -4073,8 +4059,8 @@ var app = (function () {
                     },
                     signal: u.signal
                   })["catch"](function (A) {
-                    var G;
-                    (G = e.extractResultData) == null || G.call(e, A).then(function () {
+                    var V;
+                    (V = e.extractResultData) == null || V.call(e, A).then(function () {
                       E.displayError(i, A);
                     })["catch"](function (X) {
                       E.displayError(i, X);
@@ -4300,11 +4286,11 @@ var app = (function () {
       }]);
       return Ae;
     }();
-    var w = /*#__PURE__*/function () {
-      function w() {
-        _classCallCheck(this, w);
+    var _ = /*#__PURE__*/function () {
+      function _() {
+        _classCallCheck(this, _);
       }
-      _createClass(w, null, [{
+      _createClass(_, null, [{
         key: "request",
         value: // prettier-ignore
         function () {
@@ -4364,7 +4350,7 @@ var app = (function () {
                     return E.processResponseByType(m);
                   }).then( /*#__PURE__*/function () {
                     var _ref4 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee11(m) {
-                      var V, A, _, S;
+                      var G, A, S, w;
                       return _regeneratorRuntime().wrap(function _callee11$(_context11) {
                         while (1) switch (_context11.prev = _context11.next) {
                           case 0:
@@ -4375,7 +4361,7 @@ var app = (function () {
                             return _context11.abrupt("return");
                           case 2:
                             _context11.next = 4;
-                            return (A = (V = e.deepChat).responseInterceptor) == null ? void 0 : A.call(V, m);
+                            return (A = (G = e.deepChat).responseInterceptor) == null ? void 0 : A.call(G, m);
                           case 4:
                             _context11.t0 = _context11.sent;
                             if (_context11.t0) {
@@ -4384,24 +4370,24 @@ var app = (function () {
                             }
                             _context11.t0 = m;
                           case 7:
-                            _ = _context11.t0;
+                            S = _context11.t0;
                             _context11.next = 10;
-                            return e.extractResultData(_, u, o);
+                            return e.extractResultData(S, u, o);
                           case 10:
-                            S = _context11.sent;
+                            w = _context11.sent;
                             if (d) {
                               _context11.next = 13;
                               break;
                             }
                             throw m;
                           case 13:
-                            if (!(!S || _typeof(S) != "object")) {
+                            if (!(!w || _typeof(w) != "object")) {
                               _context11.next = 15;
                               break;
                             }
-                            throw Error(C.INVALID_RESPONSE(m, "response", !!e.deepChat.responseInterceptor, _));
+                            throw Error(C.INVALID_RESPONSE(m, "response", !!e.deepChat.responseInterceptor, S));
                           case 15:
-                            S.makingAnotherRequest || (I.isSimulation(e.deepChat.stream) ? I.simulate(i, e.streamHandlers, S) : (i.addNewMessage(S), c()));
+                            w.makingAnotherRequest || (I.isSimulation(e.deepChat.stream) ? I.simulate(i, e.streamHandlers, w) : (i.addNewMessage(w), c()));
                           case 16:
                           case "end":
                             return _context11.stop();
@@ -4460,7 +4446,7 @@ var app = (function () {
                   case 11:
                     a = _context13.sent;
                     a.timeoutMS ? setTimeout(function () {
-                      w.executePollRequest(e, t, i, n);
+                      _.executePollRequest(e, t, i, n);
                     }, a.timeoutMS) : I.isSimulation(e.deepChat.stream) ? I.simulate(n, e.streamHandlers, a) : (n.addNewMessage(a), r());
                   case 13:
                   case "end":
@@ -4520,7 +4506,7 @@ var app = (function () {
                     body: u,
                     headers: a
                   };
-                  e.requestSettings.credentials && (h.credentials = e.requestSettings.credentials), w.executePollRequest(e, c, h, i);
+                  e.requestSettings.credentials && (h.credentials = e.requestSettings.credentials), _.executePollRequest(e, c, h, i);
                 case 12:
                 case "end":
                   return _context14.stop();
@@ -4549,7 +4535,7 @@ var app = (function () {
           });
         }
       }]);
-      return w;
+      return _;
     }();
     var Xe = /*#__PURE__*/function () {
       function Xe() {
@@ -4903,7 +4889,7 @@ var app = (function () {
                 case 0:
                   i = _args17.length > 2 && _args17[2] !== undefined ? _args17[2] : !0;
                   n = this.deepChat.stream;
-                  return _context17.abrupt("return", n && !I.isSimulation(n) ? I.request(this, e, t) : w.request(this, e, t, i));
+                  return _context17.abrupt("return", n && !I.isSimulation(n) ? I.request(this, e, t) : _.request(this, e, t, i));
                 case 3:
                 case "end":
                   return _context17.stop();
@@ -5089,18 +5075,18 @@ var app = (function () {
       }]);
       return Le;
     }();
-    var q = /*#__PURE__*/function (_Le) {
-      _inherits(q, _Le);
-      var _super = _createSuper(q);
+    var U = /*#__PURE__*/function (_Le) {
+      _inherits(U, _Le);
+      var _super = _createSuper(U);
       // prettier-ignore
-      function q(e, t, i, n, r) {
+      function U(e, t, i, n, r) {
         var _this6;
-        _classCallCheck(this, q);
+        _classCallCheck(this, U);
         var o;
         _this6 = _super.call(this, e, r), _this6.insertKeyPlaceholderText = "API Key", _this6.getKeyLink = "", Object.assign(_this6.rawBody, (o = e.request) == null ? void 0 : o.additionalBodyProps), _this6.keyVerificationDetails = t, _this6.buildHeadersFunc = i, n && _this6.setApiKeyProperties(n), _this6.requestSettings = _this6.buildRequestSettings(_this6.key || "", e.request);
         return _this6;
       }
-      _createClass(q, [{
+      _createClass(U, [{
         key: "setApiKeyProperties",
         value: function setApiKeyProperties(e) {
           this.key = e.key, e.validateKeyProperty && (this.validateConfigKey = e.validateKeyProperty);
@@ -5128,7 +5114,7 @@ var app = (function () {
             o = _this$keyVerification.createHeaders,
             a = _this$keyVerification.body,
             l = (o == null ? void 0 : o(e)) || this.buildHeadersFunc(e);
-          w.verifyKey(e, i, l, n, this.keyAuthenticated.bind(this, t.onSuccess), t.onFail, t.onLoad, r, a);
+          _.verifyKey(e, i, l, n, this.keyAuthenticated.bind(this, t.onSuccess), t.onFail, t.onLoad, r, a);
         }
       }, {
         key: "isDirectConnection",
@@ -5136,7 +5122,7 @@ var app = (function () {
           return !0;
         }
       }]);
-      return q;
+      return U;
     }(Le);
     var Ft = /*#__PURE__*/function () {
       function Ft() {
@@ -5209,33 +5195,33 @@ var app = (function () {
     var vo = Ji;
     var yo = "<?xml version=\"1.0\" standalone=\"no\"?>\n<svg version=\"1.1\"\n\txmlns:sodipodi=\"http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd\" xmlns:inkscape=\"http://www.inkscape.org/namespaces/inkscape\"\n\txmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"0.9em\" height=\"0.9em\"\n\tviewBox=\"0 0 1200 1200\" enable-background=\"new 0 0 1200 1200\">\n\t\t<path d=\"\n\t\t\tM669.727,273.516c-22.891-2.476-46.15-3.895-69.727-4.248c-103.025,0.457-209.823,25.517-310.913,73.536\n\t\t\tc-75.058,37.122-148.173,89.529-211.67,154.174C46.232,529.978,6.431,577.76,0,628.74c0.76,44.162,48.153,98.67,77.417,131.764\n\t\t\tc59.543,62.106,130.754,113.013,211.67,154.174c2.75,1.335,5.51,2.654,8.276,3.955l-75.072,131.102l102.005,60.286l551.416-960.033\n\t\t\tl-98.186-60.008L669.727,273.516z M902.563,338.995l-74.927,129.857c34.47,44.782,54.932,100.006,54.932,159.888\n\t\t\tc0,149.257-126.522,270.264-282.642,270.264c-6.749,0-13.29-0.728-19.922-1.172l-49.585,85.84c22.868,2.449,45.99,4.233,69.58,4.541\n\t\t\tc103.123-0.463,209.861-25.812,310.84-73.535c75.058-37.122,148.246-89.529,211.743-154.174\n\t\t\tc31.186-32.999,70.985-80.782,77.417-131.764c-0.76-44.161-48.153-98.669-77.417-131.763\n\t\t\tc-59.543-62.106-130.827-113.013-211.743-154.175C908.108,341.478,905.312,340.287,902.563,338.995L902.563,338.995z\n\t\t\tM599.927,358.478c6.846,0,13.638,0.274,20.361,0.732l-58.081,100.561c-81.514,16.526-142.676,85.88-142.676,168.897\n\t\t\tc0,20.854,3.841,40.819,10.913,59.325c0.008,0.021-0.008,0.053,0,0.074l-58.228,100.854\n\t\t\tc-34.551-44.823-54.932-100.229-54.932-160.182C317.285,479.484,443.808,358.477,599.927,358.478L599.927,358.478z M768.896,570.513\n\t\t\tL638.013,797.271c81.076-16.837,141.797-85.875,141.797-168.603C779.81,608.194,775.724,588.729,768.896,570.513L768.896,570.513z\"\n\t\t\t/>\n</svg>\n",
       xo = "<?xml version=\"1.0\" standalone=\"no\"?>\n<svg version=\"1.1\"\n\txmlns:sodipodi=\"http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd\" xmlns:inkscape=\"http://www.inkscape.org/namespaces/inkscape\"\n\txmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"0.9em\" height=\"0.9em\"\n\tviewBox=\"0 0 1200 1200\" enable-background=\"new 0 0 1200 1200\">\n\t\t<path id=\"path6686\" inkscape:connector-curvature=\"0\" d=\"M779.843,599.925c0,95.331-80.664,172.612-180.169,172.612\n\t\t\tc-99.504,0-180.168-77.281-180.168-172.612c0-95.332,80.664-172.612,180.168-172.612\n\t\t\tC699.179,427.312,779.843,504.594,779.843,599.925z M600,240.521c-103.025,0.457-209.814,25.538-310.904,73.557\n\t\t\tc-75.058,37.122-148.206,89.496-211.702,154.141C46.208,501.218,6.431,549,0,599.981c0.76,44.161,48.13,98.669,77.394,131.763\n\t\t\tc59.543,62.106,130.786,113.018,211.702,154.179c94.271,45.751,198.616,72.092,310.904,73.557\n\t\t\tc103.123-0.464,209.888-25.834,310.866-73.557c75.058-37.122,148.243-89.534,211.74-154.179\n\t\t\tc31.185-32.999,70.962-80.782,77.394-131.763c-0.76-44.161-48.13-98.671-77.394-131.764\n\t\t\tc-59.543-62.106-130.824-112.979-211.74-154.141C816.644,268.36,712.042,242.2,600,240.521z M599.924,329.769\n\t\t\tc156.119,0,282.675,120.994,282.675,270.251c0,149.256-126.556,270.25-282.675,270.25S317.249,749.275,317.249,600.02\n\t\t\tC317.249,450.763,443.805,329.769,599.924,329.769L599.924,329.769z\"/>\n</svg>\n";
-    var U = /*#__PURE__*/function () {
-      function U() {
-        _classCallCheck(this, U);
+    var q = /*#__PURE__*/function () {
+      function q() {
+        _classCallCheck(this, q);
       }
-      _createClass(U, null, [{
+      _createClass(q, null, [{
         key: "createSVGElement",
         value: function createSVGElement(e) {
           return new DOMParser().parseFromString(e, "image/svg+xml").documentElement;
         }
       }]);
-      return U;
+      return q;
     }();
     var rs = /*#__PURE__*/function () {
-      function Ve() {
-        _classCallCheck(this, Ve);
+      function Ge() {
+        _classCallCheck(this, Ge);
       }
-      _createClass(Ve, null, [{
+      _createClass(Ge, null, [{
         key: "changeVisibility",
         value:
         // prettier-ignore
         function changeVisibility(e, t, i, n) {
-          n.target.id === Ve.VISIBLE_ICON_ID ? (t.style.display = "none", i.style.display = "block", e.type = "password") : (t.style.display = "block", i.style.display = "none", e.type = "text");
+          n.target.id === Ge.VISIBLE_ICON_ID ? (t.style.display = "none", i.style.display = "block", e.type = "password") : (t.style.display = "block", i.style.display = "none", e.type = "text");
         }
       }, {
         key: "createIconElement",
         value: function createIconElement(e, t) {
-          var i = U.createSVGElement(e);
+          var i = q.createSVGElement(e);
           return i.id = t, i.classList.add("visibility-icon"), i;
         }
         // prettier-ignore
@@ -5244,13 +5230,13 @@ var app = (function () {
         value: function create(e) {
           var t = document.createElement("div");
           t.id = "visibility-icon-container";
-          var i = Ve.createIconElement(xo, Ve.VISIBLE_ICON_ID);
+          var i = Ge.createIconElement(xo, Ge.VISIBLE_ICON_ID);
           i.style.display = "none", t.appendChild(i);
-          var n = Ve.createIconElement(yo, "not-visible-icon");
-          return t.appendChild(n), t.onclick = Ve.changeVisibility.bind(this, e, i, n), t;
+          var n = Ge.createIconElement(yo, "not-visible-icon");
+          return t.appendChild(n), t.onclick = Ge.changeVisibility.bind(this, e, i, n), t;
         }
       }]);
-      return Ve;
+      return Ge;
     }();
     rs.VISIBLE_ICON_ID = "visible-icon";
     var Eo = rs;
@@ -5454,113 +5440,69 @@ var app = (function () {
     var xn = yt;
     var En = {
         model_list: [{
-          model_url: "https://huggingface.co/mlc-ai/mlc-chat-Llama-2-7b-chat-hf-q4f32_1/resolve/main/",
+          model_url: "https://huggingface.co/mlc-ai/Llama-2-7b-chat-hf-q4f32_1-MLC/resolve/main/",
           local_id: "Llama-2-7b-chat-hf-q4f32_1",
-          model_lib_url: "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/Llama-2-7b-chat-hf-q4f32_1-webgpu.wasm"
+          model_lib_url: "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/Llama-2-7b-chat-hf/Llama-2-7b-chat-hf-q4f32_1-ctx4k_cs1k-webgpu.wasm"
         }, {
-          model_url: "https://huggingface.co/mlc-ai/mlc-chat-Llama-2-13b-chat-hf-q4f32_1/resolve/main/",
-          local_id: "Llama-2-13b-chat-hf-q4f32_1",
-          model_lib_url: "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/Llama-2-13b-chat-hf-q4f32_1-webgpu.wasm"
-        }, {
-          model_url: "https://huggingface.co/mlc-ai/mlc-chat-Llama-2-7b-chat-hf-q4f16_1/resolve/main/",
+          model_url: "https://huggingface.co/mlc-ai/Llama-2-7b-chat-hf-q4f16_1-MLC/resolve/main/",
           local_id: "Llama-2-7b-chat-hf-q4f16_1",
-          model_lib_url: "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/Llama-2-7b-chat-hf-q4f16_1-webgpu.wasm",
+          model_lib_url: "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/Llama-2-7b-chat-hf/Llama-2-7b-chat-hf-q4f16_1-ctx4k_cs1k-webgpu.wasm",
           required_features: ["shader-f16"]
         }, {
-          model_url: "https://huggingface.co/mlc-ai/mlc-chat-Llama-2-13b-chat-hf-q4f16_1/resolve/main/",
+          model_url: "https://huggingface.co/mlc-ai/Llama-2-13b-chat-hf-q4f16_1-MLC/resolve/main/",
           local_id: "Llama-2-13b-chat-hf-q4f16_1",
-          model_lib_url: "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/Llama-2-13b-chat-hf-q4f16_1-webgpu.wasm",
+          model_lib_url: "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/Llama-2-13b-chat-hf/Llama-2-13b-chat-hf-q4f16_1-ctx4k_cs1k-webgpu.wasm",
           required_features: ["shader-f16"]
         }, {
-          model_url: "https://huggingface.co/mlc-ai/mlc-chat-Llama-2-70b-chat-hf-q4f16_1/resolve/main/",
+          model_url: "https://huggingface.co/mlc-ai/Llama-2-70b-chat-hf-q4f16_1-MLC/resolve/main/",
           local_id: "Llama-2-70b-chat-hf-q4f16_1",
-          model_lib_url: "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/Llama-2-70b-chat-hf-q4f16_1-webgpu.wasm",
+          model_lib_url: "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/Llama-2-70b-chat-hf/Llama-2-70b-chat-hf-q4f16_1-ctx4k_cs1k-webgpu.wasm",
           required_features: ["shader-f16"]
         }, {
-          model_url: "https://huggingface.co/mlc-ai/mlc-chat-RedPajama-INCITE-Chat-3B-v1-q4f16_1/resolve/main/",
+          model_url: "https://huggingface.co/mlc-ai/RedPajama-INCITE-Chat-3B-v1-q4f16_1-MLC/resolve/main/",
           local_id: "RedPajama-INCITE-Chat-3B-v1-q4f16_1",
-          model_lib_url: "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/RedPajama-INCITE-Chat-3B-v1-q4f16_1-webgpu.wasm",
+          model_lib_url: "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/RedPajama-INCITE-Chat-3B-v1/RedPajama-INCITE-Chat-3B-v1-q4f16_1-ctx2k-webgpu.wasm",
           required_features: ["shader-f16"]
         }, {
-          model_url: "https://huggingface.co/mlc-ai/mlc-chat-RedPajama-INCITE-Chat-3B-v1-q4f32_1/resolve/main/",
+          model_url: "https://huggingface.co/mlc-ai/RedPajama-INCITE-Chat-3B-v1-q4f32_1-MLC/resolve/main/",
           local_id: "RedPajama-INCITE-Chat-3B-v1-q4f32_1",
-          model_lib_url: "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/RedPajama-INCITE-Chat-3B-v1-q4f32_1-webgpu.wasm"
+          model_lib_url: "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/RedPajama-INCITE-Chat-3B-v1/RedPajama-INCITE-Chat-3B-v1-q4f32_1-ctx2k-webgpu.wasm"
         }, {
-          model_url: "https://huggingface.co/mlc-ai/mlc-chat-WizardCoder-15B-V1.0-q4f16_1/resolve/main/",
-          local_id: "WizardCoder-15B-V1.0-q4f16_1",
-          model_lib_url: "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/WizardCoder-15B-V1.0-q4f16_1-webgpu.wasm",
-          required_features: ["shader-f16"]
-        }, {
-          model_url: "https://huggingface.co/mlc-ai/mlc-chat-WizardCoder-15B-V1.0-q4f32_1/resolve/main/",
-          local_id: "WizardCoder-15B-V1.0-q4f32_1",
-          model_lib_url: "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/WizardCoder-15B-V1.0-q4f32_1-webgpu.wasm"
-        }, {
-          model_url: "https://huggingface.co/mlc-ai/mlc-chat-WizardMath-7B-V1.0-q4f16_1/resolve/main/",
-          local_id: "WizardMath-7B-V1.0-q4f16_1",
-          model_lib_url: "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/Llama-2-7b-chat-hf-q4f16_1-webgpu.wasm",
-          required_features: ["shader-f16"]
-        }, {
-          model_url: "https://huggingface.co/mlc-ai/mlc-chat-WizardMath-7B-V1.0-q4f32_1/resolve/main/",
-          local_id: "WizardMath-7B-V1.0-q4f32_1",
-          model_lib_url: "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/Llama-2-7b-chat-hf-q4f32_1-webgpu.wasm"
-        }, {
-          model_url: "https://huggingface.co/mlc-ai/mlc-chat-WizardMath-7B-V1.1-q4f16_1/resolve/main/",
+          model_url: "https://huggingface.co/mlc-ai/WizardMath-7B-V1.1-q4f16_1-MLC/resolve/main/",
           local_id: "WizardMath-7B-V1.1-q4f16_1",
-          model_lib_url: "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/Mistral-7B-Instruct-v0.1-q4f16_1-sw4k_cs1k-webgpu.wasm",
+          model_lib_url: "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/Mistral-7B-Instruct-v0.2/Mistral-7B-Instruct-v0.2-q4f16_1-sw4k_cs1k-webgpu.wasm",
           required_features: ["shader-f16"]
         }, {
-          model_url: "https://huggingface.co/mlc-ai/mlc-chat-WizardMath-13B-V1.0-q4f16_1/resolve/main/",
-          local_id: "WizardMath-13B-V1.0-q4f16_1",
-          model_lib_url: "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/Llama-2-13b-chat-hf-q4f16_1-webgpu.wasm",
+          model_url: "https://huggingface.co/mlc-ai/Mistral-7B-Instruct-v0.2-q4f16_1-MLC/resolve/main/",
+          local_id: "Mistral-7B-Instruct-v0.2-q4f16_1",
+          model_lib_url: "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/Mistral-7B-Instruct-v0.2/Mistral-7B-Instruct-v0.2-q4f16_1-sw4k_cs1k-webgpu.wasm",
           required_features: ["shader-f16"]
         }, {
-          model_url: "https://huggingface.co/mlc-ai/mlc-chat-WizardMath-70B-V1.0-q4f16_1/resolve/main/",
-          local_id: "WizardMath-70B-V1.0-q4f16_1",
-          model_lib_url: "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/Llama-2-70b-chat-hf-q4f16_1-webgpu.wasm",
-          required_features: ["shader-f16"]
-        }, {
-          model_url: "https://huggingface.co/mlc-ai/mlc-chat-Mistral-7B-Instruct-v0.1-q4f16_1/resolve/main/",
-          local_id: "Mistral-7B-Instruct-v0.1-q4f16_1",
-          model_lib_url: "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/Mistral-7B-Instruct-v0.1-q4f16_1-sw4k_cs1k-webgpu.wasm",
-          required_features: ["shader-f16"]
-        }, {
-          model_url: "https://huggingface.co/mlc-ai/mlc-chat-Mistral-7B-Instruct-v0.1-q4f32_1/resolve/main/",
-          local_id: "Mistral-7B-Instruct-v0.1-q4f32_1",
-          model_lib_url: "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/Mistral-7B-Instruct-v0.1-q4f32_1-sw4k_cs1k-webgpu.wasm"
-        }, {
-          model_url: "https://huggingface.co/mlc-ai/mlc-chat-OpenHermes-2.5-Mistral-7B-q4f16_1/resolve/main/",
+          model_url: "https://huggingface.co/mlc-ai/OpenHermes-2.5-Mistral-7B-q4f16_1-MLC/resolve/main/",
           local_id: "OpenHermes-2.5-Mistral-7B-q4f16_1",
-          model_lib_url: "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/Mistral-7B-Instruct-v0.1-q4f16_1-sw4k_cs1k-webgpu.wasm",
+          model_lib_url: "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/Mistral-7B-Instruct-v0.2/Mistral-7B-Instruct-v0.2-q4f16_1-sw4k_cs1k-webgpu.wasm",
           required_features: ["shader-f16"]
         }, {
-          model_url: "https://huggingface.co/mlc-ai/mlc-chat-OpenHermes-2.5-Mistral-7B-q4f32_1/resolve/main/",
-          local_id: "OpenHermes-2.5-Mistral-7B-q4f32_1",
-          model_lib_url: "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/Mistral-7B-Instruct-v0.1-q4f32_1-sw4k_cs1k-webgpu.wasm"
-        }, {
-          model_url: "https://huggingface.co/mlc-ai/mlc-chat-NeuralHermes-2.5-Mistral-7B-q4f16_1/resolve/main/",
+          model_url: "https://huggingface.co/mlc-ai/NeuralHermes-2.5-Mistral-7B-q4f16_1-MLC/resolve/main/",
           local_id: "NeuralHermes-2.5-Mistral-7B-q4f16_1",
-          model_lib_url: "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/Mistral-7B-Instruct-v0.1-q4f16_1-sw4k_cs1k-webgpu.wasm",
+          model_lib_url: "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/Mistral-7B-Instruct-v0.2/Mistral-7B-Instruct-v0.2-q4f16_1-sw4k_cs1k-webgpu.wasm",
           required_features: ["shader-f16"]
-        }, {
-          model_url: "https://huggingface.co/mlc-ai/mlc-chat-NeuralHermes-2.5-Mistral-7B-q4f32_1/resolve/main/",
-          local_id: "NeuralHermes-2.5-Mistral-7B-q4f32_1",
-          model_lib_url: "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/Mistral-7B-Instruct-v0.1-q4f32_1-sw4k_cs1k-webgpu.wasm"
         },
         // Models below fit for 128MB buffer limit (e.g. webgpu on Android)
         {
-          model_url: "https://huggingface.co/mlc-ai/mlc-chat-Llama-2-7b-chat-hf-q4f16_1-1k/resolve/main/",
+          model_url: "https://huggingface.co/mlc-ai/Llama-2-7b-chat-hf-q4f16_1-MLC/resolve/main/",
           local_id: "Llama-2-7b-chat-hf-q4f16_1-1k",
-          model_lib_url: "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/Llama-2-7b-chat-hf-q4f16_1-1k-webgpu.wasm",
+          model_lib_url: "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/Llama-2-7b-chat-hf/Llama-2-7b-chat-hf-q4f16_1-ctx1k-webgpu.wasm",
           required_features: ["shader-f16"]
         }, {
-          model_url: "https://huggingface.co/mlc-ai/mlc-chat-RedPajama-INCITE-Chat-3B-v1-q4f16_1-1k/resolve/main/",
+          model_url: "https://huggingface.co/mlc-ai/RedPajama-INCITE-Chat-3B-v1-q4f16_1-MLC/resolve/main/",
           local_id: "RedPajama-INCITE-Chat-3B-v1-q4f16_1-1k",
-          model_lib_url: "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/RedPajama-INCITE-Chat-3B-v1-q4f16_1-1k-webgpu.wasm",
+          model_lib_url: "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/RedPajama-INCITE-Chat-3B-v1/RedPajama-INCITE-Chat-3B-v1-q4f16_1-ctx1k-webgpu.wasm",
           required_features: ["shader-f16"]
         }, {
-          model_url: "https://huggingface.co/mlc-ai/mlc-chat-RedPajama-INCITE-Chat-3B-v1-q4f32_1-1k/resolve/main/",
+          model_url: "https://huggingface.co/mlc-ai/RedPajama-INCITE-Chat-3B-v1-q4f32_1-MLC/resolve/main/",
           local_id: "RedPajama-INCITE-Chat-3B-v1-q4f32_1-1k",
-          model_lib_url: "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/RedPajama-INCITE-Chat-3B-v1-q4f32_1-1k-webgpu.wasm"
+          model_lib_url: "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/RedPajama-INCITE-Chat-3B-v1/RedPajama-INCITE-Chat-3B-v1-q4f32_1-ctx1k-webgpu.wasm"
         }],
         use_web_worker: !0
       },
@@ -5743,23 +5685,22 @@ var app = (function () {
                     };
                     M.chat.setInitProgressCallback(n);
                     _context25.prev = 4;
-                    _this$getConfig = this.getConfig(), u = _this$getConfig.model, h = _this$getConfig.appConfig, p = {
-                      conv_config: {
-                        system: "keep responses to one sentence"
-                      }
-                    };
+                    _this$getConfig = this.getConfig(), u = _this$getConfig.model, h = _this$getConfig.appConfig, p = {};
+                    this._webModel.instruction && (p.conv_config = {
+                      system: this._webModel.instruction
+                    });
                     this._conversationHistory.length > 0 && (p.conversation_history = this._conversationHistory);
-                    _context25.next = 9;
+                    _context25.next = 10;
                     return M.chat.reload(u, p, h, t);
-                  case 9:
+                  case 10:
                     r = _context25.sent;
-                    _context25.next = 15;
+                    _context25.next = 16;
                     break;
-                  case 12:
-                    _context25.prev = 12;
+                  case 13:
+                    _context25.prev = 13;
                     _context25.t0 = _context25["catch"](4);
                     return _context25.abrupt("return", this.unloadChat(_context25.t0));
-                  case 15:
+                  case 16:
                     if ((a = this._webModel.introMessage) != null && a.removeAfterLoad) this._webModel.introMessage.displayed === !1 ? (c = this._messages) == null || c.removeLastMessage() : (d = this._removeIntro) == null || d.call(this);else {
                       _u = xn.setUpAfterLoad(r, this._webModel.introMessage, this._chatEl, !!this._webModel.worker);
                       (l = this._messages) == null || l.addNewMessage({
@@ -5769,11 +5710,11 @@ var app = (function () {
                       });
                     }
                     this._isModelLoaded = !0, this._isModelLoading = !1;
-                  case 17:
+                  case 18:
                   case "end":
                     return _context25.stop();
                 }
-              }, _callee25, this, [[4, 12]]);
+              }, _callee25, this, [[4, 13]]);
             }));
             function loadModel(_x47, _x48) {
               return _loadModel.apply(this, arguments);
@@ -5964,7 +5905,7 @@ var app = (function () {
                         console.error(l);
                         c = a ? this.streamHandlers.onClose : this.completionsHandlers.onFinish;
                         E.onInterceptorError(e, l, c);
-                      } else this.generateRespByType(e, r, !!this.deepChat.stream, i);
+                      } else this.generateRespByType(e, r.text, !!this.deepChat.stream, i);
                     } catch (l) {
                       this.unloadChat(l);
                     }
@@ -6138,8 +6079,8 @@ var app = (function () {
       }]);
       return Bt;
     }();
-    var os = /*#__PURE__*/function (_q) {
-      _inherits(ji, _q);
+    var os = /*#__PURE__*/function (_U) {
+      _inherits(ji, _U);
       var _super4 = _createSuper(ji);
       // prettier-ignore
       function ji(e, t, i, n, r, o) {
@@ -6174,7 +6115,7 @@ var app = (function () {
                   throw new Error("Request settings have not been set up");
                 case 2:
                   n = this.preprocessBody(this.rawBody, t, i);
-                  w.request(this, n, e);
+                  _.request(this, n, e);
                 case 4:
                 case "end":
                   return _context34.stop();
@@ -6188,7 +6129,7 @@ var app = (function () {
         }()
       }]);
       return ji;
-    }(q);
+    }(U);
     os.URL_PREFIX = "https://api-inference.huggingface.co/models/";
     var Pe = os;
     var xt = /*#__PURE__*/function (_Pe) {
@@ -6226,7 +6167,7 @@ var app = (function () {
                   }
                   throw new Error("No file was added");
                 case 4:
-                  w.poll(this, i[0], e, !1);
+                  _.poll(this, i[0], e, !1);
                 case 5:
                 case "end":
                   return _context35.stop();
@@ -6246,12 +6187,12 @@ var app = (function () {
       }]);
       return xt;
     }(Pe);
-    var _o = /*#__PURE__*/function (_xt) {
-      _inherits(_o, _xt);
-      var _super6 = _createSuper(_o);
+    var So = /*#__PURE__*/function (_xt) {
+      _inherits(So, _xt);
+      var _super6 = _createSuper(So);
       // prettier-ignore
-      function _o(e) {
-        _classCallCheck(this, _o);
+      function So(e) {
+        _classCallCheck(this, So);
         var n, r, o;
         var t = (r = (n = e.directConnection) == null ? void 0 : n.huggingFace) == null ? void 0 : r.audioClassification,
           i = (o = e.directConnection) == null ? void 0 : o.huggingFace;
@@ -6259,7 +6200,7 @@ var app = (function () {
           audio: {}
         });
       }
-      _createClass(_o, [{
+      _createClass(So, [{
         key: "extractPollResultData",
         value: function () {
           var _extractPollResultData = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee36(e) {
@@ -6296,13 +6237,13 @@ var app = (function () {
           return extractPollResultData;
         }()
       }]);
-      return _o;
+      return So;
     }(xt);
-    var So = /*#__PURE__*/function (_xt2) {
-      _inherits(So, _xt2);
-      var _super7 = _createSuper(So);
-      function So(e) {
-        _classCallCheck(this, So);
+    var wo = /*#__PURE__*/function (_xt2) {
+      _inherits(wo, _xt2);
+      var _super7 = _createSuper(wo);
+      function wo(e) {
+        _classCallCheck(this, wo);
         var n, r, o;
         var t = (r = (n = e.directConnection) == null ? void 0 : n.huggingFace) == null ? void 0 : r.imageClassification,
           i = (o = e.directConnection) == null ? void 0 : o.huggingFace;
@@ -6310,7 +6251,7 @@ var app = (function () {
           images: {}
         });
       }
-      _createClass(So, [{
+      _createClass(wo, [{
         key: "extractPollResultData",
         value: function () {
           var _extractPollResultData2 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee37(e) {
@@ -6347,7 +6288,7 @@ var app = (function () {
           return extractPollResultData;
         }()
       }]);
-      return So;
+      return wo;
     }(xt);
     var Et = "data:image/png;base64,";
     var re = /*#__PURE__*/function () {
@@ -6380,8 +6321,8 @@ var app = (function () {
       }]);
       return re;
     }();
-    var ni = /*#__PURE__*/function (_q2) {
-      _inherits(ni, _q2);
+    var ni = /*#__PURE__*/function (_U2) {
+      _inherits(ni, _U2);
       var _super8 = _createSuper(ni);
       // prettier-ignore
       function ni(e, t, i, n, r) {
@@ -6391,7 +6332,7 @@ var app = (function () {
         return _this16;
       }
       return _createClass(ni);
-    }(q);
+    }(U);
     var zt = /*#__PURE__*/function (_ni) {
       _inherits(zt, _ni);
       var _super9 = _createSuper(zt);
@@ -6444,7 +6385,7 @@ var app = (function () {
                   throw new Error("Image was not found");
                 case 4:
                   n = this.createFormDataBody(this.rawBody, i[0]);
-                  E.tempRemoveContentHeader(this.requestSettings, w.request.bind(this, this, n, e), !1);
+                  E.tempRemoveContentHeader(this.requestSettings, _.request.bind(this, this, n, e), !1);
                 case 6:
                 case "end":
                   return _context38.stop();
@@ -6501,12 +6442,12 @@ var app = (function () {
       }]);
       return zt;
     }(ni);
-    var qt = /*#__PURE__*/function (_ni2) {
-      _inherits(qt, _ni2);
-      var _super10 = _createSuper(qt);
-      function qt(e) {
+    var Ut = /*#__PURE__*/function (_ni2) {
+      _inherits(Ut, _ni2);
+      var _super10 = _createSuper(Ut);
+      function Ut(e) {
         var _this18;
-        _classCallCheck(this, qt);
+        _classCallCheck(this, Ut);
         var o;
         var t = JSON.parse(JSON.stringify(e.directConnection)),
           i = t == null ? void 0 : t.stabilityAI,
@@ -6520,10 +6461,10 @@ var app = (function () {
           };
         _this18 = _super10.call(this, e, re.buildKeyVerificationDetails(), re.buildHeaders, i, n), _this18.url = "https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v1-0/image-to-image/masking", _this18._maskSource = "MASK_IMAGE_WHITE", _this18.textInputPlaceholderText = "Describe image changes", _this18.introPanelMarkUp = "\n    <div style=\"width: 100%; text-align: center; margin-left: -10px\"><b>Stability AI</b></div>\n    <div style=\"width: 100%; text-align: center; margin-left: -10px; margin-top: 5px\"><b>Image to Image Masking</b></div>\n    <p>Upload an image, its mask image to create a new one based on the changes you have described for the mask area.</p>\n    <p>Click <a href=\"https://platform.stability.ai/\">here</a> for more info.</p>";
         var r = (o = t == null ? void 0 : t.stabilityAI) == null ? void 0 : o.imageToImageMasking;
-        _typeof(r) == "object" && (r.engine_id && (_this18.url = "https://api.stability.ai/v1/generation/".concat(r.engine_id, "/image-to-image/masking")), r.weight !== void 0 && r.weight !== null && (_this18._imageWeight = r.weight), r.mask_source !== void 0 && r.mask_source !== null && (_this18._maskSource = r.mask_source), qt.cleanConfig(r), Object.assign(_this18.rawBody, r)), _this18.canSendMessage = qt.canSendFileTextMessage;
+        _typeof(r) == "object" && (r.engine_id && (_this18.url = "https://api.stability.ai/v1/generation/".concat(r.engine_id, "/image-to-image/masking")), r.weight !== void 0 && r.weight !== null && (_this18._imageWeight = r.weight), r.mask_source !== void 0 && r.mask_source !== null && (_this18._maskSource = r.mask_source), Ut.cleanConfig(r), Object.assign(_this18.rawBody, r)), _this18.canSendMessage = Ut.canSendFileTextMessage;
         return _this18;
       }
-      _createClass(qt, [{
+      _createClass(Ut, [{
         key: "createFormDataBody",
         value: function createFormDataBody(e, t, i, n) {
           var r = new FormData();
@@ -6553,7 +6494,7 @@ var app = (function () {
                   throw new Error("Image was not found");
                 case 4:
                   n = (a = (o = t[t.length - 1]) == null ? void 0 : o.text) == null ? void 0 : a.trim(), r = this.createFormDataBody(this.rawBody, i[0], i[1], n);
-                  E.tempRemoveContentHeader(this.requestSettings, w.request.bind(this, this, r, e), !1);
+                  E.tempRemoveContentHeader(this.requestSettings, _.request.bind(this, this, r, e), !1);
                 case 6:
                 case "end":
                   return _context40.stop();
@@ -6608,13 +6549,13 @@ var app = (function () {
           return !!(t != null && t[0]) && !!(e && e.trim() !== "");
         }
       }]);
-      return qt;
+      return Ut;
     }(ni);
-    var wo = /*#__PURE__*/function (_xt3) {
-      _inherits(wo, _xt3);
-      var _super11 = _createSuper(wo);
-      function wo(e) {
-        _classCallCheck(this, wo);
+    var _o = /*#__PURE__*/function (_xt3) {
+      _inherits(_o, _xt3);
+      var _super11 = _createSuper(_o);
+      function _o(e) {
+        _classCallCheck(this, _o);
         var n, r, o;
         var t = (r = (n = e.directConnection) == null ? void 0 : n.huggingFace) == null ? void 0 : r.audioSpeechRecognition,
           i = (o = e.directConnection) == null ? void 0 : o.huggingFace;
@@ -6622,7 +6563,7 @@ var app = (function () {
           audio: {}
         });
       }
-      _createClass(wo, [{
+      _createClass(_o, [{
         key: "extractPollResultData",
         value: function () {
           var _extractPollResultData3 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee42(e) {
@@ -6658,7 +6599,7 @@ var app = (function () {
           return extractPollResultData;
         }()
       }]);
-      return wo;
+      return _o;
     }(xt);
     var Mo = /*#__PURE__*/function (_Pe2) {
       _inherits(Mo, _Pe2);
@@ -6880,12 +6821,12 @@ var app = (function () {
       }]);
       return Ao;
     }(Pe);
-    var Ut = /*#__PURE__*/function (_ni3) {
-      _inherits(Ut, _ni3);
-      var _super16 = _createSuper(Ut);
-      function Ut(e) {
+    var qt = /*#__PURE__*/function (_ni3) {
+      _inherits(qt, _ni3);
+      var _super16 = _createSuper(qt);
+      function qt(e) {
         var _this21;
-        _classCallCheck(this, Ut);
+        _classCallCheck(this, qt);
         var o;
         var t = JSON.parse(JSON.stringify(e.directConnection)),
           i = t.stabilityAI,
@@ -6899,10 +6840,10 @@ var app = (function () {
           };
         _this21 = _super16.call(this, e, re.buildKeyVerificationDetails(), re.buildHeaders, i, n), _this21.url = "https://api.stability.ai/v1/generation/stable-diffusion-v1-6/image-to-image", _this21.textInputPlaceholderText = "Describe image changes", _this21.introPanelMarkUp = "\n    <div style=\"width: 100%; text-align: center; margin-left: -10px\"><b>Stability AI: Image to Image</b></div>\n    <p>Upload an image to create a new one with the changes you have described.</p>\n    <p>Click <a href=\"https://platform.stability.ai/\">here</a> for more info.</p>";
         var r = (o = t.stabilityAI) == null ? void 0 : o.imageToImage;
-        _typeof(r) == "object" && (r.engine_id && (_this21.url = "https://api.stability.ai/v1/generation/".concat(r.engine_id, "/text-to-image")), r.weight !== void 0 && r.weight !== null && (_this21._imageWeight = r.weight), Ut.cleanConfig(r), Object.assign(_this21.rawBody, r)), _this21.canSendMessage = Ut.canSendFileTextMessage;
+        _typeof(r) == "object" && (r.engine_id && (_this21.url = "https://api.stability.ai/v1/generation/".concat(r.engine_id, "/text-to-image")), r.weight !== void 0 && r.weight !== null && (_this21._imageWeight = r.weight), qt.cleanConfig(r), Object.assign(_this21.rawBody, r)), _this21.canSendMessage = qt.canSendFileTextMessage;
         return _this21;
       }
-      _createClass(Ut, [{
+      _createClass(qt, [{
         key: "createFormDataBody",
         value: function createFormDataBody(e, t, i) {
           var n = new FormData();
@@ -6932,7 +6873,7 @@ var app = (function () {
                   throw new Error("Image was not found");
                 case 4:
                   n = (a = (o = t[t.length - 1]) == null ? void 0 : o.text) == null ? void 0 : a.trim(), r = this.createFormDataBody(this.rawBody, i[0], n);
-                  E.tempRemoveContentHeader(this.requestSettings, w.request.bind(this, this, r, e), !1);
+                  E.tempRemoveContentHeader(this.requestSettings, _.request.bind(this, this, r, e), !1);
                 case 6:
                 case "end":
                   return _context47.stop();
@@ -6987,7 +6928,7 @@ var app = (function () {
           return !!(t != null && t[0]) && !!(e && e.trim() !== "");
         }
       }]);
-      return Ut;
+      return qt;
     }(ni);
     var ko = /*#__PURE__*/function (_Pe6) {
       _inherits(ko, _Pe6);
@@ -7067,7 +7008,7 @@ var app = (function () {
                   throw new Error("Request settings have not been set up");
                 case 2:
                   i = this.preprocessBody(this.rawBody, t[t.length - 1].text);
-                  w.request(this, i, e);
+                  _.request(this, i, e);
                 case 4:
                 case "end":
                   return _context50.stop();
@@ -7166,11 +7107,11 @@ var app = (function () {
       }]);
       return Io;
     }(Pe);
-    var Vt = /*#__PURE__*/function () {
-      function Vt() {
-        _classCallCheck(this, Vt);
+    var Gt = /*#__PURE__*/function () {
+      function Gt() {
+        _classCallCheck(this, Gt);
       }
-      _createClass(Vt, null, [{
+      _createClass(Gt, null, [{
         key: "buildHeaders",
         value: function buildHeaders(e) {
           return {
@@ -7192,26 +7133,26 @@ var app = (function () {
           return {
             url: "https://api.cohere.ai/v1/generate",
             method: "POST",
-            handleVerificationResult: Vt.handleVerificationResult,
+            handleVerificationResult: Gt.handleVerificationResult,
             body: JSON.stringify({
               prompt: ""
             })
           };
         }
       }]);
-      return Vt;
+      return Gt;
     }();
-    var Yi = /*#__PURE__*/function (_q3) {
-      _inherits(Yi, _q3);
+    var Yi = /*#__PURE__*/function (_U3) {
+      _inherits(Yi, _U3);
       var _super20 = _createSuper(Yi);
       function Yi(e, t, i, n, r) {
         var _this24;
         _classCallCheck(this, Yi);
-        _this24 = _super20.call(this, e, Vt.buildKeyVerificationDetails(), Vt.buildHeaders, r), _this24.insertKeyPlaceholderText = "Cohere API Key", _this24.getKeyLink = "https://dashboard.cohere.ai/api-keys", _this24.permittedErrorPrefixes = ["invalid"], _this24.url = t, _this24.textInputPlaceholderText = i, n && _typeof(n) == "object" && Object.assign(_this24.rawBody, n);
+        _this24 = _super20.call(this, e, Gt.buildKeyVerificationDetails(), Gt.buildHeaders, r), _this24.insertKeyPlaceholderText = "Cohere API Key", _this24.getKeyLink = "https://dashboard.cohere.ai/api-keys", _this24.permittedErrorPrefixes = ["invalid"], _this24.url = t, _this24.textInputPlaceholderText = i, n && _typeof(n) == "object" && Object.assign(_this24.rawBody, n);
         return _this24;
       }
       return _createClass(Yi);
-    }(q);
+    }(U);
     var Lo = /*#__PURE__*/function (_Yi) {
       _inherits(Lo, _Yi);
       var _super21 = _createSuper(Lo);
@@ -7246,7 +7187,7 @@ var app = (function () {
                   throw new Error("Request settings have not been set up");
                 case 2:
                   i = this.preprocessBody(this.rawBody, t);
-                  w.request(this, i, e);
+                  _.request(this, i, e);
                 case 4:
                 case "end":
                   return _context53.stop();
@@ -7323,7 +7264,7 @@ var app = (function () {
                   throw new Error("Request settings have not been set up");
                 case 2:
                   i = this.preprocessBody(this.rawBody, t);
-                  w.request(this, i, e);
+                  _.request(this, i, e);
                 case 4:
                 case "end":
                   return _context55.stop();
@@ -7493,8 +7434,8 @@ var app = (function () {
       }]);
       return O;
     }();
-    var Zi = /*#__PURE__*/function (_q4) {
-      _inherits(Fi, _q4);
+    var Zi = /*#__PURE__*/function (_U4) {
+      _inherits(Fi, _U4);
       var _super23 = _createSuper(Fi);
       function Fi(e) {
         var _o$model, _a$voice;
@@ -7532,7 +7473,7 @@ var app = (function () {
                 case 2:
                   this.url = this.requestSettings.url || this.url;
                   i = this.preprocessBody(this.rawBody, t);
-                  w.request(this, i, e);
+                  _.request(this, i, e);
                 case 5:
                 case "end":
                   return _context60.stop();
@@ -7589,12 +7530,12 @@ var app = (function () {
         }()
       }]);
       return Fi;
-    }(q);
+    }(U);
     Zi.DEFAULT_MODEL = "tts-1";
     Zi.DEFAULT_VOIDE = "alloy";
     var Oo = Zi;
-    var si = /*#__PURE__*/function (_q5) {
-      _inherits(Ee, _q5);
+    var si = /*#__PURE__*/function (_U5) {
+      _inherits(Ee, _U5);
       var _super24 = _createSuper(Ee);
       function Ee(e) {
         var _o$model2;
@@ -7646,7 +7587,7 @@ var app = (function () {
                 case 4:
                   this.url = this.requestSettings.url || this._service_url;
                   n = this.preprocessBody(this.rawBody, t), r = Ee.createFormDataBody(n, i[0]);
-                  E.tempRemoveContentHeader(this.requestSettings, w.request.bind(this, this, r, e), !1);
+                  E.tempRemoveContentHeader(this.requestSettings, _.request.bind(this, this, r, e), !1);
                 case 7:
                 case "end":
                   return _context62.stop();
@@ -7705,7 +7646,7 @@ var app = (function () {
         }
       }]);
       return Ee;
-    }(q);
+    }(U);
     si.AUDIO_TRANSCRIPTIONS_URL = "https://api.openai.com/v1/audio/transcriptions";
     si.AUDIO_TRANSLATIONS_URL = "https://api.openai.com/v1/audio/translations";
     si.DEFAULT_MODEL = "whisper-1";
@@ -7812,8 +7753,8 @@ var app = (function () {
       }]);
       return Z;
     }();
-    var Po = /*#__PURE__*/function (_q6) {
-      _inherits(Po, _q6);
+    var Po = /*#__PURE__*/function (_U6) {
+      _inherits(Po, _U6);
       var _super25 = _createSuper(Po);
       // prettier-ignore
       function Po(e, t, i, n, r) {
@@ -7825,7 +7766,7 @@ var app = (function () {
         return _this27;
       }
       return _createClass(Po);
-    }(q);
+    }(U);
     var Do = /*#__PURE__*/function (_Po) {
       _inherits(Do, _Po);
       var _super26 = _createSuper(Do);
@@ -7871,7 +7812,7 @@ var app = (function () {
                   throw new Error("Request settings have not been set up");
                 case 2:
                   i = this.preprocessBody(this.rawBody, t);
-                  w.request(this, i, e), this.messages = e;
+                  _.request(this, i, e), this.messages = e;
                 case 4:
                 case "end":
                   return _context64.stop();
@@ -7902,7 +7843,7 @@ var app = (function () {
                       method: "GET",
                       headers: (t = this.requestSettings) == null ? void 0 : t.headers
                     };
-                    w.executePollRequest(this, _i9, n, this.messages);
+                    _.executePollRequest(this, _i9, n, this.messages);
                   }
                   return _context65.abrupt("return", {
                     makingAnotherRequest: !0
@@ -8087,8 +8028,8 @@ var app = (function () {
       }]);
       return ct;
     }();
-    var Xi = /*#__PURE__*/function (_q7) {
-      _inherits(Xi, _q7);
+    var Xi = /*#__PURE__*/function (_U7) {
+      _inherits(Xi, _U7);
       var _super27 = _createSuper(Xi);
       function Xi(e) {
         var _this29;
@@ -8120,7 +8061,7 @@ var app = (function () {
                   }
                   throw new Error("No file was added");
                 case 4:
-                  w.request(this, i[0], e, !1);
+                  _.request(this, i[0], e, !1);
                 case 5:
                 case "end":
                   return _context68.stop();
@@ -8172,9 +8113,9 @@ var app = (function () {
         }
       }]);
       return Xi;
-    }(q);
-    var as = /*#__PURE__*/function (_q8) {
-      _inherits(as, _q8);
+    }(U);
+    var as = /*#__PURE__*/function (_U8) {
+      _inherits(as, _U8);
       var _super28 = _createSuper(as);
       // prettier-ignore
       function as(e, t, i, n, r) {
@@ -8186,7 +8127,7 @@ var app = (function () {
         return _this30;
       }
       return _createClass(as);
-    }(q);
+    }(U);
     var ls = /*#__PURE__*/function (_as) {
       _inherits(cs, _as);
       var _super29 = _createSuper(cs);
@@ -8222,7 +8163,7 @@ var app = (function () {
                   throw new Error("Request settings have not been set up");
                 case 2:
                   i = this.preprocessBody(this.rawBody, t);
-                  w.request(this, i, e, !1);
+                  _.request(this, i, e, !1);
                 case 4:
                 case "end":
                   return _context70.stop();
@@ -8311,7 +8252,7 @@ var app = (function () {
                   }
                   throw new Error("No file was added");
                 case 4:
-                  (r = this.requestSettings) != null && r.headers && (this.requestSettings.headers["Content-Type"] = i[0].name.toLocaleLowerCase().endsWith(".wav") ? "audio/wav; codecs=audio/pcm; samplerate=16000" : "audio/ogg; codecs=opus"), w.request(this, i[0], e, !1);
+                  (r = this.requestSettings) != null && r.headers && (this.requestSettings.headers["Content-Type"] = i[0].name.toLocaleLowerCase().endsWith(".wav") ? "audio/wav; codecs=audio/pcm; samplerate=16000" : "audio/ogg; codecs=opus"), _.request(this, i[0], e, !1);
                 case 5:
                 case "end":
                   return _context72.stop();
@@ -8362,8 +8303,8 @@ var app = (function () {
     // eslint-disable-next-line max-len
     "https://learn.microsoft.com/en-GB/azure/cognitive-services/speech-service/get-started-text-to-speech?tabs=windows%2Cterminal&pivots=programming-language-rest";
     var Fo = ds;
-    var Bo = /*#__PURE__*/function (_q9) {
-      _inherits(Bo, _q9);
+    var Bo = /*#__PURE__*/function (_U9) {
+      _inherits(Bo, _U9);
       var _super31 = _createSuper(Bo);
       // prettier-ignore
       function Bo(e) {
@@ -8400,7 +8341,7 @@ var app = (function () {
                   throw new Error("Request settings have not been set up");
                 case 2:
                   i = this.preprocessBody(t);
-                  w.request(this, i, e);
+                  _.request(this, i, e);
                 case 4:
                 case "end":
                   return _context74.stop();
@@ -8442,9 +8383,9 @@ var app = (function () {
         }()
       }]);
       return Bo;
-    }(q);
-    var Qi = /*#__PURE__*/function (_q10) {
-      _inherits(ae, _q10);
+    }(U);
+    var Qi = /*#__PURE__*/function (_U10) {
+      _inherits(ae, _U10);
       var _super32 = _createSuper(ae);
       function ae(e) {
         var _l$headers, _c$OpenAIBeta;
@@ -8489,11 +8430,11 @@ var app = (function () {
           if (this.sessionId) {
             this.url = "".concat(ae.THREAD_PREFIX, "/").concat(this.sessionId, "/messages");
             var n = this.processMessage(t, i);
-            w.request(this, n, e);
+            _.request(this, n, e);
           } else {
             this.url = "".concat(ae.THREAD_PREFIX, "/runs");
             var _n2 = this.createNewThreadMessages(this.rawBody, t, i);
-            w.request(this, _n2, e);
+            _.request(this, _n2, e);
           }
           this.messages = e;
         }
@@ -8567,7 +8508,7 @@ var app = (function () {
                     method: "GET",
                     headers: (n = this.requestSettings) == null ? void 0 : n.headers
                   };
-                  return _context77.abrupt("return", (w.executePollRequest(this, t, i, this.messages), {
+                  return _context77.abrupt("return", (_.executePollRequest(this, t, i, this.messages), {
                     makingAnotherRequest: !0
                   }));
                 case 6:
@@ -8728,16 +8669,16 @@ var app = (function () {
         }()
       }]);
       return ae;
-    }(q);
+    }(U);
     Qi.THREAD_PREFIX = "https://api.openai.com/v1/threads";
     Qi.POLLING_TIMEOUT_MS = 800;
     var zo = Qi;
-    var ri = /*#__PURE__*/function (_q11) {
-      _inherits(_e, _q11);
-      var _super33 = _createSuper(_e);
-      function _e(e) {
+    var ri = /*#__PURE__*/function (_U11) {
+      _inherits(Se, _U11);
+      var _super33 = _createSuper(Se);
+      function Se(e) {
         var _this35;
-        _classCallCheck(this, _e);
+        _classCallCheck(this, Se);
         var o;
         var t = e.directConnection,
           i = t == null ? void 0 : t.openAI,
@@ -8760,10 +8701,10 @@ var app = (function () {
             }
           };
         }
-        _typeof(r) == "object" && Object.assign(_this35.rawBody, r), _this35.canSendMessage = _e.canFileSendMessage;
+        _typeof(r) == "object" && Object.assign(_this35.rawBody, r), _this35.canSendMessage = Se.canFileSendMessage;
         return _this35;
       }
-      _createClass(_e, [{
+      _createClass(Se, [{
         key: "preprocessBody",
         value: function preprocessBody(e, t) {
           var i = JSON.parse(JSON.stringify(e));
@@ -8777,11 +8718,11 @@ var app = (function () {
           var n;
           var r = (a = (o = t[t.length - 1]) == null ? void 0 : o.text) == null ? void 0 : a.trim();
           if (i[1] || r && r !== "") {
-            this.url = _e.IMAGE_EDIT_URL;
+            this.url = Se.IMAGE_EDIT_URL;
             var l = this.preprocessBody(this.rawBody, r);
-            n = _e.createFormDataBody(l, i[0], i[1]);
-          } else this.url = _e.IMAGE_VARIATIONS_URL, n = _e.createFormDataBody(this.rawBody, i[0]);
-          E.tempRemoveContentHeader(this.requestSettings, w.request.bind(this, this, n, e), !1);
+            n = Se.createFormDataBody(l, i[0], i[1]);
+          } else this.url = Se.IMAGE_VARIATIONS_URL, n = Se.createFormDataBody(this.rawBody, i[0]);
+          E.tempRemoveContentHeader(this.requestSettings, _.request.bind(this, this, n, e), !1);
         }
       }, {
         key: "callServiceAPI",
@@ -8811,9 +8752,9 @@ var app = (function () {
                   }
                   throw new Error("Request settings have not been set up");
                 case 8:
-                  this.url = _e.IMAGE_GENERATION_URL;
+                  this.url = Se.IMAGE_GENERATION_URL;
                   r = this.preprocessBody(this.rawBody, t[t.length - 1].text);
-                  w.request(this, r, e);
+                  _.request(this, r, e);
                 case 11:
                 case "end":
                   return _context81.stop();
@@ -8882,14 +8823,14 @@ var app = (function () {
           }), n;
         }
       }]);
-      return _e;
-    }(q);
+      return Se;
+    }(U);
     ri.IMAGE_GENERATION_URL = "https://api.openai.com/v1/images/generations";
     ri.IMAGE_VARIATIONS_URL = "https://api.openai.com/v1/images/variations";
     ri.IMAGE_EDIT_URL = "https://api.openai.com/v1/images/edits";
-    var qo = ri;
-    var dt = /*#__PURE__*/function (_q12) {
-      _inherits(dt, _q12);
+    var Uo = ri;
+    var dt = /*#__PURE__*/function (_U12) {
+      _inherits(dt, _U12);
       var _super34 = _createSuper(dt);
       function dt(e) {
         var _this36$maxMessages, _l$model;
@@ -8946,7 +8887,7 @@ var app = (function () {
                   throw new Error("Request settings have not been set up");
                 case 2:
                   i = this.preprocessBody(this.rawBody, t), n = this.deepChat.stream;
-                  n && (_typeof(n) != "object" || !n.simulation) || i.stream ? (i.stream = !0, I.request(this, i, e)) : w.request(this, i, e);
+                  n && (_typeof(n) != "object" || !n.simulation) || i.stream ? (i.stream = !0, I.request(this, i, e)) : _.request(this, i, e);
                 case 4:
                 case "end":
                   return _context83.stop();
@@ -9095,14 +9036,14 @@ var app = (function () {
         }
       }]);
       return dt;
-    }(q);
-    var Uo = /*#__PURE__*/function (_Yi3) {
-      _inherits(Uo, _Yi3);
-      var _super35 = _createSuper(Uo);
-      function Uo(e) {
+    }(U);
+    var qo = /*#__PURE__*/function (_Yi3) {
+      _inherits(qo, _Yi3);
+      var _super35 = _createSuper(qo);
+      function qo(e) {
         var _this37$maxMessages;
         var _this37;
-        _classCallCheck(this, Uo);
+        _classCallCheck(this, qo);
         var r;
         var t = JSON.parse(JSON.stringify(e.directConnection)),
           i = (r = t.cohere) == null ? void 0 : r.chat,
@@ -9110,7 +9051,7 @@ var app = (function () {
         _this37 = _super35.call(this, e, "https://api.cohere.ai/v1/chat", "Ask me anything!", i, n), _typeof(i) == "object" && Object.assign(_this37.rawBody, i), (_this37$maxMessages = _this37.maxMessages) !== null && _this37$maxMessages !== void 0 ? _this37$maxMessages : _this37.maxMessages = -1;
         return _this37;
       }
-      _createClass(Uo, [{
+      _createClass(qo, [{
         key: "preprocessBody",
         value: function preprocessBody(e, t) {
           var i = JSON.parse(JSON.stringify(e)),
@@ -9139,7 +9080,7 @@ var app = (function () {
                   throw new Error("Request settings have not been set up");
                 case 2:
                   i = this.preprocessBody(this.rawBody, t);
-                  w.request(this, i, e);
+                  _.request(this, i, e);
                 case 4:
                 case "end":
                   return _context86.stop();
@@ -9179,7 +9120,7 @@ var app = (function () {
           return extractResultData;
         }()
       }]);
-      return Uo;
+      return qo;
     }(Yi);
     var Ho = /*#__PURE__*/function () {
       function Ho() {
@@ -9196,17 +9137,17 @@ var app = (function () {
             r = e.webModel;
           if (r) return new $i(e);
           if (t) {
-            if (t.openAI) return t.openAI.images ? new qo(e) : t.openAI.speechToText ? new No(e) : t.openAI.textToSpeech ? new Oo(e) : t.openAI.assistant ? new zo(e) : new dt(e);
+            if (t.openAI) return t.openAI.images ? new Uo(e) : t.openAI.speechToText ? new No(e) : t.openAI.textToSpeech ? new Oo(e) : t.openAI.assistant ? new zo(e) : new dt(e);
             if (t.assemblyAI) return new Xi(e);
-            if (t.cohere) return t.cohere.textGeneration ? new Lo(e) : t.cohere.summarization ? new Ro(e) : new Uo(e);
-            if (t.huggingFace) return t.huggingFace.textGeneration ? new Mo(e) : t.huggingFace.summarization ? new Co(e) : t.huggingFace.translation ? new ko(e) : t.huggingFace.fillMask ? new Io(e) : t.huggingFace.questionAnswer ? new To(e) : t.huggingFace.audioSpeechRecognition ? new wo(e) : t.huggingFace.audioClassification ? new _o(e) : t.huggingFace.imageClassification ? new So(e) : new Ao(e);
+            if (t.cohere) return t.cohere.textGeneration ? new Lo(e) : t.cohere.summarization ? new Ro(e) : new qo(e);
+            if (t.huggingFace) return t.huggingFace.textGeneration ? new Mo(e) : t.huggingFace.summarization ? new Co(e) : t.huggingFace.translation ? new ko(e) : t.huggingFace.fillMask ? new Io(e) : t.huggingFace.questionAnswer ? new To(e) : t.huggingFace.audioSpeechRecognition ? new _o(e) : t.huggingFace.audioClassification ? new So(e) : t.huggingFace.imageClassification ? new wo(e) : new Ao(e);
             if (t.azure) {
               if (t.azure.speechToText) return new Fo(e);
               if (t.azure.textToSpeech) return new jo(e);
               if (t.azure.summarization) return new Do(e);
               if (t.azure.translation) return new Bo(e);
             }
-            if (t.stabilityAI) return t.stabilityAI.imageToImage ? new Ut(e) : t.stabilityAI.imageToImageUpscale ? new zt(e) : t.stabilityAI.imageToImageMasking ? new qt(e) : new Ht(e);
+            if (t.stabilityAI) return t.stabilityAI.imageToImage ? new qt(e) : t.stabilityAI.imageToImageUpscale ? new zt(e) : t.stabilityAI.imageToImageMasking ? new Ut(e) : new Ht(e);
           }
           return i ? new Le(e) : new Le(e, void 0, n || !0);
         }
@@ -9232,7 +9173,7 @@ var app = (function () {
       return zi;
     }();
     us.FONT_URL = "https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap";
-    var Vo = us;
+    var Go = us;
     var hs = /*#__PURE__*/_createClass(function hs() {
       _classCallCheck(this, hs);
     });
@@ -9288,21 +9229,21 @@ var app = (function () {
       }]);
       return en;
     }();
-    var Gt = /*#__PURE__*/function () {
-      function Gt(e, t, i) {
-        _classCallCheck(this, Gt);
+    var Vt = /*#__PURE__*/function () {
+      function Vt(e, t, i) {
+        _classCallCheck(this, Vt);
         this._isDisplayed = !1, e ? (this._elementRef = this.createIntroPanelWithChild(e, i), this._isDisplayed = !0) : t && (this._elementRef = this.createInternalIntroPanel(t, i), this._isDisplayed = !0);
       }
-      _createClass(Gt, [{
+      _createClass(Vt, [{
         key: "createIntroPanelWithChild",
         value: function createIntroPanelWithChild(e, t) {
-          var i = Gt.createIntroPanel(t);
+          var i = Vt.createIntroPanel(t);
           return e.style.display === "none" && (e.style.display = "block"), i.appendChild(e), i;
         }
       }, {
         key: "createInternalIntroPanel",
         value: function createInternalIntroPanel(e, t) {
-          var i = Gt.createIntroPanel(t);
+          var i = Vt.createIntroPanel(t);
           return i.id = "internal-intro-panel", i.innerHTML = e, i;
         }
       }, {
@@ -9322,17 +9263,17 @@ var app = (function () {
           return t.classList.add("intro-panel"), Object.assign(t.style, e), t;
         }
       }]);
-      return Gt;
+      return Vt;
     }();
-    var Go = /*#__PURE__*/function () {
-      function Go() {
-        _classCallCheck(this, Go);
+    var Vo = /*#__PURE__*/function () {
+      function Vo() {
+        _classCallCheck(this, Vo);
       }
-      _createClass(Go, null, [{
+      _createClass(Vo, null, [{
         key: "getText",
         value: function getText(e, t) {
           var i, n;
-          if (!e.directConnection && !e.request && !e.webModel && !e.demo) return "Connect to any API using the [request](https://deepchat.dev/docs/connect#Request)\n        property or a popular service via\n        [directConnection](https://deepchat.dev/docs/directConnection/#directConnection).\n        \n Host AI entirely on your browser via a [webModel](HERE).\n        \n To get started checkout the [Start](https://deepchat.dev/start) page and\n        live code [examples](https://deepchat.dev/examples/frameworks).\n        \n To remove this message set the [demo](https://deepchat.dev/docs/demo#demo) property to true.";
+          if (!e.directConnection && !e.request && !e.webModel && !e.demo) return "Connect to any API using the [request](https://deepchat.dev/docs/connect#Request)\n        property or a popular service via\n        [directConnection](https://deepchat.dev/docs/directConnection/#directConnection).\n        \n Host AI entirely on your browser via a [webModel](WORK).\n        \n To get started checkout the [Start](https://deepchat.dev/start) page and\n        live code [examples](https://deepchat.dev/examples/frameworks).\n        \n To remove this message set the [demo](https://deepchat.dev/docs/demo#demo) property to true.";
           if (e.directConnection) {
             if (!t.isDirectConnection()) return "Please define a valid service inside\n          the [directConnection](https://deepchat.dev/docs/directConnection/#directConnection) object.";
             var r = (i = e.directConnection.openAI) == null ? void 0 : i.chat;
@@ -9343,7 +9284,7 @@ var app = (function () {
           return null;
         }
       }]);
-      return Go;
+      return Vo;
     }();
     var Wo = "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n<svg version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" \n\t viewBox=\"50 30 420 450\" xml:space=\"preserve\">\n<g filter=\"brightness(0) saturate(100%) invert(16%) sepia(0%) saturate(1942%) hue-rotate(215deg) brightness(99%) contrast(93%)\">\n\t<g>\n\t\t<path d=\"M447.933,103.629c-0.034-3.076-1.224-6.09-3.485-8.352L352.683,3.511c-0.004-0.004-0.007-0.005-0.011-0.008\n\t\t\tC350.505,1.338,347.511,0,344.206,0H89.278C75.361,0,64.04,11.32,64.04,25.237v461.525c0,13.916,11.32,25.237,25.237,25.237\n\t\t\th333.444c13.916,0,25.237-11.32,25.237-25.237V103.753C447.96,103.709,447.937,103.672,447.933,103.629z M356.194,40.931\n\t\t\tl50.834,50.834h-49.572c-0.695,0-1.262-0.567-1.262-1.262V40.931z M423.983,486.763c0,0.695-0.566,1.261-1.261,1.261H89.278\n\t\t\tc-0.695,0-1.261-0.566-1.261-1.261V25.237c0-0.695,0.566-1.261,1.261-1.261h242.94v66.527c0,13.916,11.322,25.239,25.239,25.239\n\t\t\th66.527V486.763z\"/>\n\t</g>\n</g>\n<g>\n\t<g>\n\t\t<path d=\"M362.088,164.014H149.912c-6.62,0-11.988,5.367-11.988,11.988c0,6.62,5.368,11.988,11.988,11.988h212.175\n\t\t\tc6.62,0,11.988-5.368,11.988-11.988C374.076,169.381,368.707,164.014,362.088,164.014z\"/>\n\t</g>\n</g>\n<g>\n\t<g>\n\t\t<path d=\"M362.088,236.353H149.912c-6.62,0-11.988,5.368-11.988,11.988c0,6.62,5.368,11.988,11.988,11.988h212.175\n\t\t\tc6.62,0,11.988-5.368,11.988-11.988C374.076,241.721,368.707,236.353,362.088,236.353z\"/>\n\t</g>\n</g>\n<g>\n\t<g>\n\t\t<path d=\"M362.088,308.691H149.912c-6.62,0-11.988,5.368-11.988,11.988c0,6.621,5.368,11.988,11.988,11.988h212.175\n\t\t\tc6.62,0,11.988-5.367,11.988-11.988C374.076,314.06,368.707,308.691,362.088,308.691z\"/>\n\t</g>\n</g>\n<g>\n\t<g>\n\t\t<path d=\"M256,381.031H149.912c-6.62,0-11.988,5.368-11.988,11.988c0,6.621,5.368,11.988,11.988,11.988H256\n\t\t\tc6.62,0,11.988-5.367,11.988-11.988C267.988,386.398,262.62,381.031,256,381.031z\"/>\n\t</g>\n</g>\n</svg>";
     var fe = /*#__PURE__*/function () {
@@ -9399,7 +9340,7 @@ var app = (function () {
           t.classList.add("any-file-message-contents");
           var i = document.createElement("div");
           i.classList.add("any-file-message-icon-container");
-          var n = U.createSVGElement(Wo);
+          var n = q.createSVGElement(Wo);
           n.classList.add("any-file-message-icon"), i.appendChild(n);
           var r = document.createElement("div");
           return r.classList.add("any-file-message-text"), r.textContent = e.name || ne.DEFAULT_FILE_NAME, t.appendChild(i), t.appendChild(r), ne.processContent(t, e.src);
@@ -9434,7 +9375,7 @@ var app = (function () {
         var n = t.permittedErrorPrefixes,
           r = t.introPanelMarkUp,
           o = t.demo;
-        _this38._errorMessageOverrides = (a = e.errorMessages) == null ? void 0 : a.overrides, _this38._onClearMessages = jt.onClearMessages.bind(_assertThisInitialized(_this38), e), _this38._onError = jt.onError.bind(_assertThisInitialized(_this38), e), _this38._displayLoadingMessage = me.getDisplayLoadingMessage(e, t), _this38._permittedErrorPrefixes = n, _this38.addSetupMessageIfNeeded(e, t), _this38.populateIntroPanel(i, r, e.introPanelStyle), _this38.addIntroductoryMessage(e, t), e.initialMessages && _this38.populateInitialMessages(e.initialMessages), _this38._displayServiceErrorMessages = (l = e.errorMessages) == null ? void 0 : l.displayServiceErrorMessages, e.getMessages = function () {
+        _this38._errorMessageOverrides = (a = e.errorMessages) == null ? void 0 : a.overrides, _this38._onClearMessages = jt.onClearMessages.bind(_assertThisInitialized(_this38), e), _this38._onError = jt.onError.bind(_assertThisInitialized(_this38), e), _this38._displayLoadingMessage = me.getDisplayLoadingMessage(e, t), _this38._permittedErrorPrefixes = n, _this38.addSetupMessageIfNeeded(e, t) || _this38.populateIntroPanel(i, r, e.introPanelStyle), _this38.addIntroductoryMessage(e, t), e.initialMessages && _this38.populateInitialMessages(e.initialMessages), _this38._displayServiceErrorMessages = (l = e.errorMessages) == null ? void 0 : l.displayServiceErrorMessages, e.getMessages = function () {
           return JSON.parse(JSON.stringify(_this38.messages));
         }, e.clearMessages = _this38.clearMessages.bind(_assertThisInitialized(_this38), t), e.refreshMessages = _this38.refreshTextMessages.bind(_assertThisInitialized(_this38)), e.scrollToBottom = Y.scrollToBottom.bind(_assertThisInitialized(_this38), _this38.elementRef), e._addMessage = function (c, d) {
           _this38.addNewMessage(_objectSpread(_objectSpread({}, c), {}, {
@@ -9453,11 +9394,12 @@ var app = (function () {
       }, {
         key: "addSetupMessageIfNeeded",
         value: function addSetupMessageIfNeeded(e, t) {
-          var i = Go.getText(e, t);
+          var i = Vo.getText(e, t);
           if (i) {
             var n = this.createAndAppendNewMessageElement(i, v.AI_ROLE);
             this.applyCustomStyles(n, v.AI_ROLE, !1);
           }
+          return !!i;
         }
         // WORK - const file for deep chat classes
       }, {
@@ -9486,7 +9428,7 @@ var app = (function () {
             ke.processInitialMessageFile(t), _this39.addNewMessage(t, !0);
           }), setTimeout(function () {
             return Y.scrollToBottom(_this39.elementRef);
-          });
+          }, 0);
         }
         // this should not be activated by streamed messages
       }, {
@@ -9578,7 +9520,7 @@ var app = (function () {
       }, {
         key: "populateIntroPanel",
         value: function populateIntroPanel(e, t, i) {
-          (e || t) && (this._introPanel = new Gt(e, t, i), this._introPanel._elementRef && (se.apply(this, this._introPanel._elementRef), this.elementRef.appendChild(this._introPanel._elementRef)));
+          (e || t) && (this._introPanel = new Vt(e, t, i), this._introPanel._elementRef && (se.apply(this, this._introPanel._elementRef), this.elementRef.appendChild(this._introPanel._elementRef)));
         }
       }, {
         key: "addMultipleFiles",
@@ -9647,7 +9589,7 @@ var app = (function () {
       }]);
       return me;
     }(Ke);
-    var _t = /*#__PURE__*/function () {
+    var St = /*#__PURE__*/function () {
       function W() {
         _classCallCheck(this, W);
       }
@@ -9683,11 +9625,11 @@ var app = (function () {
       }]);
       return W;
     }();
-    _t.INPUT_OUTSIDE_LEFT_ADJUSTMENT_CLASS = "text-input-container-left-adjustment";
-    _t.INPUT_OUTSIDE_RIGHT_ADJUSTMENT_CLASS = "text-input-container-right-adjustment";
-    _t.INPUT_OUTSIDE_LEFT_SMALL_ADJUSTMENT_CLASS = "text-input-container-left-small-adjustment";
-    _t.INPUT_OUTSIDE_RIGHT_SMALL_ADJUSTMENT_CLASS = "text-input-container-right-small-adjustment";
-    var Ko = _t;
+    St.INPUT_OUTSIDE_LEFT_ADJUSTMENT_CLASS = "text-input-container-left-adjustment";
+    St.INPUT_OUTSIDE_RIGHT_ADJUSTMENT_CLASS = "text-input-container-right-adjustment";
+    St.INPUT_OUTSIDE_LEFT_SMALL_ADJUSTMENT_CLASS = "text-input-container-left-small-adjustment";
+    St.INPUT_OUTSIDE_RIGHT_SMALL_ADJUSTMENT_CLASS = "text-input-container-right-small-adjustment";
+    var Ko = St;
     var Qe = /*#__PURE__*/function () {
       function Qe() {
         _classCallCheck(this, Qe);
@@ -9722,7 +9664,7 @@ var app = (function () {
       }]);
       return Qe;
     }();
-    var _n = ["camera", "gifs", "images", "audio", "mixedFiles", "submit", "microphone"];
+    var Sn = ["camera", "gifs", "images", "audio", "mixedFiles", "submit", "microphone"];
     var j = /*#__PURE__*/function () {
       function j() {
         _classCallCheck(this, j);
@@ -9736,7 +9678,7 @@ var app = (function () {
       }, {
         key: "createElement",
         value: function createElement(e, t) {
-          return t ? j.createTextElement(e) : U.createSVGElement(e);
+          return t ? j.createTextElement(e) : q.createSVGElement(e);
         }
       }, {
         key: "createCustomElement",
@@ -9807,14 +9749,14 @@ var app = (function () {
       }]);
       return te;
     }();
-    var St = /*#__PURE__*/function () {
-      function St(e, t, i, n) {
-        _classCallCheck(this, St);
+    var wt = /*#__PURE__*/function () {
+      function wt(e, t, i, n) {
+        _classCallCheck(this, wt);
         this._mouseState = {
           state: "default"
         }, this.elementRef = e, this._customStyles = i, this.position = t, this.dropupText = n;
       }
-      _createClass(St, [{
+      _createClass(wt, [{
         key: "buttonMouseLeave",
         value: function buttonMouseLeave(e) {
           this._mouseState.state = "default", e && (te.unsetAllCSS(this.elementRef, e), te.setElementsCSS(this.elementRef, e, "default"));
@@ -9858,7 +9800,7 @@ var app = (function () {
           i && te.setElementCssUpToState(this.elementRef, i, this._mouseState.state), this.setEvents(i);
         }
       }]);
-      return St;
+      return wt;
     }();
     var gt = /*#__PURE__*/function () {
       function gt() {
@@ -9882,11 +9824,11 @@ var app = (function () {
       }]);
       return gt;
     }();
-    var we = /*#__PURE__*/function () {
-      function we() {
-        _classCallCheck(this, we);
+    var _e = /*#__PURE__*/function () {
+      function _e() {
+        _classCallCheck(this, _e);
       }
-      _createClass(we, null, [{
+      _createClass(_e, null, [{
         key: "addItemEvents",
         value: function addItemEvents(e, t, i, n) {
           Te.add(t, n), t.addEventListener("click", function () {
@@ -9913,7 +9855,7 @@ var app = (function () {
         key: "populateItem",
         value: function populateItem(e, t, i, n) {
           var r = e.children[0];
-          r.classList.contains("text-button") ? t.appendChild(we.createItemText(r.textContent, n == null ? void 0 : n.text)) : (t.appendChild(we.createItemIcon(e, n == null ? void 0 : n.iconContainer)), t.appendChild(we.createItemText(i, n == null ? void 0 : n.text)));
+          r.classList.contains("text-button") ? t.appendChild(_e.createItemText(r.textContent, n == null ? void 0 : n.text)) : (t.appendChild(_e.createItemIcon(e, n == null ? void 0 : n.iconContainer)), t.appendChild(_e.createItemText(i, n == null ? void 0 : n.text)));
         }
         // prettier-ignore
       }, {
@@ -9923,16 +9865,16 @@ var app = (function () {
           var n = t.elementRef,
             r = t.dropupText,
             o = document.createElement("div");
-          Object.assign(o.style, (l = i == null ? void 0 : i.item) == null ? void 0 : l["default"]), we.populateItem(n, o, r, i), o.classList.add("dropup-menu-item");
+          Object.assign(o.style, (l = i == null ? void 0 : i.item) == null ? void 0 : l["default"]), _e.populateItem(n, o, r, i), o.classList.add("dropup-menu-item");
           var a = T.processStateful((i == null ? void 0 : i.item) || {}, {
             backgroundColor: "#f3f3f3"
           }, {
             backgroundColor: "#ebebeb"
           });
-          return we.addItemEvents(e, o, n, a), o;
+          return _e.addItemEvents(e, o, n, a), o;
         }
       }]);
-      return we;
+      return _e;
     }();
     var tn = /*#__PURE__*/function () {
       function tn(e, t) {
@@ -9961,21 +9903,27 @@ var app = (function () {
       }, {
         key: "addItem",
         value: function addItem(e) {
-          var t = we.createItem(this, e, this._styles);
+          var t = _e.createItem(this, e, this._styles);
           this.elementRef.appendChild(t);
         }
         // prettier-ignore
       }, {
         key: "addWindowEvents",
         value: function addWindowEvents(e) {
-          var _this41 = this;
-          window.addEventListener("click", function (t) {
-            var i;
-            e.parentElement !== ((i = t.target.shadowRoot) == null ? void 0 : i.children[0]) && _this41.close();
-          }), window.addEventListener("keydown", function (t) {
-            var i, n, r;
-            _this41._isOpen && (t.key === R.ESCAPE ? (_this41.close(), (i = _this41.highlightedItem) == null || i.dispatchEvent(new MouseEvent("mouseleave"))) : t.key === R.ENTER ? ((n = _this41.highlightedItem) == null || n.click(), (r = _this41.highlightedItem) == null || r.dispatchEvent(new MouseEvent("mouseleave"))) : t.key === R.ARROW_DOWN ? gt.focusSiblingItem(_this41.highlightedItem || _this41.elementRef.children[_this41.elementRef.children.length - 1], _this41.elementRef, !0) : t.key === R.ARROW_UP && gt.focusSiblingItem(_this41.highlightedItem || _this41.elementRef.children[0], _this41.elementRef, !1));
-          });
+          this.clickEvent = this.windowClick.bind(this, e), window.addEventListener("click", this.clickEvent), this.keyDownEvent = this.windowKeyDown.bind(this, e), window.addEventListener("keydown", this.keyDownEvent);
+        }
+      }, {
+        key: "windowClick",
+        value: function windowClick(e, t) {
+          var i;
+          !e.isConnected && this.clickEvent ? window.removeEventListener("click", this.clickEvent) : e.parentElement !== ((i = t.target.shadowRoot) == null ? void 0 : i.children[0]) && this.close();
+        }
+        // prettier-ignore
+      }, {
+        key: "windowKeyDown",
+        value: function windowKeyDown(e, t) {
+          var i, n, r;
+          !e.isConnected && this.keyDownEvent ? window.removeEventListener("keydown", this.keyDownEvent) : this._isOpen && (t.key === R.ESCAPE ? (this.close(), (i = this.highlightedItem) == null || i.dispatchEvent(new MouseEvent("mouseleave"))) : t.key === R.ENTER ? ((n = this.highlightedItem) == null || n.click(), (r = this.highlightedItem) == null || r.dispatchEvent(new MouseEvent("mouseleave"))) : t.key === R.ARROW_DOWN ? gt.focusSiblingItem(this.highlightedItem || this.elementRef.children[this.elementRef.children.length - 1], this.elementRef, !0) : t.key === R.ARROW_UP && gt.focusSiblingItem(this.highlightedItem || this.elementRef.children[0], this.elementRef, !1));
         }
       }], [{
         key: "createElement",
@@ -9986,19 +9934,19 @@ var app = (function () {
       }]);
       return tn;
     }();
-    var Je = /*#__PURE__*/function (_St) {
-      _inherits(Je, _St);
+    var Je = /*#__PURE__*/function (_wt) {
+      _inherits(Je, _wt);
       var _super37 = _createSuper(Je);
       function Je(e, t) {
-        var _this42;
+        var _this41;
         _classCallCheck(this, Je);
         var n;
-        _this42 = _super37.call(this, Je.createButtonElement(), void 0, {
+        _this41 = _super37.call(this, Je.createButtonElement(), void 0, {
           styles: (n = t == null ? void 0 : t.button) == null ? void 0 : n.styles
         });
-        var i = _this42.createInnerElements(_this42._customStyles);
-        _this42._menu = new tn(e, t == null ? void 0 : t.menu), _this42.addClickEvent(), _this42.buttonContainer = Je.createButtonContainer(), _this42.elementRef.appendChild(i.styles), _this42.buttonContainer.appendChild(_this42.elementRef), _this42.elementRef.classList.add("dropup-icon", "upload-file-button"), _this42.buttonContainer.appendChild(_this42._menu.elementRef), _this42.reapplyStateStyle("styles"), _this42.addContainerEvents(e);
-        return _this42;
+        var i = _this41.createInnerElements(_this41._customStyles);
+        _this41._menu = new tn(e, t == null ? void 0 : t.menu), _this41.addClickEvent(), _this41.buttonContainer = Je.createButtonContainer(), _this41.elementRef.appendChild(i.styles), _this41.buttonContainer.appendChild(_this41.elementRef), _this41.elementRef.classList.add("dropup-icon", "upload-file-button"), _this41.buttonContainer.appendChild(_this41._menu.elementRef), _this41.reapplyStateStyle("styles"), _this41.addContainerEvents(e);
+        return _this41;
       }
       _createClass(Je, [{
         key: "createInnerElements",
@@ -10025,9 +9973,9 @@ var app = (function () {
       }, {
         key: "addContainerEvents",
         value: function addContainerEvents(e) {
-          var _this43 = this;
+          var _this42 = this;
           e.addEventListener("click", function (t) {
-            t.target.classList.contains("dropup-icon") || _this43._menu.close();
+            t.target.classList.contains("dropup-icon") || _this42._menu.close();
           });
         }
       }], [{
@@ -10039,7 +9987,7 @@ var app = (function () {
       }, {
         key: "createSVGIconElement",
         value: function createSVGIconElement() {
-          var e = U.createSVGElement(Jo);
+          var e = q.createSVGElement(Jo);
           return e.id = "dropup-icon", e;
         }
       }, {
@@ -10056,7 +10004,7 @@ var app = (function () {
         }
       }]);
       return Je;
-    }(St);
+    }(wt);
     var F = /*#__PURE__*/function () {
       function F() {
         _classCallCheck(this, F);
@@ -10067,7 +10015,7 @@ var app = (function () {
         // prettier-ignore
         function addToDropup(e, t, i, n) {
           var r = new Je(i, n);
-          _n.forEach(function (a) {
+          Sn.forEach(function (a) {
             var l = t["dropup-menu"].findIndex(function (d) {
                 return d.buttonType === a;
               }),
@@ -10117,7 +10065,7 @@ var app = (function () {
             r && F.setPosition(e, n, t[r]);
           }), t["inside-right"].length === 0 && e.submit && F.setPosition(e, "submit", t["inside-right"]), t["outside-right"].length === 0 && (e.submit ? F.setPosition(e, "submit", t["outside-right"]) : e.microphone ? F.setPosition(e, "microphone", t["outside-right"]) : e.camera && F.setPosition(e, "camera", t["outside-right"])), e.submit && F.setPosition(e, "submit", t["outside-left"].length === 0 ? t["outside-left"] : t["inside-right"]), e.microphone && F.setPosition(e, "microphone", t["outside-left"].length === 0 ? t["outside-left"] : t["inside-right"]);
           var i = Object.keys(e);
-          return i.length > 1 || t["dropup-menu"].length > 0 ? _n.forEach(function (n) {
+          return i.length > 1 || t["dropup-menu"].length > 0 ? Sn.forEach(function (n) {
             e[n] && t["dropup-menu"].push(_objectSpread(_objectSpread({}, e[n]), {}, {
               buttonType: n
             }));
@@ -10162,10 +10110,10 @@ var app = (function () {
     var ue = /*#__PURE__*/function () {
       // prettier-ignore
       function ue(e, t, i, n) {
-        var _this44 = this;
+        var _this43 = this;
         _classCallCheck(this, ue);
         this._attachments = [], this._fileCountLimit = 99, this._acceptedFormat = "", t.maxNumberOfFiles && (this._fileCountLimit = t.maxNumberOfFiles), this._toggleContainerDisplay = i, this._fileAttachmentsContainerRef = n, t.acceptedFormats && (this._acceptedFormat = t.acceptedFormats), setTimeout(function () {
-          _this44._validationHandler = e._validationHandler;
+          _this43._validationHandler = e._validationHandler;
         });
       }
       _createClass(ue, [{
@@ -10181,7 +10129,7 @@ var app = (function () {
             var r = ue.createImageAttachment(t);
             this.addFileAttachment(e, "image", r, i);
           } else if (n === "audio") {
-            var _r2 = qi.createAudioAttachment(t);
+            var _r2 = Ui.createAudioAttachment(t);
             this.addFileAttachment(e, "audio", _r2, i);
           } else {
             var _r3 = ue.createAnyFileAttachment(e.name);
@@ -10222,7 +10170,7 @@ var app = (function () {
               return r === e;
             }),
             i = this._attachments[t].attachmentContainerElement;
-          this._attachments.splice(t, 1), qi.stopAttachmentPlayback(i), i.remove(), this._toggleContainerDisplay(!1), (n = this._validationHandler) == null || n.call(this);
+          this._attachments.splice(t, 1), Ui.stopAttachmentPlayback(i), i.remove(), this._toggleContainerDisplay(!1), (n = this._validationHandler) == null || n.call(this);
         }
       }, {
         key: "getFiles",
@@ -10294,24 +10242,24 @@ var app = (function () {
       return ue;
     }();
     var ea = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<svg viewBox=\"0 0 32 32\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\">\n  <title>play</title>\n  <path d=\"M5.92 24.096q0 1.088 0.928 1.728 0.512 0.288 1.088 0.288 0.448 0 0.896-0.224l16.16-8.064q0.48-0.256 0.8-0.736t0.288-1.088-0.288-1.056-0.8-0.736l-16.16-8.064q-0.448-0.224-0.896-0.224-0.544 0-1.088 0.288-0.928 0.608-0.928 1.728v16.16z\"></path>\n</svg>",
-      Sn = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<svg viewBox=\"0 0 32 32\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\">\n<title>stop</title>\n<path d=\"M5.92 24.096q0 0.832 0.576 1.408t1.44 0.608h16.128q0.832 0 1.44-0.608t0.576-1.408v-16.16q0-0.832-0.576-1.44t-1.44-0.576h-16.128q-0.832 0-1.44 0.576t-0.576 1.44v16.16z\"></path>\n</svg>",
+      wn = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<svg viewBox=\"0 0 32 32\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\">\n<title>stop</title>\n<path d=\"M5.92 24.096q0 0.832 0.576 1.408t1.44 0.608h16.128q0.832 0 1.44-0.608t0.576-1.408v-16.16q0-0.832-0.576-1.44t-1.44-0.576h-16.128q-0.832 0-1.44 0.576t-0.576 1.44v16.16z\"></path>\n</svg>",
       ps = /*#__PURE__*/function (_ue) {
-        _inherits(Se, _ue);
-        var _super38 = _createSuper(Se);
+        _inherits(we, _ue);
+        var _super38 = _createSuper(we);
         // prettier-ignore
-        function Se(e, t, i, n) {
-          _classCallCheck(this, Se);
+        function we(e, t, i, n) {
+          _classCallCheck(this, we);
           return _super38.call(this, e, t, i, n);
         }
-        _createClass(Se, [{
+        _createClass(we, [{
           key: "createTimer",
           value: function createTimer(e, t) {
-            var _this45 = this;
+            var _this44 = this;
             var i = 0;
-            var n = t !== void 0 && t < Se.TIMER_LIMIT_S ? t : Se.TIMER_LIMIT_S;
+            var n = t !== void 0 && t < we.TIMER_LIMIT_S ? t : we.TIMER_LIMIT_S;
             return setInterval(function () {
               var a;
-              i += 1, i === n && ((a = _this45.stopPlaceholderCallback) == null || a.call(_this45), _this45.clearTimer()), i === 600 && e.classList.add("audio-placeholder-text-4-digits");
+              i += 1, i === n && ((a = _this44.stopPlaceholderCallback) == null || a.call(_this44), _this44.clearTimer()), i === 600 && e.classList.add("audio-placeholder-text-4-digits");
               var r = Math.floor(i / 60),
                 o = (i % 60).toString().padStart(2, "0");
               e.textContent = "".concat(r, ":").concat(o);
@@ -10320,18 +10268,18 @@ var app = (function () {
         }, {
           key: "createPlaceholderAudioAttachment",
           value: function createPlaceholderAudioAttachment(e) {
-            var t = Se.createAudioContainer(),
+            var t = we.createAudioContainer(),
               i = document.createElement("div");
             i.classList.add("audio-placeholder-text-3-digits");
             var n = document.createElement("div");
             n.classList.add("file-attachment-text-container", "audio-placeholder-text-3-digits-container"), n.appendChild(i);
-            var r = U.createSVGElement(Sn);
+            var r = q.createSVGElement(wn);
             return r.classList.add("attachment-icon", "stop-icon", "not-removable-attachment-icon"), i.textContent = "0:00", this._activePlaceholderTimer = this.createTimer(i, e), t.appendChild(n), this.addPlaceholderAudioAttachmentEvents(t, r, n), t;
           }
         }, {
           key: "addPlaceholderAudioAttachmentEvents",
           value: function addPlaceholderAudioAttachmentEvents(e, t, i) {
-            var _this46 = this;
+            var _this45 = this;
             var n = function n() {
               return e.replaceChildren(t);
             };
@@ -10342,7 +10290,7 @@ var app = (function () {
             e.addEventListener("mouseleave", r);
             var o = function o() {
               var a;
-              return (a = _this46.stopPlaceholderCallback) == null ? void 0 : a.call(_this46);
+              return (a = _this45.stopPlaceholderCallback) == null ? void 0 : a.call(_this45);
             };
             e.addEventListener("click", o);
           }
@@ -10357,7 +10305,7 @@ var app = (function () {
           key: "completePlaceholderAttachment",
           value: function completePlaceholderAttachment(e, t) {
             var i = this._activePlaceholderAttachment;
-            i && (i.file = e, Se.addAudioElements(i.attachmentContainerElement.children[0], t), i.removeButton = this.createRemoveAttachmentButton(i), i.attachmentContainerElement.appendChild(i.removeButton), this._activePlaceholderAttachment = void 0, this.clearTimer());
+            i && (i.file = e, we.addAudioElements(i.attachmentContainerElement.children[0], t), i.removeButton = this.createRemoveAttachmentButton(i), i.attachmentContainerElement.appendChild(i.removeButton), this._activePlaceholderAttachment = void 0, this.clearTimer());
           }
         }, {
           key: "removePlaceholderAttachment",
@@ -10381,9 +10329,9 @@ var app = (function () {
             var i = e.parentElement ? Y.cloneElement(e) : e,
               n = document.createElement("audio");
             n.src = t;
-            var r = U.createSVGElement(ea);
+            var r = q.createSVGElement(ea);
             r.classList.add("attachment-icon", "play-icon");
-            var o = U.createSVGElement(Sn);
+            var o = q.createSVGElement(wn);
             o.classList.add("attachment-icon", "stop-icon"), i.replaceChildren(r), n.onplay = function () {
               i.replaceChildren(o);
             }, n.onpause = function () {
@@ -10397,8 +10345,8 @@ var app = (function () {
         }, {
           key: "createAudioAttachment",
           value: function createAudioAttachment(e) {
-            var t = Se.createAudioContainer();
-            return Se.addAudioElements(t, e), t;
+            var t = we.createAudioContainer();
+            return we.addAudioElements(t, e), t;
           }
         }, {
           key: "stopAttachmentPlayback",
@@ -10407,10 +10355,10 @@ var app = (function () {
             (n = (i = (t = e.children[0]) == null ? void 0 : t.children) == null ? void 0 : i[0]) != null && n.classList.contains("stop-icon") && e.children[0].click();
           }
         }]);
-        return Se;
+        return we;
       }(ue);
     ps.TIMER_LIMIT_S = 5999;
-    var qi = ps;
+    var Ui = ps;
     var ta = /*#__PURE__*/function () {
       function ta() {
         _classCallCheck(this, ta);
@@ -10420,20 +10368,20 @@ var app = (function () {
         value:
         // prettier-ignore
         function create(e, t, i, n, r) {
-          return r === "audio" ? new qi(e, t, i, n) : new ue(e, t, i, n);
+          return r === "audio" ? new Ui(e, t, i, n) : new ue(e, t, i, n);
         }
       }]);
       return ta;
     }();
-    var wt = /*#__PURE__*/function () {
-      function wt(e, t, i) {
-        _classCallCheck(this, wt);
+    var _t = /*#__PURE__*/function () {
+      function _t(e, t, i) {
+        _classCallCheck(this, _t);
         this._fileAttachmentsTypes = [], this.elementRef = this.createAttachmentContainer();
         var n = _typeof(i) == "object" && !!i.displayFileAttachmentContainer;
         this.toggleContainerDisplay(n), e.appendChild(this.elementRef), t && Object.assign(this.elementRef.style, t);
       }
       // prettier-ignore
-      _createClass(wt, [{
+      _createClass(_t, [{
         key: "addType",
         value: function addType(e, t, i) {
           var n = ta.create(e, t, this.toggleContainerDisplay.bind(this), this.elementRef, i);
@@ -10497,7 +10445,7 @@ var app = (function () {
       }, {
         key: "addFilesToAnyType",
         value: function addFilesToAnyType(e) {
-          wt.addFilesToType(e, this._fileAttachmentsTypes);
+          _t.addFilesToType(e, this._fileAttachmentsTypes);
         }
       }, {
         key: "removeAllFiles",
@@ -10522,12 +10470,12 @@ var app = (function () {
           });
         }
       }]);
-      return wt;
+      return _t;
     }();
     var fs = /*#__PURE__*/function () {
       function le(e, t, i) {
         _classCallCheck(this, le);
-        this._isOpen = !1, this._contentRef = le.createModalContent(t, i == null ? void 0 : i.backgroundColor), this._buttonPanel = le.createButtonPanel(i == null ? void 0 : i.backgroundColor), this._elementRef = le.createContainer(this._contentRef, i), this._elementRef.appendChild(this._buttonPanel), e.appendChild(this._elementRef), this._backgroundPanelRef = le.createDarkBackgroundPanel(), e.appendChild(this._backgroundPanelRef), this.addWindowEvents();
+        this._isOpen = !1, this._contentRef = le.createModalContent(t, i == null ? void 0 : i.backgroundColor), this._buttonPanel = le.createButtonPanel(i == null ? void 0 : i.backgroundColor), this._elementRef = le.createContainer(this._contentRef, i), this._elementRef.appendChild(this._buttonPanel), e.appendChild(this._elementRef), this._backgroundPanelRef = le.createDarkBackgroundPanel(), e.appendChild(this._backgroundPanelRef), this.addWindowEvents(e);
       }
       _createClass(le, [{
         key: "isOpen",
@@ -10537,20 +10485,20 @@ var app = (function () {
       }, {
         key: "addButtons",
         value: function addButtons() {
-          var _this47 = this;
+          var _this46 = this;
           for (var _len2 = arguments.length, e = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
             e[_key2] = arguments[_key2];
           }
           e.forEach(function (t) {
-            return _this47._buttonPanel.appendChild(t);
+            return _this46._buttonPanel.appendChild(t);
           });
         }
       }, {
         key: "close",
         value: function close() {
-          var _this48 = this;
+          var _this47 = this;
           this._elementRef.classList.remove("show-modal"), this._elementRef.classList.add("hide-modal"), this._backgroundPanelRef.classList.remove("show-modal-background"), this._backgroundPanelRef.classList.add("hide-modal-background"), this._isOpen = !1, setTimeout(function () {
-            _this48._elementRef.style.display = "none", _this48._backgroundPanelRef.style.display = "none";
+            _this47._elementRef.style.display = "none", _this47._backgroundPanelRef.style.display = "none";
           }, le.MODAL_CLOSE_TIMEOUT_MS);
         }
       }, {
@@ -10566,22 +10514,24 @@ var app = (function () {
       }, {
         key: "addCloseButton",
         value: function addCloseButton(e, t, i) {
-          var _this49 = this;
+          var _this48 = this;
           var n = t ? le.createSVGButton(e) : le.createTextButton(e);
           return this.addButtons(n), n.onclick = function () {
-            _this49.close(), setTimeout(function () {
+            _this48.close(), setTimeout(function () {
               i == null || i();
             }, 140);
           }, n;
         }
       }, {
         key: "addWindowEvents",
-        value: function addWindowEvents() {
-          var _this50 = this;
-          window.addEventListener("keydown", function (e) {
-            var t, i;
-            _this50._isOpen && (e.key === R.ESCAPE ? (_this50.close(), (t = _this50.extensionCloseCallback) == null || t.call(_this50)) : e.key === R.ENTER && (_this50.close(), (i = _this50.extensionCloseCallback) == null || i.call(_this50)));
-          });
+        value: function addWindowEvents(e) {
+          this.keyDownEvent = this.windowKeyDown.bind(this, e), window.addEventListener("keydown", this.keyDownEvent);
+        }
+      }, {
+        key: "windowKeyDown",
+        value: function windowKeyDown(e, t) {
+          var i, n;
+          !e.isConnected && this.keyDownEvent ? window.removeEventListener("keydown", this.keyDownEvent) : this._isOpen && (t.key === R.ESCAPE ? (this.close(), (i = this.extensionCloseCallback) == null || i.call(this)) : t.key === R.ENTER && (this.close(), (n = this.extensionCloseCallback) == null || n.call(this)));
         }
       }], [{
         key: "createContainer",
@@ -10619,7 +10569,7 @@ var app = (function () {
         value: function createSVGButton(e) {
           var t = document.createElement("div");
           t.classList.add("modal-button", "modal-svg-button");
-          var i = U.createSVGElement(e);
+          var i = q.createSVGElement(e);
           return i.classList.add("modal-svg-button-icon"), t.appendChild(i), t;
         }
       }, {
@@ -10636,18 +10586,18 @@ var app = (function () {
     }();
     fs.MODAL_CLOSE_TIMEOUT_MS = 190;
     var at = fs;
-    var ut = /*#__PURE__*/function (_St2) {
-      _inherits(ut, _St2);
+    var ut = /*#__PURE__*/function (_wt2) {
+      _inherits(ut, _wt2);
       var _super39 = _createSuper(ut);
       // prettier-ignore
       function ut(e, t, i, n, r, o) {
-        var _this51;
+        var _this49;
         _classCallCheck(this, ut);
         var l, c, d, u, h, p;
-        _this51 = _super39.call(this, ut.createButtonElement(), (l = i.button) == null ? void 0 : l.position, i.button, o);
-        var a = _this51.createInnerElements(n, r, _this51._customStyles);
-        _this51._inputElement = ut.createInputElement((c = i == null ? void 0 : i.files) == null ? void 0 : c.acceptedFormats), _this51.addClickEvent(e, i), _this51.elementRef.replaceChildren(a.styles), _this51.reapplyStateStyle("styles"), _this51._fileAttachmentsType = t, _this51._openModalOnce = ((u = (d = i.files) == null ? void 0 : d.infoModal) == null ? void 0 : u.openModalOnce) === !1 || (p = (h = i.files) == null ? void 0 : h.infoModal) == null ? void 0 : p.openModalOnce;
-        return _this51;
+        _this49 = _super39.call(this, ut.createButtonElement(), (l = i.button) == null ? void 0 : l.position, i.button, o);
+        var a = _this49.createInnerElements(n, r, _this49._customStyles);
+        _this49._inputElement = ut.createInputElement((c = i == null ? void 0 : i.files) == null ? void 0 : c.acceptedFormats), _this49.addClickEvent(e, i), _this49.elementRef.replaceChildren(a.styles), _this49.reapplyStateStyle("styles"), _this49._fileAttachmentsType = t, _this49._openModalOnce = ((u = (d = i.files) == null ? void 0 : d.infoModal) == null ? void 0 : u.openModalOnce) === !1 || (p = (h = i.files) == null ? void 0 : h.infoModal) == null ? void 0 : p.openModalOnce;
+        return _this49;
       }
       _createClass(ut, [{
         key: "createInnerElements",
@@ -10665,7 +10615,7 @@ var app = (function () {
       }, {
         key: "import",
         value: function _import(e) {
-          wt.addFilesToType(Array.from(e.files || []), [this._fileAttachmentsType]), e.value = "";
+          _t.addFilesToType(Array.from(e.files || []), [this._fileAttachmentsType]), e.value = "";
         }
       }, {
         key: "createInnerElement",
@@ -10699,12 +10649,12 @@ var app = (function () {
       }, {
         key: "createSVGIconElement",
         value: function createSVGIconElement(e, t) {
-          var i = U.createSVGElement(t);
+          var i = q.createSVGElement(t);
           return i.id = e, i;
         }
       }]);
       return ut;
-    }(St);
+    }(wt);
     var de = /*#__PURE__*/function () {
       function de() {
         _classCallCheck(this, de);
@@ -10861,14 +10811,14 @@ var app = (function () {
       return Me;
     }();
     var ia = "<?xml version=\"1.0\" encoding=\"iso-8859-1\"?>\n<svg height=\"1.4em\" width=\"1.4em\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\"\n\t viewBox=\"0 0 490.9 490.9\" xml:space=\"preserve\">\n\t<g>\n\t\t<g>\n\t\t\t<path d=\"M245.5,322.9c53,0,96.2-43.2,96.2-96.2V96.2c0-53-43.2-96.2-96.2-96.2s-96.2,43.2-96.2,96.2v130.5\n\t\t\t\tC149.3,279.8,192.5,322.9,245.5,322.9z M173.8,96.2c0-39.5,32.2-71.7,71.7-71.7s71.7,32.2,71.7,71.7v130.5\n\t\t\t\tc0,39.5-32.2,71.7-71.7,71.7s-71.7-32.2-71.7-71.7V96.2z\"/>\n\t\t\t<path d=\"M94.4,214.5c-6.8,0-12.3,5.5-12.3,12.3c0,85.9,66.7,156.6,151.1,162.8v76.7h-63.9c-6.8,0-12.3,5.5-12.3,12.3\n\t\t\t\ts5.5,12.3,12.3,12.3h152.3c6.8,0,12.3-5.5,12.3-12.3s-5.5-12.3-12.3-12.3h-63.9v-76.7c84.4-6.3,151.1-76.9,151.1-162.8\n\t\t\t\tc0-6.8-5.5-12.3-12.3-12.3s-12.3,5.5-12.3,12.3c0,76.6-62.3,138.9-138.9,138.9s-138.9-62.3-138.9-138.9\n\t\t\t\tC106.6,220,101.2,214.5,94.4,214.5z\"/>\n\t\t</g>\n\t</g>\n</svg>\n";
-    var bt = /*#__PURE__*/function (_St3) {
-      _inherits(bt, _St3);
+    var bt = /*#__PURE__*/function (_wt3) {
+      _inherits(bt, _wt3);
       var _super40 = _createSuper(bt);
       function bt(e) {
-        var _this52;
+        var _this50;
         _classCallCheck(this, bt);
-        (e == null ? void 0 : e.position) === "dropup-menu" && (e.position = "outside-right"), _this52 = _super40.call(this, bt.createMicrophoneElement(), e == null ? void 0 : e.position, e), _this52.isActive = !1, _this52._innerElements = _this52.createInnerElements(_this52._customStyles), _this52.changeToDefault();
-        return _this52;
+        (e == null ? void 0 : e.position) === "dropup-menu" && (e.position = "outside-right"), _this50 = _super40.call(this, bt.createMicrophoneElement(), e == null ? void 0 : e.position, e), _this50.isActive = !1, _this50._innerElements = _this50.createInnerElements(_this50._customStyles), _this50.changeToDefault();
+        return _this50;
       }
       _createClass(bt, [{
         key: "createInnerElements",
@@ -10932,12 +10882,12 @@ var app = (function () {
       }, {
         key: "createSVGIconElement",
         value: function createSVGIconElement() {
-          var e = U.createSVGElement(ia);
+          var e = q.createSVGElement(ia);
           return e.id = "microphone-icon", e;
         }
       }]);
       return bt;
-    }(St);
+    }(wt);
     var ms = {},
       oi = {},
       ai = {},
@@ -11005,7 +10955,7 @@ var app = (function () {
       value: !0
     });
     ai.WebSpeechTranscript = void 0;
-    var wn = Mt;
+    var _n = Mt;
     var ra = /*#__PURE__*/function () {
       function ra() {
         _classCallCheck(this, ra);
@@ -11016,7 +10966,7 @@ var app = (function () {
           var n = "";
           for (var r = e.resultIndex; r < e.results.length; ++r) {
             var o = e.results[r][0].transcript;
-            i && (o = wn.Translate.translate(o, i)), e.results[r].isFinal ? t += o : n += o;
+            i && (o = _n.Translate.translate(o, i)), e.results[r].isFinal ? t += o : n += o;
           }
           return {
             interimTranscript: n,
@@ -11031,7 +10981,7 @@ var app = (function () {
           var r = "";
           for (var o = e.resultIndex; o < e.results.length; ++o) {
             var a = e.results[o][0].transcript;
-            i && (a = wn.Translate.translate(a, i)), n += a;
+            i && (a = _n.Translate.translate(a, i)), n += a;
           }
           return {
             interimTranscript: r,
@@ -11075,9 +11025,9 @@ var app = (function () {
       }, {
         key: "keyDownWindow",
         value: function keyDownWindow(e) {
-          var _this53 = this;
+          var _this51 = this;
           e.element && J.getElementIfFocusedOnAvailable(e.element, document.activeElement) && (J.KEY_DOWN_TIMEOUT !== null && clearTimeout(J.KEY_DOWN_TIMEOUT), J.KEY_DOWN_TIMEOUT = setTimeout(function () {
-            J.KEY_DOWN_TIMEOUT = null, _this53.resetRecording(e);
+            J.KEY_DOWN_TIMEOUT = null, _this51.resetRecording(e);
           }, 500));
         }
       }, {
@@ -11479,7 +11429,7 @@ var app = (function () {
     ui.Padding = void 0;
     var ua = je,
       An = Fe,
-      qe = De;
+      Ue = De;
     var Kt = /*#__PURE__*/function () {
       function Kt() {
         _classCallCheck(this, Kt);
@@ -11492,11 +11442,11 @@ var app = (function () {
               r = t.value[n - 1],
               o = t.selectionEnd === null ? n : t.selectionEnd,
               a = t.value[o];
-            qe.Text.isCharDefined(r) && (e.startPadding = " ", e.numberOfSpacesBeforeNewText = 1), qe.Text.isCharDefined(a) && (e.endPadding = " ", e.numberOfSpacesAfterNewText = 1), e.isCursorAtEnd = t.value.length === o;
+            Ue.Text.isCharDefined(r) && (e.startPadding = " ", e.numberOfSpacesBeforeNewText = 1), Ue.Text.isCharDefined(a) && (e.endPadding = " ", e.numberOfSpacesAfterNewText = 1), e.isCursorAtEnd = t.value.length === o;
             return;
           }
           var i = t.value[t.value.length - 1];
-          qe.Text.isCharDefined(i) && (e.startPadding = " ", e.numberOfSpacesBeforeNewText = 1), e.isCursorAtEnd = !0;
+          Ue.Text.isCharDefined(i) && (e.startPadding = " ", e.numberOfSpacesBeforeNewText = 1), e.isCursorAtEnd = !0;
         }
       }, {
         key: "setStateForGenericElement",
@@ -11509,12 +11459,12 @@ var app = (function () {
                 c = (i = t.textContent) === null || i === void 0 ? void 0 : i[l - 1],
                 d = An.Cursor.getGenericElementCursorOffset(t, a, !1),
                 u = (n = t.textContent) === null || n === void 0 ? void 0 : n[d];
-              qe.Text.isCharDefined(c) && (e.startPadding = " "), qe.Text.isCharDefined(u) && (e.endPadding = " "), e.isCursorAtEnd = ((r = t.textContent) === null || r === void 0 ? void 0 : r.length) === d;
+              Ue.Text.isCharDefined(c) && (e.startPadding = " "), Ue.Text.isCharDefined(u) && (e.endPadding = " "), e.isCursorAtEnd = ((r = t.textContent) === null || r === void 0 ? void 0 : r.length) === d;
               return;
             }
           }
           var o = t.innerText.charAt(t.innerText.length - 1);
-          qe.Text.isCharDefined(o) && (e.startPadding = " "), e.isCursorAtEnd = !0;
+          Ue.Text.isCharDefined(o) && (e.startPadding = " "), e.isCursorAtEnd = !0;
         }
       }, {
         key: "setState",
@@ -11698,22 +11648,22 @@ var app = (function () {
       }, {
         key: "setEvents",
         value: function setEvents() {
-          var _this54 = this;
+          var _this52 = this;
           this._service && (this._service.onstart = function () {
-            _this54.setStateOnStart();
+            _this52.setStateOnStart();
           }, this._service.onerror = function (e) {
-            Nn.Browser.IS_SAFARI() && e.message === "Another request is started" || e.error === "aborted" && _this54.isRestarting || e.error !== "no-speech" && _this54.error(e.message || e.error);
+            Nn.Browser.IS_SAFARI() && e.message === "Another request is started" || e.error === "aborted" && _this52.isRestarting || e.error !== "no-speech" && _this52.error(e.message || e.error);
           }, this._service.onaudioend = function () {
-            _this54.setStateOnStop();
+            _this52.setStateOnStop();
           }, this._service.onend = function () {
-            _this54._stopping = !1;
+            _this52._stopping = !1;
           }, this._service.onresult = function (e) {
-            if (_typeof(e.results) > "u" && _this54._service) _this54._service.onend = null, _this54._service.stop();else if (_this54._extractText && !_this54._stopping) {
-              var _this54$_extractText = _this54._extractText(e, _this54.finalTranscript, _this54._translations),
-                t = _this54$_extractText.interimTranscript,
-                _i17 = _this54$_extractText.finalTranscript,
-                n = _this54$_extractText.newText;
-              _this54.updateElements(t, _i17, n);
+            if (_typeof(e.results) > "u" && _this52._service) _this52._service.onend = null, _this52._service.stop();else if (_this52._extractText && !_this52._stopping) {
+              var _this52$_extractText = _this52._extractText(e, _this52.finalTranscript, _this52._translations),
+                t = _this52$_extractText.interimTranscript,
+                _i17 = _this52$_extractText.finalTranscript,
+                n = _this52$_extractText.newText;
+              _this52.updateElements(t, _i17, n);
             }
           });
         }
@@ -11933,10 +11883,10 @@ var app = (function () {
       _inherits(Yt, _va$Speech);
       var _super42 = _createSuper(Yt);
       function Yt() {
-        var _this55;
+        var _this53;
         _classCallCheck(this, Yt);
-        _this55 = _super42.apply(this, arguments), _this55._newTextPadding = "";
-        return _this55;
+        _this53 = _super42.apply(this, arguments), _this53._newTextPadding = "";
+        return _this53;
       }
       _createClass(Yt, [{
         key: "start",
@@ -12064,12 +12014,12 @@ var app = (function () {
       }, {
         key: "retrieveTokenInterval",
         value: function retrieveTokenInterval(e) {
-          var _this56 = this;
+          var _this54 = this;
           this._retrieveTokenInterval = setInterval(function () {
             e == null || e().then(function (t) {
-              _this56._service && (_this56._service.authorizationToken = (t == null ? void 0 : t.trim()) || "");
+              _this54._service && (_this54._service.authorizationToken = (t == null ? void 0 : t.trim()) || "");
             })["catch"](function (t) {
-              _this56.error(t);
+              _this54.error(t);
             });
           }, 1e4);
         }
@@ -12151,18 +12101,18 @@ var app = (function () {
       _inherits(Zt, _bt);
       var _super43 = _createSuper(Zt);
       function Zt(e, t, i) {
-        var _this57;
+        var _this55;
         _classCallCheck(this, Zt);
         var o;
-        _this57 = _super43.call(this, _typeof(e.speechToText) == "object" ? (o = e.speechToText) == null ? void 0 : o.button : {});
+        _this55 = _super43.call(this, _typeof(e.speechToText) == "object" ? (o = e.speechToText) == null ? void 0 : o.button : {});
         var _Zt$processConfigurat = Zt.processConfiguration(t, e.speechToText),
           n = _Zt$processConfigurat.serviceName,
           r = _Zt$processConfigurat.processedConfig;
-        if (_this57._addErrorMessage = i, n === "webspeech" && !Li.isWebSpeechSupported()) _this57.changeToUnsupported();else {
+        if (_this55._addErrorMessage = i, n === "webspeech" && !Li.isWebSpeechSupported()) _this55.changeToUnsupported();else {
           var a = !e.textInput || !e.textInput.disabled;
-          _this57.elementRef.onclick = _this57.buttonClick.bind(_assertThisInitialized(_this57), t, a, n, r);
+          _this55.elementRef.onclick = _this55.buttonClick.bind(_assertThisInitialized(_this55), t, a, n, r);
         }
-        return _this57;
+        return _this55;
       }
       // prettier-ignore
       _createClass(Zt, [{
@@ -12243,11 +12193,11 @@ var app = (function () {
       _inherits(Ea, _bt2);
       var _super44 = _createSuper(Ea);
       function Ea(e, t) {
-        var _this58;
+        var _this56;
         _classCallCheck(this, Ea);
         var i, n;
-        _this58 = _super44.call(this, t.button), _this58._waitingForBrowserApproval = !1, _this58._audioType = e, _this58._extension = ((i = t.files) == null ? void 0 : i.format) || "mp3", _this58._maxDurationSeconds = (n = t.files) == null ? void 0 : n.maxDurationSeconds, _this58.elementRef.onclick = _this58.buttonClick.bind(_assertThisInitialized(_this58));
-        return _this58;
+        _this56 = _super44.call(this, t.button), _this56._waitingForBrowserApproval = !1, _this56._audioType = e, _this56._extension = ((i = t.files) == null ? void 0 : i.format) || "mp3", _this56._maxDurationSeconds = (n = t.files) == null ? void 0 : n.maxDurationSeconds, _this56.elementRef.onclick = _this56.buttonClick.bind(_assertThisInitialized(_this56));
+        return _this56;
       }
       _createClass(Ea, [{
         key: "buttonClick",
@@ -12257,10 +12207,10 @@ var app = (function () {
       }, {
         key: "stop",
         value: function stop() {
-          var _this59 = this;
+          var _this57 = this;
           return new Promise(function (e) {
             var t, i;
-            _this59.changeToDefault(), (t = _this59._mediaRecorder) == null || t.stop(), (i = _this59._mediaStream) == null || i.getTracks().forEach(function (n) {
+            _this57.changeToDefault(), (t = _this57._mediaRecorder) == null || t.stop(), (i = _this57._mediaStream) == null || i.getTracks().forEach(function (n) {
               return n.stop();
             }), setTimeout(function () {
               e();
@@ -12270,23 +12220,23 @@ var app = (function () {
       }, {
         key: "record",
         value: function record() {
-          var _this60 = this;
+          var _this58 = this;
           navigator.mediaDevices.getUserMedia({
             audio: !0
           }).then(function (e) {
-            _this60.changeToActive(), _this60._mediaRecorder = new MediaRecorder(e), _this60._audioType.addPlaceholderAttachment(_this60.stop.bind(_this60), _this60._maxDurationSeconds), _this60._mediaStream = e, _this60._mediaRecorder.addEventListener("dataavailable", function (t) {
-              _this60.createFile(t);
-            }), _this60._mediaRecorder.start();
+            _this58.changeToActive(), _this58._mediaRecorder = new MediaRecorder(e), _this58._audioType.addPlaceholderAttachment(_this58.stop.bind(_this58), _this58._maxDurationSeconds), _this58._mediaStream = e, _this58._mediaRecorder.addEventListener("dataavailable", function (t) {
+              _this58.createFile(t);
+            }), _this58._mediaRecorder.start();
           })["catch"](function (e) {
-            console.error(e), _this60.stop();
+            console.error(e), _this58.stop();
           })["finally"](function () {
-            _this60._waitingForBrowserApproval = !1;
+            _this58._waitingForBrowserApproval = !1;
           });
         }
       }, {
         key: "createFile",
         value: function createFile(e) {
-          var _this61 = this;
+          var _this59 = this;
           var t = new Blob([e.data], {
               type: "audio/".concat(this._extension)
             }),
@@ -12296,13 +12246,13 @@ var app = (function () {
             }),
             r = new FileReader();
           r.readAsDataURL(n), r.onload = function (o) {
-            _this61._audioType.completePlaceholderAttachment(n, o.target.result);
+            _this59._audioType.completePlaceholderAttachment(n, o.target.result);
           };
         }
       }]);
       return Ea;
     }(bt);
-    var _a = "<?xml version=\"1.0\" standalone=\"no\"?>\n<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.0//EN\" \"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">\n<svg xmlns=\"http://www.w3.org/2000/svg\" stroke=\"currentColor\" fill=\"none\" stroke-width=\"1\" viewBox=\"0 0 24 24\" stroke-linecap=\"round\" stroke-linejoin=\"round\">\n  <line x1=\"22\" y1=\"2\" x2=\"11\" y2=\"14\"></line>\n  <polygon points=\"22 2 15 22 11 14 2 10 22 2\"></polygon>\n</svg>\n";
+    var Sa = "<?xml version=\"1.0\" standalone=\"no\"?>\n<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.0//EN\" \"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">\n<svg xmlns=\"http://www.w3.org/2000/svg\" stroke=\"currentColor\" fill=\"none\" stroke-width=\"1\" viewBox=\"0 0 24 24\" stroke-linecap=\"round\" stroke-linejoin=\"round\">\n  <line x1=\"22\" y1=\"2\" x2=\"11\" y2=\"14\"></line>\n  <polygon points=\"22 2 15 22 11 14 2 10 22 2\"></polygon>\n</svg>\n";
     var B = /*#__PURE__*/function () {
       function B() {
         _classCallCheck(this, B);
@@ -12371,24 +12321,24 @@ var app = (function () {
       }]);
       return Ce;
     }();
-    var yi = /*#__PURE__*/function (_St4) {
-      _inherits(k, _St4);
+    var yi = /*#__PURE__*/function (_wt4) {
+      _inherits(k, _wt4);
       var _super45 = _createSuper(k);
       // prettier-ignore
       function k(e, t, i, n, r) {
-        var _this62;
+        var _this60;
         _classCallCheck(this, k);
         var o = Ce.process(e.submitButtonStyles);
-        _this62 = _super45.call(this, k.createButtonContainerElement(), o == null ? void 0 : o.position, o), _this62._isSVGLoadingIconOverriden = !1, _this62.status = {
+        _this60 = _super45.call(this, k.createButtonContainerElement(), o == null ? void 0 : o.position, o), _this60._isSVGLoadingIconOverriden = !1, _this60.status = {
           requestInProgress: !1,
           loadingActive: !1
-        }, _this62._messages = i, _this62._inputElementRef = t, _this62._fileAttachments = r, _this62._innerElements = _this62.createInnerElements(), _this62._abortStream = new AbortController(), _this62._stopClicked = {
+        }, _this60._messages = i, _this60._inputElementRef = t, _this60._fileAttachments = r, _this60._innerElements = _this60.createInnerElements(), _this60._abortStream = new AbortController(), _this60._stopClicked = {
           listener: function listener() {}
-        }, _this62._serviceIO = n, _this62._alwaysEnabled = !!(o != null && o.alwaysEnabled), e.disableSubmitButton = _this62.disableSubmitButton.bind(_assertThisInitialized(_this62), n), _this62.attemptOverwriteLoadingStyle(e), setTimeout(function () {
+        }, _this60._serviceIO = n, _this60._alwaysEnabled = !!(o != null && o.alwaysEnabled), e.disableSubmitButton = _this60.disableSubmitButton.bind(_assertThisInitialized(_this60), n), _this60.attemptOverwriteLoadingStyle(e), setTimeout(function () {
           var a;
-          _this62._validationHandler = e._validationHandler, _this62.assignHandlers(_this62._validationHandler), (a = _this62._validationHandler) == null || a.call(_assertThisInitialized(_this62));
+          _this60._validationHandler = e._validationHandler, _this60.assignHandlers(_this60._validationHandler), (a = _this60._validationHandler) == null || a.call(_assertThisInitialized(_this60));
         });
-        return _this62;
+        return _this60;
       }
       // prettier-ignore
       _createClass(k, [{
@@ -12477,7 +12427,7 @@ var app = (function () {
         key: "programmaticSubmit",
         value: function () {
           var _programmaticSubmit = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee100(e) {
-            var _this63 = this;
+            var _this61 = this;
             var t;
             return _regeneratorRuntime().wrap(function _callee100$(_context100) {
               while (1) switch (_context100.prev = _context100.next) {
@@ -12492,7 +12442,7 @@ var app = (function () {
                       type: ue.getTypeFromBlob(i)
                     };
                   })), setTimeout(function () {
-                    return _this63.attemptSubmit(t, !0);
+                    return _this61.attemptSubmit(t, !0);
                   });
                 case 3:
                 case "end":
@@ -12536,7 +12486,7 @@ var app = (function () {
                   return this.addNewMessage(e);
                 case 10:
                   this._serviceIO.isWebModel() || this._messages.addLoadingMessage();
-                  Ui.clear(this._inputElementRef);
+                  qi.clear(this._inputElementRef);
                   i = (o = e.files) == null ? void 0 : o.map(function (l) {
                     return l.file;
                   }), n = {
@@ -12639,7 +12589,7 @@ var app = (function () {
       }, {
         key: "createSubmitIconElement",
         value: function createSubmitIconElement() {
-          var e = U.createSVGElement(_a);
+          var e = q.createSVGElement(Sa);
           return e.id = "submit-icon", e;
         }
       }, {
@@ -12656,12 +12606,12 @@ var app = (function () {
         }
       }]);
       return k;
-    }(St);
+    }(wt);
     yi.SUBMIT_CLASS = "submit-button";
     yi.LOADING_CLASS = "loading-button";
     yi.DISABLED_CLASS = "disabled-button";
-    var Sa = yi;
-    var wa = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<svg viewBox=\"0 0 32 32\" xmlns=\"http://www.w3.org/2000/svg\">\n  <path d=\"M27.1 14.313V5.396L24.158 8.34c-2.33-2.325-5.033-3.503-8.11-3.503C9.902 4.837 4.901 9.847 4.899 16c.001 6.152 5.003 11.158 11.15 11.16 4.276 0 9.369-2.227 10.836-8.478l.028-.122h-3.23l-.022.068c-1.078 3.242-4.138 5.421-7.613 5.421a8 8 0 0 1-5.691-2.359A7.993 7.993 0 0 1 8 16.001c0-4.438 3.611-8.049 8.05-8.049 2.069 0 3.638.58 5.924 2.573l-3.792 3.789H27.1z\"/>\n</svg>\n",
+    var wa = yi;
+    var _a = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<svg viewBox=\"0 0 32 32\" xmlns=\"http://www.w3.org/2000/svg\">\n  <path d=\"M27.1 14.313V5.396L24.158 8.34c-2.33-2.325-5.033-3.503-8.11-3.503C9.902 4.837 4.901 9.847 4.899 16c.001 6.152 5.003 11.158 11.15 11.16 4.276 0 9.369-2.227 10.836-8.478l.028-.122h-3.23l-.022.068c-1.078 3.242-4.138 5.421-7.613 5.421a8 8 0 0 1-5.691-2.359A7.993 7.993 0 0 1 8 16.001c0-4.438 3.611-8.049 8.05-8.049 2.069 0 3.638.58 5.924 2.573l-3.792 3.789H27.1z\"/>\n</svg>\n",
       Ma = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<svg viewBox=\"0 0 32 32\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\">\n  <title>capture</title>\n  <path d=\"M0 16q0 3.264 1.28 6.208t3.392 5.12 5.12 3.424 6.208 1.248 6.208-1.248 5.12-3.424 3.392-5.12 1.28-6.208-1.28-6.208-3.392-5.12-5.088-3.392-6.24-1.28q-3.264 0-6.208 1.28t-5.12 3.392-3.392 5.12-1.28 6.208zM4 16q0-3.264 1.6-6.016t4.384-4.352 6.016-1.632 6.016 1.632 4.384 4.352 1.6 6.016-1.6 6.048-4.384 4.352-6.016 1.6-6.016-1.6-4.384-4.352-1.6-6.048z\"></path>\n</svg>\n",
       Ta = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<svg viewBox=\"0 0 1024 1024\" xmlns=\"http://www.w3.org/2000/svg\">\n  <path d=\"M195.2 195.2a64 64 0 0 1 90.496 0L512 421.504 738.304 195.2a64 64 0 0 1 90.496 90.496L602.496 512 828.8 738.304a64 64 0 0 1-90.496 90.496L512 602.496 285.696 828.8a64 64 0 0 1-90.496-90.496L421.504 512 195.2 285.696a64 64 0 0 1 0-90.496z\"/>\n</svg>",
       Ca = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<svg viewBox=\"0 0 24 24\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n  <path d=\"M4.89163 13.2687L9.16582 17.5427L18.7085 8\" stroke=\"#000000\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>\n</svg>";
@@ -12670,14 +12620,14 @@ var app = (function () {
       var _super46 = _createSuper(sn);
       // prettier-ignore
       function sn(e, t, i, n) {
-        var _this64;
+        var _this62;
         _classCallCheck(this, sn);
-        _this64 = _super46.call(this, e, ["modal-content", "modal-camera-content"], i), _this64._stopped = !1, _this64._format = "image/png", _this64._canvas = document.createElement("canvas"), _this64._canvas.classList.add("camera-modal-canvas");
-        var _this64$addButtonsAnd = _this64.addButtonsAndTheirEvents(t),
-          r = _this64$addButtonsAnd.captureButton,
-          o = _this64$addButtonsAnd.submitButton;
-        _this64._captureButton = r, _this64._submitButton = o, _this64._captureIcon = _this64._captureButton.children[0], _this64._refreshIcon = U.createSVGElement(wa), _this64._refreshIcon.classList.add("modal-svg-button-icon", "modal-svg-refresh-icon"), (n == null ? void 0 : n.format) === "jpeg" && (_this64._format = "image/jpeg"), n != null && n.dimensions && (_this64._dimensions = n.dimensions), _this64._contentRef.appendChild(_this64._canvas), _this64.extensionCloseCallback = _this64.stop;
-        return _this64;
+        _this62 = _super46.call(this, e, ["modal-content", "modal-camera-content"], i), _this62._stopped = !1, _this62._format = "image/png", _this62._canvas = document.createElement("canvas"), _this62._canvas.classList.add("camera-modal-canvas");
+        var _this62$addButtonsAnd = _this62.addButtonsAndTheirEvents(t),
+          r = _this62$addButtonsAnd.captureButton,
+          o = _this62$addButtonsAnd.submitButton;
+        _this62._captureButton = r, _this62._submitButton = o, _this62._captureIcon = _this62._captureButton.children[0], _this62._refreshIcon = q.createSVGElement(_a), _this62._refreshIcon.classList.add("modal-svg-button-icon", "modal-svg-refresh-icon"), (n == null ? void 0 : n.format) === "jpeg" && (_this62._format = "image/jpeg"), n != null && n.dimensions && (_this62._dimensions = n.dimensions), _this62._contentRef.appendChild(_this62._canvas), _this62.extensionCloseCallback = _this62.stop;
+        return _this62;
       }
       _createClass(sn, [{
         key: "addButtonsAndTheirEvents",
@@ -12696,38 +12646,38 @@ var app = (function () {
       }, {
         key: "addButtonEvents",
         value: function addButtonEvents(e, t, i, n) {
-          var _this65 = this;
+          var _this63 = this;
           e.onclick = function () {
-            _this65.capture();
+            _this63.capture();
           }, t.addEventListener("click", this.stop.bind(this)), i.onclick = function () {
-            var r = _this65.getFile();
-            r && wt.addFilesToType([r], [n]), _this65.stop(), _this65.close();
+            var r = _this63.getFile();
+            r && _t.addFilesToType([r], [n]), _this63.stop(), _this63.close();
           };
         }
       }, {
         key: "stop",
         value: function stop() {
-          var _this66 = this;
+          var _this64 = this;
           this._mediaStream && this._mediaStream.getTracks().forEach(function (e) {
             return e.stop();
           }), this._stopped = !0, setTimeout(function () {
-            _this66._captureButton.replaceChildren(_this66._captureIcon), _this66._captureButton.classList.replace("modal-svg-refresh-button", "modal-svg-camera-button");
-            var e = _this66._canvas.getContext("2d");
-            e == null || e.clearRect(0, 0, _this66._canvas.width, _this66._canvas.height);
+            _this64._captureButton.replaceChildren(_this64._captureIcon), _this64._captureButton.classList.replace("modal-svg-refresh-button", "modal-svg-camera-button");
+            var e = _this64._canvas.getContext("2d");
+            e == null || e.clearRect(0, 0, _this64._canvas.width, _this64._canvas.height);
           }, at.MODAL_CLOSE_TIMEOUT_MS);
         }
       }, {
         key: "start",
         value: function start() {
-          var _this67 = this;
+          var _this65 = this;
           this._dataURL = void 0, this._submitButton.classList.add("modal-svg-submit-disabled"), this._stopped = !1, navigator.mediaDevices.getUserMedia({
             video: this._dimensions || !0
           }).then(function (e) {
-            if (_this67._mediaStream = e, !_this67.isOpen()) return _this67.stop();
+            if (_this65._mediaStream = e, !_this65.isOpen()) return _this65.stop();
             var t = document.createElement("video");
-            t.srcObject = e, t.play(), requestAnimationFrame(_this67.updateCanvas.bind(_this67, t, _this67._canvas));
+            t.srcObject = e, t.play(), requestAnimationFrame(_this65.updateCanvas.bind(_this65, t, _this65._canvas));
           })["catch"](function (e) {
-            console.error(e), _this67.stop(), _this67.close();
+            console.error(e), _this65.stop(), _this65.close();
           });
         }
       }, {
@@ -12781,17 +12731,17 @@ var app = (function () {
       return sn;
     }(at);
     var Aa = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<svg viewBox=\"0 0 32 32\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\">\n  <path d=\"M29 7h-4.599l-2.401-4h-12l-2.4 4h-4.6c-1 0-3 1-3 2.969v16.031c0 1.657 1.5 3 2.792 3h26.271c1.313 0 2.938-1.406 2.938-2.968v-16.032c0-1-1-3-3-3zM30 26.032c0 0.395-0.639 0.947-0.937 0.969h-26.265c-0.232-0.019-0.797-0.47-0.797-1v-16.031c0-0.634 0.851-0.953 1-0.969h5.732l2.4-4h9.802l1.785 3.030 0.55 0.97h5.731c0.705 0 0.99 0.921 1 1v16.032zM16 10c-3.866 0-7 3.134-7 7s3.134 7 7 7 7-3.134 7-7-3.134-7-7-7zM16 22c-2.757 0-5-2.243-5-5s2.243-5 5-5 5 2.243 5 5-2.243 5-5 5z\"></path>\n</svg>";
-    var Xt = /*#__PURE__*/function (_St5) {
-      _inherits(Xt, _St5);
+    var Xt = /*#__PURE__*/function (_wt5) {
+      _inherits(Xt, _wt5);
       var _super47 = _createSuper(Xt);
       function Xt(e, t, i) {
-        var _this68;
+        var _this66;
         _classCallCheck(this, Xt);
         var r;
-        _this68 = _super47.call(this, Xt.createButtonElement(), (r = i == null ? void 0 : i.button) == null ? void 0 : r.position, (i == null ? void 0 : i.button) || {}, "Photo");
-        var n = _this68.createInnerElements(_this68._customStyles);
-        i && _this68.addClickEvent(e, t, i.modalContainerStyle, i.files), _this68.elementRef.classList.add("upload-file-button"), _this68.elementRef.appendChild(n.styles), _this68.reapplyStateStyle("styles");
-        return _this68;
+        _this66 = _super47.call(this, Xt.createButtonElement(), (r = i == null ? void 0 : i.button) == null ? void 0 : r.position, (i == null ? void 0 : i.button) || {}, "Photo");
+        var n = _this66.createInnerElements(_this66._customStyles);
+        i && _this66.addClickEvent(e, t, i.modalContainerStyle, i.files), _this66.elementRef.classList.add("upload-file-button"), _this66.elementRef.appendChild(n.styles), _this66.reapplyStateStyle("styles");
+        return _this66;
       }
       _createClass(Xt, [{
         key: "createInnerElements",
@@ -12822,24 +12772,24 @@ var app = (function () {
       }, {
         key: "createSVGIconElement",
         value: function createSVGIconElement() {
-          var e = U.createSVGElement(Aa);
+          var e = q.createSVGElement(Aa);
           return e.id = "camera-icon", e;
         }
       }]);
       return Xt;
-    }(St);
+    }(wt);
     var pt = /*#__PURE__*/function () {
       // prettier-ignore
       function pt(e, t, i, n) {
         _classCallCheck(this, pt);
         this.elementRef = pt.createPanelElement(e.inputAreaStyle);
-        var r = new Ui(e, i),
+        var r = new qi(e, i),
           o = {},
           a = this.createFileUploadComponents(e, i, n, o);
         e.speechToText && !o.microphone && (o.microphone = {
           button: new Zt(e, r, t.addNewErrorMessage.bind(t))
         });
-        var l = new Sa(e, r.inputElementRef, t, i, a);
+        var l = new wa(e, r.inputElementRef, t, i, a);
         r.submit = l.submitFromInput.bind(l), Me.attach(e, i, r, a, l), e.submitUserMessage = l.programmaticSubmit.bind(l), o.submit = {
           button: l
         }, pt.addElements(this.elementRef, r, o, n, a, e.dropupStyles);
@@ -12850,7 +12800,7 @@ var app = (function () {
         // prettier-ignore
         function createFileUploadComponents(e, t, i, n) {
           var o, a, l, c;
-          var r = new wt(this.elementRef, e.attachmentContainerStyle, t.demo);
+          var r = new _t(this.elementRef, e.attachmentContainerStyle, t.demo);
           if (pt.createUploadButtons(e, t.fileTypes || {}, r, i, n), (o = t.camera) != null && o.files) {
             var d = ((a = n.images) == null ? void 0 : a.fileType) || r.addType(e, t.camera.files, "images");
             n.camera = {
@@ -12938,22 +12888,22 @@ var app = (function () {
       _inherits(b, _vo);
       var _super48 = _createSuper(b);
       function b() {
-        var _this69;
+        var _this67;
         _classCallCheck(this, b);
-        _this69 = _super48.call(this), _this69.getMessages = function () {
+        _this67 = _super48.call(this), _this67.getMessages = function () {
           return [];
-        }, _this69.submitUserMessage = function () {
+        }, _this67.submitUserMessage = function () {
           return console.warn("submitUserMessage failed - please wait for chat view to render before calling this property.");
-        }, _this69.focusInput = function () {
-          return Qt.focusFromParentElement(_this69._elementRef);
-        }, _this69.refreshMessages = function () {}, _this69.clearMessages = function () {}, _this69.scrollToBottom = function () {}, _this69.disableSubmitButton = function () {}, _this69._hasBeenRendered = !1, _this69._auxiliaryStyleApplied = !1, _this69._addMessage = function () {
+        }, _this67.focusInput = function () {
+          return Qt.focusFromParentElement(_this67._elementRef);
+        }, _this67.refreshMessages = function () {}, _this67.clearMessages = function () {}, _this67.scrollToBottom = function () {}, _this67.disableSubmitButton = function () {}, _this67._hasBeenRendered = !1, _this67._auxiliaryStyleApplied = !1, _this67._addMessage = function () {
           return console.warn("addMessage failed - please wait for chat view to render before calling this property.");
-        }, Vo.appendStyleSheetToHead(), _this69._elementRef = document.createElement("div"), _this69._elementRef.id = "container", _this69.attachShadow({
+        }, Go.appendStyleSheetToHead(), _this67._elementRef = document.createElement("div"), _this67._elementRef.id = "container", _this67.attachShadow({
           mode: "open"
-        }).appendChild(_this69._elementRef), Ei.apply(ka, _this69.shadowRoot), setTimeout(function () {
-          _this69._hasBeenRendered || _this69.onRender();
+        }).appendChild(_this67._elementRef), Ei.apply(ka, _this67.shadowRoot), setTimeout(function () {
+          _this67._hasBeenRendered || _this67.onRender();
         }, 20);
-        return _this69;
+        return _this67;
       }
       _createClass(b, [{
         key: "changeToChatView",
@@ -12965,7 +12915,7 @@ var app = (function () {
         key: "onRender",
         value: function onRender() {
           var _this$_childElement;
-          (!this._activeService || this._activeService.demo) && (this._activeService = Ho.create(this)), this.auxiliaryStyle && !this._auxiliaryStyleApplied && (Ei.apply(this.auxiliaryStyle, this.shadowRoot), this._auxiliaryStyleApplied = !0), Ei.applyDefaultStyleToComponent(this.style, this.chatStyle), ke.checkForContainerStyles(this, this._elementRef), this._activeService.key && this._activeService.validateConfigKey ? Dt.render(this._elementRef, this.changeToChatView.bind(this), this._activeService) : !(this._activeService instanceof q) || this._activeService.key ? ((_this$_childElement = this._childElement) !== null && _this$_childElement !== void 0 ? _this$_childElement : this._childElement = this.children[0], rn.render(this, this._elementRef, this._activeService, this._childElement)) : this._activeService instanceof q && P.render(this._elementRef, this.changeToChatView.bind(this), this._activeService), this._hasBeenRendered = !0, jt.onRender(this);
+          (!this._activeService || this._activeService.demo) && (this._activeService = Ho.create(this)), this.auxiliaryStyle && !this._auxiliaryStyleApplied && (Ei.apply(this.auxiliaryStyle, this.shadowRoot), this._auxiliaryStyleApplied = !0), Ei.applyDefaultStyleToComponent(this.style, this.chatStyle), ke.checkForContainerStyles(this, this._elementRef), this._activeService.key && this._activeService.validateConfigKey ? Dt.render(this._elementRef, this.changeToChatView.bind(this), this._activeService) : !(this._activeService instanceof U) || this._activeService.key ? ((_this$_childElement = this._childElement) !== null && _this$_childElement !== void 0 ? _this$_childElement : this._childElement = this.children[0], rn.render(this, this._elementRef, this._activeService, this._childElement)) : this._activeService instanceof U && P.render(this._elementRef, this.changeToChatView.bind(this), this._activeService), this._hasBeenRendered = !0, jt.onRender(this);
         }
       }, {
         key: "disconnectedCallback",
@@ -13021,26 +12971,6 @@ var app = (function () {
 
     function create_fragment(ctx) {
     	let main;
-    	let h1;
-    	let t1;
-    	let div2;
-    	let div1;
-    	let div0;
-    	let p0;
-    	let strong0;
-    	let t3;
-    	let t4;
-    	let p1;
-    	let t6;
-    	let p2;
-    	let strong1;
-    	let br0;
-    	let t8;
-    	let br1;
-    	let t9;
-    	let br2;
-    	let t10;
-    	let t11;
     	let deep_chat;
     	let deep_chat_directconnection_value;
     	let deep_chat__insertkeyviewstyles_value;
@@ -13052,53 +12982,7 @@ var app = (function () {
     	const block = {
     		c: function create() {
     			main = element("main");
-    			h1 = element("h1");
-    			h1.textContent = "BIDARA";
-    			t1 = space();
-    			div2 = element("div");
-    			div1 = element("div");
-    			div0 = element("div");
-    			p0 = element("p");
-    			strong0 = element("strong");
-    			strong0.textContent = "BIDARA";
-    			t3 = text(" is a GPT-4 chatbot that was instructed to help scientists and engineers understand, learn from, and emulate the strategies used by living things to create sustainable designs and technologies.");
-    			t4 = space();
-    			p1 = element("p");
-    			p1.textContent = "BIDARA can guide users through the Biomimicry Institute’s Design Process, a step-by-step method to propose biomimetic solutions to challenges. This process includes defining the problem, biologizing the challenge, discovering natural models, abstracting design strategies, and emulating nature's lessons.";
-    			t6 = space();
-    			p2 = element("p");
-    			strong1 = element("strong");
-    			strong1.textContent = "WARNING";
-    			br0 = element("br");
-    			t8 = text("\n              - Do not share any sensitive information in your conversations including but not limited to, personal information, sensitive or non-public government/company data, ITAR, CUI, export controlled, or trade secrets.");
-    			br1 = element("br");
-    			t9 = text("\n              - While OpenAI has safeguards in place, BIDARA may occasionally generate incorrect or misleading information and produce offensive or biased content.");
-    			br2 = element("br");
-    			t10 = text("\n              - The chatbot may produce inaccurate information about people, places, or facts.");
-    			t11 = space();
     			deep_chat = element("deep-chat");
-    			add_location(h1, file, 34, 6, 1207);
-    			add_location(strong0, file, 49, 15, 1590);
-    			add_location(p0, file, 49, 12, 1587);
-    			add_location(p1, file, 51, 12, 1824);
-    			add_location(strong1, file, 54, 14, 2167);
-    			add_location(br0, file, 54, 38, 2191);
-    			add_location(br1, file, 55, 225, 2422);
-    			add_location(br2, file, 56, 163, 2591);
-    			add_location(p2, file, 53, 12, 2149);
-    			set_style(div0, "font-size", "15px");
-    			set_style(div0, "line-height", "20px");
-    			add_location(div0, file, 48, 10, 1526);
-    			add_location(div1, file, 47, 8, 1510);
-    			set_style(div2, "width", "100%");
-    			set_style(div2, "background-color", "#f3f3f3");
-    			set_style(div2, "border-radius", "10px");
-    			set_style(div2, "padding", "12px");
-    			set_style(div2, "padding-bottom", "15px");
-    			set_style(div2, "text-align", "left");
-    			set_style(div2, "margin-left", "auto");
-    			set_style(div2, "margin-right", "auto");
-    			add_location(div2, file, 35, 6, 1229);
 
     			set_custom_element_data(deep_chat, "directconnection", deep_chat_directconnection_value = {
     				openAI: {
@@ -13118,39 +13002,21 @@ var app = (function () {
 
     			set_custom_element_data(deep_chat, "chatstyle", deep_chat_chatstyle_value = {
     				width: "100%",
-    				backgroundColor: "#f7f7f7",
-    				borderRadius: "8px"
+    				height: "100%",
+    				position: "absolute",
+    				backgroundColor: "white",
+    				border: "none"
     			});
 
-    			add_location(deep_chat, file, 64, 4, 2930);
-    			attr_dev(main, "class", "svelte-rs1n6k");
-    			add_location(main, file, 33, 2, 1194);
+    			add_location(deep_chat, file, 65, 4, 3599);
+    			attr_dev(main, "class", "svelte-13qagp3");
+    			add_location(main, file, 33, 2, 1851);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, main, anchor);
-    			append_dev(main, h1);
-    			append_dev(main, t1);
-    			append_dev(main, div2);
-    			append_dev(div2, div1);
-    			append_dev(div1, div0);
-    			append_dev(div0, p0);
-    			append_dev(p0, strong0);
-    			append_dev(p0, t3);
-    			append_dev(div0, t4);
-    			append_dev(div0, p1);
-    			append_dev(div0, t6);
-    			append_dev(div0, p2);
-    			append_dev(p2, strong1);
-    			append_dev(p2, br0);
-    			append_dev(p2, t8);
-    			append_dev(p2, br1);
-    			append_dev(p2, t9);
-    			append_dev(p2, br2);
-    			append_dev(p2, t10);
-    			append_dev(main, t11);
     			append_dev(main, deep_chat);
     		},
     		p: noop,
@@ -13203,7 +13069,7 @@ var app = (function () {
     	const initialMessages = [
     		{
     			role: "ai",
-    			text: "How can I assist you today? If you're looking to explore biomimetic solutions or have a particular challenge in mind for a sustainable design, I'm here to guide you through the Biomimicry Design Process. Please share the details of your challenge, and we can begin by defining it as per the first step in the process."
+    			text: "Hi, I'm **BIDARA**, bio-inspired design and research assisant. I'm an OpenAI [GPT-4](https://openai.com/research/gpt-4) [assistant](https://platform.openai.com/docs/assistants/how-it-works), that was instructed by [NASA's PeTaL initiative](https://www1.grc.nasa.gov/research-and-engineering/vine/petal/) to help others understand, learn from, and emulate the strategies used by living things to create sustainable designs and technologies using the [Biomimicry Institute's design process](https://toolbox.biomimicry.org/methods/process/).\n\nBefore we begin, please be advised:\n\n- Do not share any sensitive information in your conversations including but not limited to, personal information, sensitive or non-public government/company data, ITAR, CUI, export controlled, or trade secrets.\n- While OpenAI has safeguards in place, BIDARA may occasionally generate incorrect or misleading information and produce offensive or biased content.\n\nHow can I assist you today?"
     		}
     	];
 

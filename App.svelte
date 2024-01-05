@@ -5,7 +5,7 @@
     import { DeepChat } from "deep-chat-dev";
   
     const initialMessages = [
-      { role: "ai", text: "How can I assist you today? If you're looking to explore biomimetic solutions or have a particular challenge in mind for a sustainable design, I'm here to guide you through the Biomimicry Design Process. Please share the details of your challenge, and we can begin by defining it as per the first step in the process." }
+      { role: "ai", text: "Hi, I'm **BIDARA**, bio-inspired design and research assisant. I'm an OpenAI [GPT-4](https://openai.com/research/gpt-4) [assistant](https://platform.openai.com/docs/assistants/how-it-works), that was instructed by [NASA's PeTaL initiative](https://www1.grc.nasa.gov/research-and-engineering/vine/petal/) to help others understand, learn from, and emulate the strategies used by living things to create sustainable designs and technologies using the [Biomimicry Institute's design process](https://toolbox.biomimicry.org/methods/process/).\n\nBefore we begin, please be advised:\n\n- Do not share any sensitive information in your conversations including but not limited to, personal information, sensitive or non-public government/company data, ITAR, CUI, export controlled, or trade secrets.\n- While OpenAI has safeguards in place, BIDARA may occasionally generate incorrect or misleading information and produce offensive or biased content.\n\nHow can I assist you today?" }
     ];
 
     function getCurrentWeather(location) {
@@ -32,6 +32,7 @@
   </script>
   
   <main>
+    <!--
       <h1>BIDARA</h1>
       <div
         style="
@@ -59,7 +60,7 @@
             </p>
           </div>
         </div>
-      </div>
+      </div>-->
     <!-- demo/textInput are examples of passing an object directly into a property -->
     <!-- initialMessages is an example of passing a state object into a property -->
     <deep-chat
@@ -90,8 +91,10 @@
       initialMessages={initialMessages}
       chatStyle={{
         width: "100%",
-        backgroundColor: "#f7f7f7",
-        borderRadius: "8px"
+        height: "100%",
+        position: "absolute",
+        backgroundColor: "white",
+        border: "none",
       }}
     />
   </main>
@@ -99,8 +102,6 @@
   <style>
     main {
       font-family: sans-serif;
-      text-align: center;
-      justify-content: center;
       display: grid;
     }
   </style>
