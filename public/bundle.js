@@ -13003,7 +13003,7 @@ var app = (function () {
 
     			set_custom_element_data(deep_chat, "chatstyle", deep_chat_chatstyle_value = {
     				width: "100%",
-    				height: "100dvh",
+    				height: "100vh",
     				backgroundColor: "white",
     				border: "none",
     				fontSize: "16px",
@@ -13015,7 +13015,7 @@ var app = (function () {
     			});
 
     			add_location(deep_chat, file, 65, 4, 3599);
-    			attr_dev(main, "class", "svelte-vg9zoq");
+    			attr_dev(main, "class", "svelte-1ken4da");
     			add_location(main, file, 33, 2, 1851);
     		},
     		l: function claim(nodes) {
