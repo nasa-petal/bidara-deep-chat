@@ -90,7 +90,7 @@
       textInput={{placeholder:{text: "Say something"}}}
       initialMessages={initialMessages}
       chatStyle={{
-        width: "100vh",
+        width: "100%",
         height: "100vh",
         position: "fixed",
         backgroundColor: "white",
@@ -116,7 +116,7 @@
       display: grid;
       position:fixed;
       height:100vh;
-      width:100vh;
+      width:100%;
     }
   </style>
 
