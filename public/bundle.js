@@ -13005,11 +13005,12 @@ var app = (function () {
     				height: "100%",
     				position: "absolute",
     				backgroundColor: "white",
-    				border: "none"
+    				border: "none",
+    				fontFamily: 'system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"'
     			});
 
     			add_location(deep_chat, file, 65, 4, 3599);
-    			attr_dev(main, "class", "svelte-13qagp3");
+    			attr_dev(main, "class", "svelte-u93l4o");
     			add_location(main, file, 33, 2, 1851);
     		},
     		l: function claim(nodes) {

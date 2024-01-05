@@ -95,13 +95,14 @@
         position: "absolute",
         backgroundColor: "white",
         border: "none",
+        fontFamily: 'system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"'
       }}
     />
   </main>
   
   <style>
     main {
-      font-family: sans-serif;
+      font-family: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
       display: grid;
     }
   </style>
