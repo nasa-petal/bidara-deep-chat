@@ -12978,6 +12978,7 @@ var app = (function () {
     	let deep_chat_mixedfiles_value;
     	let deep_chat_textinput_value;
     	let deep_chat_chatstyle_value;
+    	let deep_chat_messagestyles_value;
 
     	const block = {
     		c: function create() {
@@ -13002,12 +13003,16 @@ var app = (function () {
 
     			set_custom_element_data(deep_chat, "chatstyle", deep_chat_chatstyle_value = {
     				width: "100%",
-    				height: "100%",
+    				height: "100dvh",
     				position: "absolute",
     				backgroundColor: "white",
     				border: "none",
     				fontSize: "16px",
     				fontFamily: 'system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"'
+    			});
+
+    			set_custom_element_data(deep_chat, "messagestyles", deep_chat_messagestyles_value = {
+    				default: { shared: { bubble: { maxWidth: "75%" } } }
     			});
 
     			add_location(deep_chat, file, 65, 4, 3599);
