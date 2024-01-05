@@ -95,6 +95,7 @@
         position: "absolute",
         backgroundColor: "white",
         border: "none",
+        fontSize: "16px",
         fontFamily: 'system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"'
       }}
     />
