@@ -122,7 +122,11 @@
       }}
       _insertKeyViewStyles={{displayCautionText: false}}
       demo={false}
-      mixedFiles={true}
+      mixedFiles={{
+        button: {
+          position: "outside-left"
+        }
+      }}
       textInput={{
         styles: {
           container: {
