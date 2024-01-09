@@ -13062,6 +13062,7 @@ var app = (function () {
     	let deep_chat_textinput_value;
     	let deep_chat_chatstyle_value;
     	let deep_chat_messagestyles_value;
+    	let deep_chat_submitbuttonstyles_value;
 
     	const block = {
     		c: function create() {
@@ -13083,7 +13084,19 @@ var app = (function () {
     			set_custom_element_data(deep_chat, "_insertkeyviewstyles", deep_chat__insertkeyviewstyles_value = { displayCautionText: false });
     			set_custom_element_data(deep_chat, "demo", deep_chat_demo_value = false);
     			set_custom_element_data(deep_chat, "mixedfiles", deep_chat_mixedfiles_value = true);
-    			set_custom_element_data(deep_chat, "textinput", deep_chat_textinput_value = { placeholder: { text: "Say something" } });
+
+    			set_custom_element_data(deep_chat, "textinput", deep_chat_textinput_value = {
+    				styles: {
+    					container: {
+    						boxShadow: "none",
+    						borderRadius: "100vmax",
+    						border: "1px solid rgba(0,0,0,0.2)"
+    					},
+    					text: { padding: "0.4em 0.8em" }
+    				},
+    				placeholder: { text: "Say something" }
+    			});
+
     			set_custom_element_data(deep_chat, "initialmessages", /*initialMessages*/ ctx[0]);
 
     			set_custom_element_data(deep_chat, "chatstyle", deep_chat_chatstyle_value = {
@@ -13097,6 +13110,30 @@ var app = (function () {
 
     			set_custom_element_data(deep_chat, "messagestyles", deep_chat_messagestyles_value = {
     				default: { shared: { bubble: { maxWidth: "75%" } } }
+    			});
+
+    			set_custom_element_data(deep_chat, "submitbuttonstyles", deep_chat_submitbuttonstyles_value = {
+    				submit: {
+    					container: {
+    						default: {
+    							width: ".9em",
+    							height: ".9em",
+    							right: "calc(10% + 0.4em)",
+    							bottom: ".9em",
+    							borderRadius: "100vmax",
+    							padding: ".3em",
+    							backgroundColor: "rgb(0, 132, 255)"
+    						}
+    					},
+    					svg: {
+    						content: '<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 115.4 122.88"><title>up-arrow</title><path d="M24.94,67.88A14.66,14.66,0,0,1,4.38,47L47.83,4.21a14.66,14.66,0,0,1,20.56,0L111,46.15A14.66,14.66,0,0,1,90.46,67.06l-18-17.69-.29,59.17c-.1,19.28-29.42,19-29.33-.25L43.14,50,24.94,67.88Z"/></svg>',
+    						styles: {
+    							default: {
+    								filter: "brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(7500%) hue-rotate(315deg) brightness(99%) contrast(102%)"
+    							}
+    						}
+    					}
+    				}
     			});
 
     			add_location(deep_chat, file, 92, 4, 4590);

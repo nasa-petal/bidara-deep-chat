@@ -116,7 +116,19 @@
       _insertKeyViewStyles={{displayCautionText: false}}
       demo={false}
       mixedFiles={true}
-      textInput={{placeholder:{text: "Say something"}}}
+      textInput={{
+        styles: {
+          container: {
+            boxShadow: "none",
+            borderRadius: "100vmax",
+            border: "1px solid rgba(0,0,0,0.2)"
+          },
+          text: {
+            padding: "0.4em 0.8em"
+          }
+        },
+        placeholder:{text: "Say something"}
+      }}
       initialMessages={initialMessages}
       chatStyle={{
         width: "100%",
@@ -131,6 +143,29 @@
           shared: {
             bubble: {
               maxWidth: "75%"
+            }
+          }
+        }
+      }}
+      submitButtonStyles={{
+        submit: {
+          container: {
+            default: {
+              width: ".9em",
+              height: ".9em",
+              right: "calc(10% + 0.4em)",
+              bottom: ".9em",
+              borderRadius: "100vmax",
+              padding: ".3em",
+              backgroundColor: "rgb(0, 132, 255)"
+            }
+          },
+          svg: {
+            content: '<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 115.4 122.88"><title>up-arrow</title><path d="M24.94,67.88A14.66,14.66,0,0,1,4.38,47L47.83,4.21a14.66,14.66,0,0,1,20.56,0L111,46.15A14.66,14.66,0,0,1,90.46,67.06l-18-17.69-.29,59.17c-.1,19.28-29.42,19-29.33-.25L43.14,50,24.94,67.88Z"/></svg>',
+            styles: {
+              default: {
+                filter: "brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(7500%) hue-rotate(315deg) brightness(99%) contrast(102%)"
+              }
             }
           }
         }
