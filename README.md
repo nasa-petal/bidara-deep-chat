@@ -10,10 +10,10 @@ BIDARA can guide users through the Biomimicry Institute’s [Design Process](htt
 
 ## For developers
 
-Uses Svelte and [deep-chat](https://github.com/OvidijusParsiunas/deep-chat)
+Uses Svelte and [deep-chat](https://github.com/OvidijusParsiunas/deep-chat)    
 Template based on https://github.com/sveltejs/template
 
-### run locally
+### Run locally
 ```
 npm install
 npm run dev
