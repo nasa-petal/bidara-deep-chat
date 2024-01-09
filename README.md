@@ -8,7 +8,13 @@ BIDARA can guide users through the Biomimicry Institute’s [Design Process](htt
 
 `bidara-deep-chat` uses [a web interface](https://github.com/OvidijusParsiunas/deep-chat) to connect to BIDARA over the OpenAI Assistants API. To use it, you need to register for [an OpenAI API key](https://platform.openai.com/account/api-keys) first. All messages are sent directly from your web browser to OpenAI and back.
 
-## For developers
+## :rocket: Features enabled
+
+&nbsp;&nbsp;&nbsp;&nbsp; :white_check_mark: **Code Interpreter** *[more info](https://platform.openai.com/docs/assistants/tools/code-interpreter), [filetypes supported](https://platform.openai.com/docs/assistants/tools/supported-files)*    
+&nbsp;&nbsp;&nbsp;&nbsp; :white_check_mark: **Knowledge Retrieval** *[more info](https://platform.openai.com/docs/assistants/tools/knowledge-retrieval), [filetypes supported](https://platform.openai.com/docs/assistants/tools/supported-files)*    
+&nbsp;&nbsp;&nbsp;&nbsp; :ballot_box_with_check: **Function Calling** *(useful functions coming soon)*
+
+## :computer: For developers
 
 Uses Svelte and [deep-chat](https://github.com/OvidijusParsiunas/deep-chat)    
 Template based on https://github.com/sveltejs/template
