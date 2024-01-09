@@ -11,6 +11,13 @@
       { role: "ai", text: "How can I assist you today?" }
     ];
 
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    let openai_key = urlParams.get('key')
+    if (openai_key === null) {
+      openai_key = localStorage.getItem('openai-key');
+    }
+
     function getCurrentWeather(location) {
       location = location.toLowerCase();
       if (location.includes('tokyo')) {
@@ -94,7 +101,7 @@
       id="chat-element"
       directConnection={{
         openAI: {
-          key: localStorage.getItem('openai-key'),
+          key: openai_key,
           validateKeyProperty: true,
           assistant: {
             assistant_id: "asst_0qjNhzjIMuwfjJJ2e4Cl8vdY",

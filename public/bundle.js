@@ -13072,11 +13072,11 @@ var app = (function () {
 
     			set_custom_element_data(deep_chat, "directconnection", deep_chat_directconnection_value = {
     				openAI: {
-    					key: localStorage.getItem('openai-key'),
+    					key: /*openai_key*/ ctx[0],
     					validateKeyProperty: true,
     					assistant: {
     						assistant_id: "asst_0qjNhzjIMuwfjJJ2e4Cl8vdY",
-    						function_handler: /*func*/ ctx[1]
+    						function_handler: /*func*/ ctx[2]
     					}
     				}
     			});
@@ -13100,7 +13100,7 @@ var app = (function () {
     				placeholder: { text: "Say something" }
     			});
 
-    			set_custom_element_data(deep_chat, "initialmessages", /*initialMessages*/ ctx[0]);
+    			set_custom_element_data(deep_chat, "initialmessages", /*initialMessages*/ ctx[1]);
 
     			set_custom_element_data(deep_chat, "chatstyle", deep_chat_chatstyle_value = {
     				width: "100%",
@@ -13152,9 +13152,9 @@ var app = (function () {
     				}
     			});
 
-    			add_location(deep_chat, file, 92, 4, 4590);
+    			add_location(deep_chat, file, 99, 4, 4829);
     			attr_dev(main, "class", "svelte-u93l4o");
-    			add_location(main, file, 60, 2, 2842);
+    			add_location(main, file, 67, 2, 3081);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -13163,7 +13163,20 @@ var app = (function () {
     			insert_dev(target, main, anchor);
     			append_dev(main, deep_chat);
     		},
-    		p: noop,
+    		p: function update(ctx, [dirty]) {
+    			if (dirty & /*openai_key*/ 1 && deep_chat_directconnection_value !== (deep_chat_directconnection_value = {
+    				openAI: {
+    					key: /*openai_key*/ ctx[0],
+    					validateKeyProperty: true,
+    					assistant: {
+    						assistant_id: "asst_0qjNhzjIMuwfjJJ2e4Cl8vdY",
+    						function_handler: /*func*/ ctx[2]
+    					}
+    				}
+    			})) {
+    				set_custom_element_data(deep_chat, "directconnection", deep_chat_directconnection_value);
+    			}
+    		},
     		i: noop,
     		o: noop,
     		d: function destroy(detaching) {
@@ -13225,6 +13238,14 @@ var app = (function () {
     		}
     	];
 
+    	const queryString = window.location.search;
+    	const urlParams = new URLSearchParams(queryString);
+    	let openai_key = urlParams.get('key');
+
+    	if (openai_key === null) {
+    		openai_key = localStorage.getItem('openai-key');
+    	}
+
     	onMount(async () => {
     		// runs after the component has finished loading.
     		const deepChatRef = document.getElementById('chat-element');
@@ -13274,11 +13295,22 @@ var app = (function () {
     		DeepChat: b,
     		onMount,
     		initialMessages,
+    		queryString,
+    		urlParams,
+    		openai_key,
     		getCurrentWeather,
     		getCurrentTime
     	});
 
-    	return [initialMessages, func];
+    	$$self.$inject_state = $$props => {
+    		if ('openai_key' in $$props) $$invalidate(0, openai_key = $$props.openai_key);
+    	};
+
+    	if ($$props && "$$inject" in $$props) {
+    		$$self.$inject_state($$props.$$inject);
+    	}
+
+    	return [openai_key, initialMessages, func];
     }
 
     class App extends SvelteComponentDev {
