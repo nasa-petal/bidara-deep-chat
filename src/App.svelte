@@ -160,7 +160,7 @@
             paddingRight: "2.5em"
           }
         },
-        placeholder:{text: "Say something"}
+        placeholder:{text: "How might we..."}
       }}
       initialMessages={initialMessages}
       chatStyle={{
