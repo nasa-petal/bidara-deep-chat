@@ -13116,12 +13116,12 @@ var app = (function () {
     				submit: {
     					container: {
     						default: {
-    							width: ".9em",
-    							height: ".9em",
-    							right: "calc(10% + 0.4em)",
-    							bottom: ".9em",
+    							width: "1em",
+    							height: "1em",
+    							right: "calc(10% + 0.3em)",
+    							bottom: ".85em",
     							borderRadius: "100vmax",
-    							padding: "0.3em 0.3em 0.34em 0.32em",
+    							padding: "0.3em",
     							backgroundColor: "rgb(0, 132, 255)"
     						}
     					},
