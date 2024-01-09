@@ -129,7 +129,7 @@
               default: {
                 width: "1em",
                 height: "1em",
-                right: "calc(10% + 0.5em)",
+                right: "calc(10% + 0.4em)",
                 bottom: ".7em",
                 borderRadius: "100vmax",
                 padding: "0.5em",
