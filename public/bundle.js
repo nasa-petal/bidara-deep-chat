@@ -13120,6 +13120,11 @@ var app = (function () {
     							padding: ".42em .7em"
     						}
     					}
+    				},
+    				loading: {
+    					shared: {
+    						bubble: { padding: "0.6em 0.75em 0.6em 1.3em" }
+    					}
     				}
     			});
 
