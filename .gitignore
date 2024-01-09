@@ -1,5 +1,8 @@
 node_modules
 /secrets.txt
+/public/bundle.css
+/public/bundle.js
+/public/bundle.js.map
 
 # Editor directories and files
 .DS_Store
