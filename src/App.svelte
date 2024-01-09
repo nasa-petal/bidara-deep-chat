@@ -148,6 +148,13 @@
           position: "outside-left"
         }
       }}
+      attachmentContainerStyle={{
+        backgroundColor: "rgba(255, 255, 255, 0.6)",
+        borderRadius: "5px 5px 0 0",
+        border: "1px solid rgba(0,0,0,0.2)",
+        top: "-2.6em",
+        height: "4em"
+      }}
       textInput={{
         styles: {
           container: {
