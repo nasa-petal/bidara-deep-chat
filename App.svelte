@@ -120,11 +120,12 @@
         styles: {
           container: {
             boxShadow: "none",
-            borderRadius: "100vmax",
+            borderRadius: "1em",
             border: "1px solid rgba(0,0,0,0.2)"
           },
           text: {
-            padding: "0.4em 0.8em"
+            padding: "0.4em 0.8em",
+            paddingRight: "2.5em"
           }
         },
         placeholder:{text: "Say something"}
@@ -142,7 +143,9 @@
         default: {
           shared: {
             bubble: {
-              maxWidth: "75%"
+              maxWidth: "75%",
+              borderRadius: "1em",
+              padding: ".42em .7em"
             }
           }
         }

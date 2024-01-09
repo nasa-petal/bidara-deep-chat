@@ -13089,10 +13089,13 @@ var app = (function () {
     				styles: {
     					container: {
     						boxShadow: "none",
-    						borderRadius: "100vmax",
+    						borderRadius: "1em",
     						border: "1px solid rgba(0,0,0,0.2)"
     					},
-    					text: { padding: "0.4em 0.8em" }
+    					text: {
+    						padding: "0.4em 0.8em",
+    						paddingRight: "2.5em"
+    					}
     				},
     				placeholder: { text: "Say something" }
     			});
@@ -13109,7 +13112,15 @@ var app = (function () {
     			});
 
     			set_custom_element_data(deep_chat, "messagestyles", deep_chat_messagestyles_value = {
-    				default: { shared: { bubble: { maxWidth: "75%" } } }
+    				default: {
+    					shared: {
+    						bubble: {
+    							maxWidth: "75%",
+    							borderRadius: "1em",
+    							padding: ".42em .7em"
+    						}
+    					}
+    				}
     			});
 
     			set_custom_element_data(deep_chat, "submitbuttonstyles", deep_chat_submitbuttonstyles_value = {
