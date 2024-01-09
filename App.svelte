@@ -3,6 +3,7 @@
 
   <script>
     import { DeepChat } from "deep-chat-dev";
+    import { onMount } from 'svelte';
   
     const initialMessages = [
       { role: "ai", text: "Hi, I'm **BIDARA**, bio-inspired design and research assisant. I'm an OpenAI [GPT-4](https://openai.com/research/gpt-4) [assistant](https://platform.openai.com/docs/assistants/how-it-works), that was instructed by [NASA's PeTaL initiative](https://www1.grc.nasa.gov/research-and-engineering/vine/petal/) to help others understand, learn from, and emulate the strategies used by living things to create sustainable designs and technologies using the [Biomimicry Institute's design process](https://toolbox.biomimicry.org/methods/process/)." },
@@ -31,6 +32,30 @@
         return '12p';
       }
     }
+
+    onMount(async () => { // runs after the component has finished loading.
+      const deepChatRef = document.getElementById('chat-element');
+
+      deepChatRef.onNewMessage = (message) => {
+        // save messages to localStorage.
+        // this function is called once for each message including initialMessages, ai messages, and user messages.
+      };
+
+      deepChatRef.onComponentRender = () => {
+        // save key to localStorage.
+        // The event occurs before key is set, and again, after key is set.
+        if (deepChatRef._activeService.key) {
+          if (localStorage.getItem("openai-key") === null) {
+            localStorage.setItem('openai-key', deepChatRef._activeService.key);
+          }
+        }
+      };
+
+      deepChatRef.responseInterceptor = (response) => {
+        //console.log(response); // printed above
+        return response;
+      };
+    });    
   </script>
   
   <main>
@@ -66,8 +91,10 @@
     <!-- demo/textInput are examples of passing an object directly into a property -->
     <!-- initialMessages is an example of passing a state object into a property -->
     <deep-chat
+      id="chat-element"
       directConnection={{
         openAI: {
+          key: localStorage.getItem('openai-key'),
           validateKeyProperty: true,
           assistant: {
             assistant_id: "asst_0qjNhzjIMuwfjJJ2e4Cl8vdY",
@@ -110,7 +137,7 @@
       }}
     />
   </main>
-  
+
   <style>
     main {
       font-family: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";

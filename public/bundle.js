@@ -66,6 +66,23 @@ var app = (function () {
     function set_current_component(component) {
         current_component = component;
     }
+    function get_current_component() {
+        if (!current_component)
+            throw new Error('Function called outside component initialization');
+        return current_component;
+    }
+    /**
+     * The `onMount` function schedules a callback to run as soon as the component has been mounted to the DOM.
+     * It must be called during the component's initialisation (but doesn't need to live *inside* the component;
+     * it can be called from an external module).
+     *
+     * `onMount` does not run inside a [server-side component](/docs#run-time-server-side-component-api).
+     *
+     * https://svelte.dev/docs#run-time-svelte-onmount
+     */
+    function onMount(fn) {
+        get_current_component().$$.on_mount.push(fn);
+    }
 
     const dirty_components = [];
     const binding_callbacks = [];
@@ -1227,17 +1244,17 @@ var app = (function () {
     function z(s) {
       return Rs.test(s) ? s.replace(Os, Ps) : s;
     }
-    var f = {};
-    f.blockquote_open = function () {
+    var m = {};
+    m.blockquote_open = function () {
       return "<blockquote>\n";
     };
-    f.blockquote_close = function (s, e) {
+    m.blockquote_close = function (s, e) {
       return "</blockquote>" + Re(s, e);
     };
-    f.code = function (s, e) {
+    m.code = function (s, e) {
       return s[e].block ? "<pre><code>" + z(s[e].content) + "</code></pre>" + Re(s, e) : "<code>" + z(s[e].content) + "</code>";
     };
-    f.fence = function (s, e, t, i, n) {
+    m.fence = function (s, e, t, i, n) {
       var r = s[e],
         o = "",
         a = t.langPrefix,
@@ -1251,203 +1268,203 @@ var app = (function () {
       }
       return t.highlight ? u = t.highlight.apply(t.highlight, [r.content].concat(c)) || z(r.content) : u = z(r.content), "<pre><code" + o + ">" + u + "</code></pre>" + Re(s, e);
     };
-    f.fence_custom = {};
-    f.heading_open = function (s, e) {
+    m.fence_custom = {};
+    m.heading_open = function (s, e) {
       return "<h" + s[e].hLevel + ">";
     };
-    f.heading_close = function (s, e) {
+    m.heading_close = function (s, e) {
       return "</h" + s[e].hLevel + ">\n";
     };
-    f.hr = function (s, e, t) {
+    m.hr = function (s, e, t) {
       return (t.xhtmlOut ? "<hr />" : "<hr>") + Re(s, e);
     };
-    f.bullet_list_open = function () {
+    m.bullet_list_open = function () {
       return "<ul>\n";
     };
-    f.bullet_list_close = function (s, e) {
+    m.bullet_list_close = function (s, e) {
       return "</ul>" + Re(s, e);
     };
-    f.list_item_open = function () {
+    m.list_item_open = function () {
       return "<li>";
     };
-    f.list_item_close = function () {
+    m.list_item_close = function () {
       return "</li>\n";
     };
-    f.ordered_list_open = function (s, e) {
+    m.ordered_list_open = function (s, e) {
       var t = s[e],
         i = t.order > 1 ? ' start="' + t.order + '"' : "";
       return "<ol" + i + ">\n";
     };
-    f.ordered_list_close = function (s, e) {
+    m.ordered_list_close = function (s, e) {
       return "</ol>" + Re(s, e);
     };
-    f.paragraph_open = function (s, e) {
+    m.paragraph_open = function (s, e) {
       return s[e].tight ? "" : "<p>";
     };
-    f.paragraph_close = function (s, e) {
+    m.paragraph_close = function (s, e) {
       var t = !(s[e].tight && e && s[e - 1].type === "inline" && !s[e - 1].content);
       return (s[e].tight ? "" : "</p>") + (t ? Re(s, e) : "");
     };
-    f.link_open = function (s, e, t) {
+    m.link_open = function (s, e, t) {
       var i = s[e].title ? ' title="' + z(Ie(s[e].title)) + '"' : "",
         n = t.linkTarget ? ' target="' + t.linkTarget + '"' : "";
       return '<a href="' + z(s[e].href) + '"' + i + n + ">";
     };
-    f.link_close = function () {
+    m.link_close = function () {
       return "</a>";
     };
-    f.image = function (s, e, t) {
+    m.image = function (s, e, t) {
       var i = ' src="' + z(s[e].src) + '"',
         n = s[e].title ? ' title="' + z(Ie(s[e].title)) + '"' : "",
         r = ' alt="' + (s[e].alt ? z(Ie(ft(s[e].alt))) : "") + '"',
         o = t.xhtmlOut ? " /" : "";
       return "<img" + i + r + n + o + ">";
     };
-    f.table_open = function () {
+    m.table_open = function () {
       return "<table>\n";
     };
-    f.table_close = function () {
+    m.table_close = function () {
       return "</table>\n";
     };
-    f.thead_open = function () {
+    m.thead_open = function () {
       return "<thead>\n";
     };
-    f.thead_close = function () {
+    m.thead_close = function () {
       return "</thead>\n";
     };
-    f.tbody_open = function () {
+    m.tbody_open = function () {
       return "<tbody>\n";
     };
-    f.tbody_close = function () {
+    m.tbody_close = function () {
       return "</tbody>\n";
     };
-    f.tr_open = function () {
+    m.tr_open = function () {
       return "<tr>";
     };
-    f.tr_close = function () {
+    m.tr_close = function () {
       return "</tr>\n";
     };
-    f.th_open = function (s, e) {
+    m.th_open = function (s, e) {
       var t = s[e];
       return "<th" + (t.align ? ' style="text-align:' + t.align + '"' : "") + ">";
     };
-    f.th_close = function () {
+    m.th_close = function () {
       return "</th>";
     };
-    f.td_open = function (s, e) {
+    m.td_open = function (s, e) {
       var t = s[e];
       return "<td" + (t.align ? ' style="text-align:' + t.align + '"' : "") + ">";
     };
-    f.td_close = function () {
+    m.td_close = function () {
       return "</td>";
     };
-    f.strong_open = function () {
+    m.strong_open = function () {
       return "<strong>";
     };
-    f.strong_close = function () {
+    m.strong_close = function () {
       return "</strong>";
     };
-    f.em_open = function () {
+    m.em_open = function () {
       return "<em>";
     };
-    f.em_close = function () {
+    m.em_close = function () {
       return "</em>";
     };
-    f.del_open = function () {
+    m.del_open = function () {
       return "<del>";
     };
-    f.del_close = function () {
+    m.del_close = function () {
       return "</del>";
     };
-    f.ins_open = function () {
+    m.ins_open = function () {
       return "<ins>";
     };
-    f.ins_close = function () {
+    m.ins_close = function () {
       return "</ins>";
     };
-    f.mark_open = function () {
+    m.mark_open = function () {
       return "<mark>";
     };
-    f.mark_close = function () {
+    m.mark_close = function () {
       return "</mark>";
     };
-    f.sub = function (s, e) {
+    m.sub = function (s, e) {
       return "<sub>" + z(s[e].content) + "</sub>";
     };
-    f.sup = function (s, e) {
+    m.sup = function (s, e) {
       return "<sup>" + z(s[e].content) + "</sup>";
     };
-    f.hardbreak = function (s, e, t) {
+    m.hardbreak = function (s, e, t) {
       return t.xhtmlOut ? "<br />\n" : "<br>\n";
     };
-    f.softbreak = function (s, e, t) {
+    m.softbreak = function (s, e, t) {
       return t.breaks ? t.xhtmlOut ? "<br />\n" : "<br>\n" : "\n";
     };
-    f.text = function (s, e) {
+    m.text = function (s, e) {
       return z(s[e].content);
     };
-    f.htmlblock = function (s, e) {
+    m.htmlblock = function (s, e) {
       return s[e].content;
     };
-    f.htmltag = function (s, e) {
+    m.htmltag = function (s, e) {
       return s[e].content;
     };
-    f.abbr_open = function (s, e) {
+    m.abbr_open = function (s, e) {
       return '<abbr title="' + z(Ie(s[e].title)) + '">';
     };
-    f.abbr_close = function () {
+    m.abbr_close = function () {
       return "</abbr>";
     };
-    f.footnote_ref = function (s, e) {
+    m.footnote_ref = function (s, e) {
       var t = Number(s[e].id + 1).toString(),
         i = "fnref" + t;
       return s[e].subId > 0 && (i += ":" + s[e].subId), '<sup class="footnote-ref"><a href="#fn' + t + '" id="' + i + '">[' + t + "]</a></sup>";
     };
-    f.footnote_block_open = function (s, e, t) {
+    m.footnote_block_open = function (s, e, t) {
       var i = t.xhtmlOut ? "<hr class=\"footnotes-sep\" />\n" : "<hr class=\"footnotes-sep\">\n";
       return i + "<section class=\"footnotes\">\n<ol class=\"footnotes-list\">\n";
     };
-    f.footnote_block_close = function () {
+    m.footnote_block_close = function () {
       return "</ol>\n</section>\n";
     };
-    f.footnote_open = function (s, e) {
+    m.footnote_open = function (s, e) {
       var t = Number(s[e].id + 1).toString();
       return '<li id="fn' + t + '"  class="footnote-item">';
     };
-    f.footnote_close = function () {
+    m.footnote_close = function () {
       return "</li>\n";
     };
-    f.footnote_anchor = function (s, e) {
+    m.footnote_anchor = function (s, e) {
       var t = Number(s[e].id + 1).toString(),
         i = "fnref" + t;
       return s[e].subId > 0 && (i += ":" + s[e].subId), ' <a href="#' + i + '" class="footnote-backref">↩</a>';
     };
-    f.dl_open = function () {
+    m.dl_open = function () {
       return "<dl>\n";
     };
-    f.dt_open = function () {
+    m.dt_open = function () {
       return "<dt>";
     };
-    f.dd_open = function () {
+    m.dd_open = function () {
       return "<dd>";
     };
-    f.dl_close = function () {
+    m.dl_close = function () {
       return "</dl>\n";
     };
-    f.dt_close = function () {
+    m.dt_close = function () {
       return "</dt>\n";
     };
-    f.dd_close = function () {
+    m.dd_close = function () {
       return "</dd>\n";
     };
     function $n(s, e) {
       return ++e >= s.length - 2 ? e : s[e].type === "paragraph_open" && s[e].tight && s[e + 1].type === "inline" && s[e + 1].content.length === 0 && s[e + 2].type === "paragraph_close" && s[e + 2].tight ? $n(s, e + 2) : e;
     }
-    var Re = f.getBreak = function (e, t) {
+    var Re = m.getBreak = function (e, t) {
       return t = $n(e, t), t < e.length && e[t].type === "list_item_close" ? "" : "\n";
     };
     function Gi() {
-      this.rules = Kn({}, f), this.getBreak = f.getBreak;
+      this.rules = Kn({}, m), this.getBreak = m.getBreak;
     }
     Gi.prototype.renderInline = function (s, e, t) {
       for (var i = this.rules, n = s.length, r = 0, o = ""; n--;) o += i[s[r].type](s, r++, e, t, this);
@@ -1655,13 +1672,13 @@ var app = (function () {
       return s.trim().replace(/\s+/g, " ").toUpperCase();
     }
     function Bs(s, e, t, i) {
-      var n, r, o, a, l, c, d, u, h;
+      var n, r, o, a, l, c, d, u, p;
       if (s.charCodeAt(0) !== 91 || s.indexOf("]:") === -1 || (n = new Oe(s, e, t, i, []), r = mt(n, 0), r < 0 || s.charCodeAt(r + 1) !== 58)) return -1;
       for (a = n.posMax, o = r + 2; o < a && (l = n.src.charCodeAt(o), !(l !== 32 && l !== 10)); o++);
       if (!Yn(n, o)) return -1;
       for (d = n.linkContent, o = n.pos, c = o, o = o + 1; o < a && (l = n.src.charCodeAt(o), !(l !== 32 && l !== 10)); o++);
       for (o < a && c !== o && Zn(n, o) ? (u = n.linkContent, o = n.pos) : (u = "", o = c); o < a && n.src.charCodeAt(o) === 32;) o++;
-      return o < a && n.src.charCodeAt(o) !== 10 ? -1 : (h = Xn(s.slice(1, r)), _typeof(i.references[h]) > "u" && (i.references[h] = {
+      return o < a && n.src.charCodeAt(o) !== 10 ? -1 : (p = Xn(s.slice(1, r)), _typeof(i.references[p]) > "u" && (i.references[p] = {
         title: u,
         href: d
       }), o);
@@ -1698,9 +1715,9 @@ var app = (function () {
         c,
         d = 0,
         u = !1,
-        h = {};
-      if (s.env.footnotes && (s.tokens = s.tokens.filter(function (p) {
-        return p.type === "footnote_reference_open" ? (u = !0, l = [], c = p.label, !1) : p.type === "footnote_reference_close" ? (u = !1, h[":" + c] = l, !1) : (u && l.push(p), !u);
+        p = {};
+      if (s.env.footnotes && (s.tokens = s.tokens.filter(function (h) {
+        return h.type === "footnote_reference_open" ? (u = !0, l = [], c = h.label, !1) : h.type === "footnote_reference_close" ? (u = !1, p[":" + c] = l, !1) : (u && l.push(h), !u);
       }), !!s.env.footnotes.list)) {
         for (o = s.env.footnotes.list, s.tokens.push({
           type: "footnote_block_open",
@@ -1723,7 +1740,7 @@ var app = (function () {
             type: "paragraph_close",
             tight: !1,
             level: --d
-          })) : o[e].label && (a = h[":" + o[e].label]), s.tokens = s.tokens.concat(a), s.tokens[s.tokens.length - 1].type === "paragraph_close" ? r = s.tokens.pop() : r = null, n = o[e].count > 0 ? o[e].count : 1, i = 0; i < n; i++) s.tokens.push({
+          })) : o[e].label && (a = p[":" + o[e].label]), s.tokens = s.tokens.concat(a), s.tokens[s.tokens.length - 1].type === "paragraph_close" ? r = s.tokens.pop() : r = null, n = o[e].count > 0 ? o[e].count : 1, i = 0; i < n; i++) s.tokens.push({
             type: "footnote_anchor",
             id: e,
             subId: i,
@@ -1756,15 +1773,15 @@ var app = (function () {
         c,
         d,
         u,
-        h,
-        p = s.tokens;
+        p,
+        h = s.tokens;
       if (s.env.abbreviations) {
-        for (s.env.abbrRegExp || (h = "(^|[" + cn.split("").map(Si).join("") + "])(" + Object.keys(s.env.abbreviations).map(function (g) {
+        for (s.env.abbrRegExp || (p = "(^|[" + cn.split("").map(Si).join("") + "])(" + Object.keys(s.env.abbreviations).map(function (g) {
           return g.substr(1);
-        }).sort(function (g, m) {
-          return m.length - g.length;
-        }).map(Si).join("|") + ")($|[" + cn.split("").map(Si).join("") + "])", s.env.abbrRegExp = new RegExp(h, "g")), d = s.env.abbrRegExp, t = 0, i = p.length; t < i; t++) if (p[t].type === "inline") {
-          for (n = p[t].children, e = n.length - 1; e >= 0; e--) if (r = n[e], r.type === "text") {
+        }).sort(function (g, f) {
+          return f.length - g.length;
+        }).map(Si).join("|") + ")($|[" + cn.split("").map(Si).join("") + "])", s.env.abbrRegExp = new RegExp(p, "g")), d = s.env.abbrRegExp, t = 0, i = h.length; t < i; t++) if (h[t].type === "inline") {
+          for (n = h[t].children, e = n.length - 1; e >= 0; e--) if (r = n[e], r.type === "text") {
             for (l = 0, o = r.content, d.lastIndex = 0, c = r.level, a = []; u = d.exec(o);) d.lastIndex > l && a.push({
               type: "text",
               content: o.slice(l, u.index + u[1].length),
@@ -1785,7 +1802,7 @@ var app = (function () {
               type: "text",
               content: o.slice(l),
               level: c
-            }), p[t].children = n = [].concat(n.slice(0, e), a, n.slice(e + 1)));
+            }), h[t].children = n = [].concat(n.slice(0, e), a, n.slice(e + 1)));
           }
         }
       }
@@ -1820,20 +1837,20 @@ var app = (function () {
       return s.substr(0, e) + t + s.substr(e + 1);
     }
     function Zs(s) {
-      var e, t, i, n, r, o, a, l, c, d, u, h, p, g, m, S, w;
+      var e, t, i, n, r, o, a, l, c, d, u, p, h, g, f, S, w;
       if (s.options.typographer) {
-        for (w = [], m = s.tokens.length - 1; m >= 0; m--) if (s.tokens[m].type === "inline") {
-          for (S = s.tokens[m].children, w.length = 0, e = 0; e < S.length; e++) if (t = S[e], !(t.type !== "text" || $s.test(t.text))) {
-            for (a = S[e].level, p = w.length - 1; p >= 0 && !(w[p].level <= a); p--);
-            w.length = p + 1, i = t.content, r = 0, o = i.length;
+        for (w = [], f = s.tokens.length - 1; f >= 0; f--) if (s.tokens[f].type === "inline") {
+          for (S = s.tokens[f].children, w.length = 0, e = 0; e < S.length; e++) if (t = S[e], !(t.type !== "text" || $s.test(t.text))) {
+            for (a = S[e].level, h = w.length - 1; h >= 0 && !(w[h].level <= a); h--);
+            w.length = h + 1, i = t.content, r = 0, o = i.length;
             e: for (; r < o && (dn.lastIndex = r, n = dn.exec(i), !!n);) {
               if (l = !hn(i, n.index - 1), r = n.index + 1, g = n[0] === "'", c = !hn(i, r), !c && !l) {
                 g && (t.content = ze(t.content, n.index, un));
                 continue;
               }
-              if (u = !c, h = !l, h) {
-                for (p = w.length - 1; p >= 0 && (d = w[p], !(w[p].level < a)); p--) if (d.single === g && w[p].level === a) {
-                  d = w[p], g ? (S[d.token].content = ze(S[d.token].content, d.pos, s.options.quotes[2]), t.content = ze(t.content, n.index, s.options.quotes[3])) : (S[d.token].content = ze(S[d.token].content, d.pos, s.options.quotes[0]), t.content = ze(t.content, n.index, s.options.quotes[1])), w.length = p;
+              if (u = !c, p = !l, p) {
+                for (h = w.length - 1; h >= 0 && (d = w[h], !(w[h].level < a)); h--) if (d.single === g && w[h].level === a) {
+                  d = w[h], g ? (S[d.token].content = ze(S[d.token].content, d.pos, s.options.quotes[2]), t.content = ze(t.content, n.index, s.options.quotes[3])) : (S[d.token].content = ze(S[d.token].content, d.pos, s.options.quotes[0]), t.content = ze(t.content, n.index, s.options.quotes[1])), w.length = h;
                   continue e;
                 }
               }
@@ -1842,7 +1859,7 @@ var app = (function () {
                 pos: n.index,
                 single: g,
                 level: a
-              }) : h && g && (t.content = ze(t.content, n.index, un));
+              }) : p && g && (t.content = ze(t.content, n.index, un));
             }
           }
         }
@@ -1954,20 +1971,20 @@ var app = (function () {
         c,
         d,
         u,
-        h,
         p,
+        h,
         g,
-        m = s.bMarks[e] + s.tShift[e],
+        f = s.bMarks[e] + s.tShift[e],
         S = s.eMarks[e];
-      if (m > S || s.src.charCodeAt(m++) !== 62 || s.level >= s.options.maxNesting) return !1;
+      if (f > S || s.src.charCodeAt(f++) !== 62 || s.level >= s.options.maxNesting) return !1;
       if (i) return !0;
-      for (s.src.charCodeAt(m) === 32 && m++, l = s.blkIndent, s.blkIndent = 0, a = [s.bMarks[e]], s.bMarks[e] = m, m = m < S ? s.skipSpaces(m) : m, r = m >= S, o = [s.tShift[e]], s.tShift[e] = m - s.bMarks[e], u = s.parser.ruler.getRules("blockquote"), n = e + 1; n < t && (m = s.bMarks[n] + s.tShift[n], S = s.eMarks[n], !(m >= S)); n++) {
-        if (s.src.charCodeAt(m++) === 62) {
-          s.src.charCodeAt(m) === 32 && m++, a.push(s.bMarks[n]), s.bMarks[n] = m, m = m < S ? s.skipSpaces(m) : m, r = m >= S, o.push(s.tShift[n]), s.tShift[n] = m - s.bMarks[n];
+      for (s.src.charCodeAt(f) === 32 && f++, l = s.blkIndent, s.blkIndent = 0, a = [s.bMarks[e]], s.bMarks[e] = f, f = f < S ? s.skipSpaces(f) : f, r = f >= S, o = [s.tShift[e]], s.tShift[e] = f - s.bMarks[e], u = s.parser.ruler.getRules("blockquote"), n = e + 1; n < t && (f = s.bMarks[n] + s.tShift[n], S = s.eMarks[n], !(f >= S)); n++) {
+        if (s.src.charCodeAt(f++) === 62) {
+          s.src.charCodeAt(f) === 32 && f++, a.push(s.bMarks[n]), s.bMarks[n] = f, f = f < S ? s.skipSpaces(f) : f, r = f >= S, o.push(s.tShift[n]), s.tShift[n] = f - s.bMarks[n];
           continue;
         }
         if (r) break;
-        for (g = !1, h = 0, p = u.length; h < p; h++) if (u[h](s, n, t, !0)) {
+        for (g = !1, p = 0, h = u.length; p < h; p++) if (u[p](s, n, t, !0)) {
           g = !0;
           break;
         }
@@ -1981,7 +1998,7 @@ var app = (function () {
       }), s.parser.tokenize(s, e, n), s.tokens.push({
         type: "blockquote_close",
         level: --s.level
-      }), s.parentType = c, d[1] = s.line, h = 0; h < o.length; h++) s.bMarks[h + e] = a[h], s.tShift[h + e] = o[h];
+      }), s.parentType = c, d[1] = s.line, p = 0; p < o.length; p++) s.bMarks[p + e] = a[p], s.tShift[p + e] = o[p];
       return s.blkIndent = l, !0;
     }
     function tr(s, e, t, i) {
@@ -2034,10 +2051,10 @@ var app = (function () {
         c,
         d,
         u,
-        h,
         p,
+        h,
         g,
-        m,
+        f,
         S,
         w,
         G,
@@ -2051,7 +2068,7 @@ var app = (function () {
         xi;
       if ((u = fn(s, e)) >= 0) S = !0;else if ((u = pn(s, e)) >= 0) S = !1;else return !1;
       if (s.level >= s.options.maxNesting) return !1;
-      if (m = s.src.charCodeAt(u - 1), i) return !0;
+      if (f = s.src.charCodeAt(u - 1), i) return !0;
       for (G = s.tokens.length, S ? (d = s.bMarks[e] + s.tShift[e], g = Number(s.src.substr(d, u - d - 1)), s.tokens.push({
         type: "ordered_list_open",
         order: g,
@@ -2061,7 +2078,7 @@ var app = (function () {
         type: "bullet_list_open",
         lines: V = [e, 0],
         level: s.level++
-      }), n = e, A = !1, Q = s.parser.ruler.getRules("list"); n < t && (w = s.skipSpaces(u), h = s.eMarks[n], w >= h ? p = 1 : p = w - u, p > 4 && (p = 1), p < 1 && (p = 1), r = u - s.bMarks[n] + p, s.tokens.push({
+      }), n = e, A = !1, Q = s.parser.ruler.getRules("list"); n < t && (w = s.skipSpaces(u), p = s.eMarks[n], w >= p ? h = 1 : h = w - u, h > 4 && (h = 1), h < 1 && (h = 1), r = u - s.bMarks[n] + h, s.tokens.push({
         type: "list_item_open",
         lines: X = [e, 0],
         level: s.level++
@@ -2077,7 +2094,7 @@ var app = (function () {
         if (S) {
           if (u = fn(s, n), u < 0) break;
         } else if (u = pn(s, n), u < 0) break;
-        if (m !== s.src.charCodeAt(u - 1)) break;
+        if (f !== s.src.charCodeAt(u - 1)) break;
       }
       return s.tokens.push({
         type: S ? "ordered_list_close" : "bullet_list_close",
@@ -2194,21 +2211,21 @@ var app = (function () {
       return s.src.substr(t, i - t);
     }
     function ur(s, e, t, i) {
-      var n, r, o, a, l, c, d, u, h, p, g;
+      var n, r, o, a, l, c, d, u, p, h, g;
       if (e + 2 > t || (l = e + 1, s.tShift[l] < s.blkIndent) || (o = s.bMarks[l] + s.tShift[l], o >= s.eMarks[l]) || (n = s.src.charCodeAt(o), n !== 124 && n !== 45 && n !== 58) || (r = _i(s, e + 1), !/^[-:| ]+$/.test(r)) || (c = r.split("|"), c <= 2)) return !1;
       for (u = [], a = 0; a < c.length; a++) {
-        if (h = c[a].trim(), !h) {
+        if (p = c[a].trim(), !p) {
           if (a === 0 || a === c.length - 1) continue;
           return !1;
         }
-        if (!/^:?-+:?$/.test(h)) return !1;
-        h.charCodeAt(h.length - 1) === 58 ? u.push(h.charCodeAt(0) === 58 ? "center" : "right") : h.charCodeAt(0) === 58 ? u.push("left") : u.push("");
+        if (!/^:?-+:?$/.test(p)) return !1;
+        p.charCodeAt(p.length - 1) === 58 ? u.push(p.charCodeAt(0) === 58 ? "center" : "right") : p.charCodeAt(0) === 58 ? u.push("left") : u.push("");
       }
       if (r = _i(s, e).trim(), r.indexOf("|") === -1 || (c = r.replace(/^\||\|$/g, "").split("|"), u.length !== c.length)) return !1;
       if (i) return !0;
       for (s.tokens.push({
         type: "table_open",
-        lines: p = [e, 0],
+        lines: h = [e, 0],
         level: s.level++
       }), s.tokens.push({
         type: "thead_open",
@@ -2271,7 +2288,7 @@ var app = (function () {
       }), s.tokens.push({
         type: "table_close",
         level: --s.level
-      }), p[1] = g[1] = l, s.line = l, !0;
+      }), h[1] = g[1] = l, s.line = l, !0;
     }
     function It(s, e) {
       var t,
@@ -2287,7 +2304,7 @@ var app = (function () {
       for (t = e + 2, i = s.tokens.length - 2; t < i; t++) s.tokens[t].level === n && s.tokens[t].type === "paragraph_open" && (s.tokens[t + 2].tight = !0, s.tokens[t].tight = !0, t += 2);
     }
     function pr(s, e, t, i) {
-      var n, r, o, a, l, c, d, u, h, p, g, m, S, w;
+      var n, r, o, a, l, c, d, u, p, h, g, f, S, w;
       if (i) return s.ddIndent < 0 ? !1 : It(s, e) >= 0;
       if (d = e + 1, s.isEmpty(d) && ++d > t || s.tShift[d] < s.blkIndent || (n = It(s, d), n < 0) || s.level >= s.options.maxNesting) return !1;
       c = s.tokens.length, s.tokens.push({
@@ -2314,7 +2331,7 @@ var app = (function () {
             type: "dd_open",
             lines: a = [d, 0],
             level: s.level++
-          }), m = s.tight, h = s.ddIndent, u = s.blkIndent, g = s.tShift[r], p = s.parentType, s.blkIndent = s.ddIndent = s.tShift[r] + 2, s.tShift[r] = n - s.bMarks[r], s.tight = !0, s.parentType = "deflist", s.parser.tokenize(s, r, t, !0), (!s.tight || S) && (w = !1), S = s.line - r > 1 && s.isEmpty(s.line - 1), s.tShift[r] = g, s.tight = m, s.parentType = p, s.blkIndent = u, s.ddIndent = h, s.tokens.push({
+          }), f = s.tight, p = s.ddIndent, u = s.blkIndent, g = s.tShift[r], h = s.parentType, s.blkIndent = s.ddIndent = s.tShift[r] + 2, s.tShift[r] = n - s.bMarks[r], s.tight = !0, s.parentType = "deflist", s.parser.tokenize(s, r, t, !0), (!s.tight || S) && (w = !1), S = s.line - r > 1 && s.isEmpty(s.line - 1), s.tShift[r] = g, s.tight = f, s.parentType = h, s.blkIndent = u, s.ddIndent = p, s.tokens.push({
             type: "dd_close",
             level: --s.level
           }), a[1] = d = s.line, d >= t || s.tShift[d] < s.blkIndent) break e;
@@ -2691,21 +2708,21 @@ var app = (function () {
         c,
         d = !1,
         u = s.pos,
-        h = s.posMax,
-        p = s.pos,
-        g = s.src.charCodeAt(p);
-      if (g === 33 && (d = !0, g = s.src.charCodeAt(++p)), g !== 91 || s.level >= s.options.maxNesting || (t = p + 1, i = mt(s, p), i < 0)) return !1;
-      if (a = i + 1, a < h && s.src.charCodeAt(a) === 40) {
-        for (a++; a < h && (c = s.src.charCodeAt(a), !(c !== 32 && c !== 10)); a++);
-        if (a >= h) return !1;
-        for (p = a, Yn(s, a) ? (r = s.linkContent, a = s.pos) : r = "", p = a; a < h && (c = s.src.charCodeAt(a), !(c !== 32 && c !== 10)); a++);
-        if (a < h && p !== a && Zn(s, a)) for (o = s.linkContent, a = s.pos; a < h && (c = s.src.charCodeAt(a), !(c !== 32 && c !== 10)); a++);else o = "";
-        if (a >= h || s.src.charCodeAt(a) !== 41) return s.pos = u, !1;
+        p = s.posMax,
+        h = s.pos,
+        g = s.src.charCodeAt(h);
+      if (g === 33 && (d = !0, g = s.src.charCodeAt(++h)), g !== 91 || s.level >= s.options.maxNesting || (t = h + 1, i = mt(s, h), i < 0)) return !1;
+      if (a = i + 1, a < p && s.src.charCodeAt(a) === 40) {
+        for (a++; a < p && (c = s.src.charCodeAt(a), !(c !== 32 && c !== 10)); a++);
+        if (a >= p) return !1;
+        for (h = a, Yn(s, a) ? (r = s.linkContent, a = s.pos) : r = "", h = a; a < p && (c = s.src.charCodeAt(a), !(c !== 32 && c !== 10)); a++);
+        if (a < p && h !== a && Zn(s, a)) for (o = s.linkContent, a = s.pos; a < p && (c = s.src.charCodeAt(a), !(c !== 32 && c !== 10)); a++);else o = "";
+        if (a >= p || s.src.charCodeAt(a) !== 41) return s.pos = u, !1;
         a++;
       } else {
         if (s.linkLevel > 0) return !1;
-        for (; a < h && (c = s.src.charCodeAt(a), !(c !== 32 && c !== 10)); a++);
-        if (a < h && s.src.charCodeAt(a) === 91 && (p = a + 1, a = mt(s, a), a >= 0 ? n = s.src.slice(p, a++) : a = p - 1), n || (_typeof(n) > "u" && (a = i + 1), n = s.src.slice(t, i)), l = s.env.references[Xn(n)], !l) return s.pos = u, !1;
+        for (; a < p && (c = s.src.charCodeAt(a), !(c !== 32 && c !== 10)); a++);
+        if (a < p && s.src.charCodeAt(a) === 91 && (h = a + 1, a = mt(s, a), a >= 0 ? n = s.src.slice(h, a++) : a = h - 1), n || (_typeof(n) > "u" && (a = i + 1), n = s.src.slice(t, i)), l = s.env.references[Xn(n)], !l) return s.pos = u, !1;
         r = l.href, o = l.title;
       }
       return e || (s.pos = t, s.posMax = i, d ? s.push({
@@ -2722,7 +2739,7 @@ var app = (function () {
       }), s.linkLevel++, s.parser.tokenize(s), s.linkLevel--, s.push({
         type: "link_close",
         level: --s.level
-      }))), s.pos = a, s.posMax = h, !0;
+      }))), s.pos = a, s.posMax = p, !0;
     }
     function Rr(s, e) {
       var t,
@@ -3663,29 +3680,29 @@ var app = (function () {
       return _co.apply(this, arguments);
     }
     function _co() {
-      _co = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee103(s, e) {
+      _co = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee104(s, e) {
         var t, i;
-        return _regeneratorRuntime().wrap(function _callee103$(_context103) {
-          while (1) switch (_context103.prev = _context103.next) {
+        return _regeneratorRuntime().wrap(function _callee104$(_context104) {
+          while (1) switch (_context104.prev = _context104.next) {
             case 0:
               t = s.getReader();
             case 1:
-              _context103.next = 3;
+              _context104.next = 3;
               return t.read();
             case 3:
-              if ((i = _context103.sent).done) {
-                _context103.next = 7;
+              if ((i = _context104.sent).done) {
+                _context104.next = 7;
                 break;
               }
               e(i.value);
             case 5:
-              _context103.next = 1;
+              _context104.next = 1;
               break;
             case 7:
             case "end":
-              return _context103.stop();
+              return _context104.stop();
           }
-        }, _callee103);
+        }, _callee104);
       }));
       return _co.apply(this, arguments);
     }
@@ -3774,18 +3791,18 @@ var app = (function () {
         l = e.openWhenHidden,
         c = e.fetch,
         d = fo(e, ["signal", "headers", "onopen", "onmessage", "onclose", "onerror", "openWhenHidden", "fetch"]);
-      return new Promise(function (u, h) {
-        var p = Object.assign({}, i);
-        p.accept || (p.accept = Di);
+      return new Promise(function (u, p) {
+        var h = Object.assign({}, i);
+        h.accept || (h.accept = Di);
         var g;
-        function m() {
+        function f() {
           g.abort(), document.hidden || X();
         }
-        l || document.addEventListener("visibilitychange", m);
+        l || document.addEventListener("visibilitychange", f);
         var S = mo,
           w = 0;
         function G() {
-          document.removeEventListener("visibilitychange", m), window.clearTimeout(w), g.abort();
+          document.removeEventListener("visibilitychange", f), window.clearTimeout(w), g.abort();
         }
         t == null || t.addEventListener("abort", function () {
           G(), u();
@@ -3805,7 +3822,7 @@ var app = (function () {
                   _context3.prev = 1;
                   _context3.next = 4;
                   return A(s, Object.assign(Object.assign({}, d), {
-                    headers: p,
+                    headers: h,
                     signal: g.signal
                   }));
                 case 4:
@@ -3815,7 +3832,7 @@ var app = (function () {
                 case 7:
                   _context3.next = 9;
                   return co(Q.body, uo(ho(function (N) {
-                    N ? p[yn] = N : delete p[yn];
+                    N ? h[yn] = N : delete h[yn];
                   }, function (N) {
                     S = N;
                   }, r)));
@@ -3832,7 +3849,7 @@ var app = (function () {
                     N = (oe = a == null ? void 0 : a(_context3.t0)) !== null && oe !== void 0 ? oe : S;
                     window.clearTimeout(w), w = window.setTimeout(X, N);
                   } catch (N) {
-                    G(), h(N);
+                    G(), p(N);
                   }
                 case 17:
                 case "end":
@@ -3933,9 +3950,9 @@ var app = (function () {
         function () {
           var _request = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee7(e, t, i) {
             var n,
-              p,
+              h,
               g,
-              m,
+              f,
               S,
               w,
               G,
@@ -3948,7 +3965,7 @@ var app = (function () {
               c,
               d,
               u,
-              h,
+              p,
               _args7 = arguments;
             return _regeneratorRuntime().wrap(function _callee7$(_context7) {
               while (1) switch (_context7.prev = _context7.next) {
@@ -3956,7 +3973,7 @@ var app = (function () {
                   n = _args7.length > 3 && _args7[3] !== undefined ? _args7[3] : !0;
                   r = {
                     body: t,
-                    headers: (p = e.requestSettings) == null ? void 0 : p.headers
+                    headers: (h = e.requestSettings) == null ? void 0 : h.headers
                   };
                   _context7.next = 4;
                   return E.processRequestInterceptor(e.deepChat, r);
@@ -3981,13 +3998,13 @@ var app = (function () {
                   }
                   return _context7.abrupt("return", Ae.stream(e, o, i));
                 case 16:
-                  if (!(((m = e.requestSettings) == null ? void 0 : m.url) === ve.URL)) {
+                  if (!(((f = e.requestSettings) == null ? void 0 : f.url) === ve.URL)) {
                     _context7.next = 18;
                     break;
                   }
                   return _context7.abrupt("return", ve.requestStream(i, e.streamHandlers));
                 case 18:
-                  h = new Ze(i);
+                  p = new Ze(i);
                   go(((S = e.requestSettings) == null ? void 0 : S.url) || e.url || "", {
                     method: ((w = e.requestSettings) == null ? void 0 : w.method) || "POST",
                     headers: a,
@@ -4040,7 +4057,7 @@ var app = (function () {
                             case 7:
                               N = _context6.t0;
                               (oe = e.extractResultData) == null || oe.call(e, N).then(function (Be) {
-                                h.upsertStreamedMessage(Be);
+                                p.upsertStreamedMessage(Be);
                               })["catch"](function (Be) {
                                 return E.displayError(i, Be);
                               });
@@ -4055,7 +4072,7 @@ var app = (function () {
                       throw d(), A;
                     },
                     onclose: function onclose() {
-                      h.finaliseStreamedMessage(), d();
+                      p.finaliseStreamedMessage(), d();
                     },
                     signal: u.signal
                   })["catch"](function (A) {
@@ -4135,7 +4152,7 @@ var app = (function () {
                   n = !0;
                   r = /*#__PURE__*/function () {
                     var _ref2 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee8(c) {
-                      var u, h, d;
+                      var u, p, d;
                       return _regeneratorRuntime().wrap(function _callee8$(_context8) {
                         while (1) switch (_context8.prev = _context8.next) {
                           case 0:
@@ -4147,7 +4164,7 @@ var app = (function () {
                           case 2:
                             n = !1;
                             _context8.next = 5;
-                            return (h = (u = e.deepChat).responseInterceptor) == null ? void 0 : h.call(u, c);
+                            return (p = (u = e.deepChat).responseInterceptor) == null ? void 0 : p.call(u, c);
                           case 5:
                             _context8.t0 = _context8.sent;
                             if (_context8.t0) {
@@ -4185,7 +4202,7 @@ var app = (function () {
       }, {
         key: "stream",
         value: function stream(e, t, i) {
-          var u, h;
+          var u, p;
           var n = !0,
             r = !1;
           var o = new Ze(i),
@@ -4195,14 +4212,14 @@ var app = (function () {
             l = function l() {
               n && (o.finaliseStreamedMessage(), e.streamHandlers.onClose(), n = !1);
             },
-            c = function c(p) {
-              n && (!p || _typeof(p) != "object" || typeof p.error != "string" && typeof p.html != "string" && typeof p.text != "string" ? console.error(C.INVALID_RESPONSE(p, "server", !1)) : p.error ? (console.error(p.error), o.finaliseStreamedMessage(), e.streamHandlers.onClose(), i.addNewErrorMessage("service", p.error), n = !1) : o.upsertStreamedMessage(p));
+            c = function c(h) {
+              n && (!h || _typeof(h) != "object" || typeof h.error != "string" && typeof h.html != "string" && typeof h.text != "string" ? console.error(C.INVALID_RESPONSE(h, "server", !1)) : h.error ? (console.error(h.error), o.finaliseStreamedMessage(), e.streamHandlers.onClose(), i.addNewErrorMessage("service", h.error), n = !1) : o.upsertStreamedMessage(h));
             };
           e.streamHandlers.abortStream.abort = function () {
             o.finaliseStreamedMessage(), e.streamHandlers.onClose(), n = !1;
           };
           var d = Ae.generateOptionalSignals();
-          (h = (u = e.requestSettings).handler) == null || h.call(u, t, _objectSpread(_objectSpread({}, d), {}, {
+          (p = (u = e.requestSettings).handler) == null || p.call(u, t, _objectSpread(_objectSpread({}, d), {}, {
             onOpen: a,
             onResponse: c,
             onClose: l,
@@ -4229,7 +4246,7 @@ var app = (function () {
             },
             o = /*#__PURE__*/function () {
               var _ref3 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee10(d) {
-                var h, p, u;
+                var p, h, u;
                 return _regeneratorRuntime().wrap(function _callee10$(_context10) {
                   while (1) switch (_context10.prev = _context10.next) {
                     case 0:
@@ -4240,7 +4257,7 @@ var app = (function () {
                       return _context10.abrupt("return");
                     case 2:
                       _context10.next = 4;
-                      return (p = (h = e.deepChat).responseInterceptor) == null ? void 0 : p.call(h, d);
+                      return (h = (p = e.deepChat).responseInterceptor) == null ? void 0 : h.call(p, d);
                     case 4:
                       _context10.t0 = _context10.sent;
                       if (_context10.t0) {
@@ -4296,8 +4313,8 @@ var app = (function () {
         function () {
           var _request3 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee12(e, t, i) {
             var n,
-              h,
               p,
+              h,
               g,
               r,
               _yield$E$processReque2,
@@ -4314,7 +4331,7 @@ var app = (function () {
                   n = _args12.length > 3 && _args12[3] !== undefined ? _args12[3] : !0;
                   r = {
                     body: t,
-                    headers: (h = e.requestSettings) == null ? void 0 : h.headers
+                    headers: (p = e.requestSettings) == null ? void 0 : p.headers
                   };
                   _context12.next = 4;
                   return E.processRequestInterceptor(e.deepChat, r);
@@ -4330,7 +4347,7 @@ var app = (function () {
                   }
                   return _context12.abrupt("return", E.onInterceptorError(i, l, c));
                 case 11:
-                  if (!((p = e.requestSettings) != null && p.handler)) {
+                  if (!((h = e.requestSettings) != null && h.handler)) {
                     _context12.next = 13;
                     break;
                   }
@@ -4344,12 +4361,12 @@ var app = (function () {
                 case 15:
                   d = !0;
                   u = E.fetch.bind(this, e, a, n);
-                  u(o).then(function (m) {
-                    return d = !!m.ok, m;
-                  }).then(function (m) {
-                    return E.processResponseByType(m);
+                  u(o).then(function (f) {
+                    return d = !!f.ok, f;
+                  }).then(function (f) {
+                    return E.processResponseByType(f);
                   }).then( /*#__PURE__*/function () {
-                    var _ref4 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee11(m) {
+                    var _ref4 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee11(f) {
                       var G, A, S, w;
                       return _regeneratorRuntime().wrap(function _callee11$(_context11) {
                         while (1) switch (_context11.prev = _context11.next) {
@@ -4361,14 +4378,14 @@ var app = (function () {
                             return _context11.abrupt("return");
                           case 2:
                             _context11.next = 4;
-                            return (A = (G = e.deepChat).responseInterceptor) == null ? void 0 : A.call(G, m);
+                            return (A = (G = e.deepChat).responseInterceptor) == null ? void 0 : A.call(G, f);
                           case 4:
                             _context11.t0 = _context11.sent;
                             if (_context11.t0) {
                               _context11.next = 7;
                               break;
                             }
-                            _context11.t0 = m;
+                            _context11.t0 = f;
                           case 7:
                             S = _context11.t0;
                             _context11.next = 10;
@@ -4379,13 +4396,13 @@ var app = (function () {
                               _context11.next = 13;
                               break;
                             }
-                            throw m;
+                            throw f;
                           case 13:
                             if (!(!w || _typeof(w) != "object")) {
                               _context11.next = 15;
                               break;
                             }
-                            throw Error(C.INVALID_RESPONSE(m, "response", !!e.deepChat.responseInterceptor, S));
+                            throw Error(C.INVALID_RESPONSE(f, "response", !!e.deepChat.responseInterceptor, S));
                           case 15:
                             w.makingAnotherRequest || (I.isSimulation(e.deepChat.stream) ? I.simulate(i, e.streamHandlers, w) : (i.addNewMessage(w), c()));
                           case 16:
@@ -4397,8 +4414,8 @@ var app = (function () {
                     return function (_x23) {
                       return _ref4.apply(this, arguments);
                     };
-                  }())["catch"](function (m) {
-                    E.displayError(i, m), c();
+                  }())["catch"](function (f) {
+                    E.displayError(i, f), c();
                   });
                 case 18:
                 case "end":
@@ -4467,9 +4484,9 @@ var app = (function () {
         value: function () {
           var _poll = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee14(e, t, i) {
             var n,
-              p,
+              h,
               g,
-              m,
+              f,
               r,
               _yield$E$processReque3,
               o,
@@ -4478,7 +4495,7 @@ var app = (function () {
               c,
               d,
               u,
-              h,
+              p,
               _args14 = arguments;
             return _regeneratorRuntime().wrap(function _callee14$(_context14) {
               while (1) switch (_context14.prev = _context14.next) {
@@ -4486,7 +4503,7 @@ var app = (function () {
                   n = _args14.length > 3 && _args14[3] !== undefined ? _args14[3] : !0;
                   r = {
                     body: t,
-                    headers: (p = e.requestSettings) == null ? void 0 : p.headers
+                    headers: (h = e.requestSettings) == null ? void 0 : h.headers
                   };
                   _context14.next = 4;
                   return E.processRequestInterceptor(e.deepChat, r);
@@ -4501,12 +4518,12 @@ var app = (function () {
                   }
                   return _context14.abrupt("return", E.onInterceptorError(i, l));
                 case 10:
-                  c = ((g = e.requestSettings) == null ? void 0 : g.url) || e.url || "", d = ((m = e.requestSettings) == null ? void 0 : m.method) || "POST", u = n ? JSON.stringify(o) : o, h = {
+                  c = ((g = e.requestSettings) == null ? void 0 : g.url) || e.url || "", d = ((f = e.requestSettings) == null ? void 0 : f.method) || "POST", u = n ? JSON.stringify(o) : o, p = {
                     method: d,
                     body: u,
                     headers: a
                   };
-                  e.requestSettings.credentials && (h.credentials = e.requestSettings.credentials), _.executePollRequest(e, c, h, i);
+                  e.requestSettings.credentials && (p.credentials = e.requestSettings.credentials), _.executePollRequest(e, c, p, i);
                 case 12:
                 case "end":
                   return _context14.stop();
@@ -4789,12 +4806,12 @@ var app = (function () {
       }, {
         key: "processMicrophone",
         value: function processMicrophone(e, t, i, n) {
-          var _l$files, _h$maxNumberOfFiles;
-          var a, l, c, d, u, h;
+          var _l$files, _p$maxNumberOfFiles;
+          var a, l, c, d, u, p;
           var o = _objectSpread({
             acceptedFormats: "audio/*"
           }, ((a = e.fileTypes.audio) == null ? void 0 : a.files) || {});
-          i && (navigator.mediaDevices.getUserMedia !== void 0 ? (e.recordAudio = L.parseConfig(e.requestSettings, o, t, i), _typeof(i) == "object" && i.files && ((_l$files = (l = e.recordAudio).files) !== null && _l$files !== void 0 ? _l$files : l.files = {}, e.recordAudio.files.format = (c = i.files) == null ? void 0 : c.format, e.recordAudio.files.maxDurationSeconds = (d = i.files) == null ? void 0 : d.maxDurationSeconds, (u = e.fileTypes.audio) != null && u.files && ((_h$maxNumberOfFiles = (h = e.fileTypes.audio.files).maxNumberOfFiles) !== null && _h$maxNumberOfFiles !== void 0 ? _h$maxNumberOfFiles : h.maxNumberOfFiles = i.files.maxNumberOfFiles))) : n || (e.fileTypes.audio = L.parseConfig(e.requestSettings, o, t, i)));
+          i && (navigator.mediaDevices.getUserMedia !== void 0 ? (e.recordAudio = L.parseConfig(e.requestSettings, o, t, i), _typeof(i) == "object" && i.files && ((_l$files = (l = e.recordAudio).files) !== null && _l$files !== void 0 ? _l$files : l.files = {}, e.recordAudio.files.format = (c = i.files) == null ? void 0 : c.format, e.recordAudio.files.maxDurationSeconds = (d = i.files) == null ? void 0 : d.maxDurationSeconds, (u = e.fileTypes.audio) != null && u.files && ((_p$maxNumberOfFiles = (p = e.fileTypes.audio.files).maxNumberOfFiles) !== null && _p$maxNumberOfFiles !== void 0 ? _p$maxNumberOfFiles : p.maxNumberOfFiles = i.files.maxNumberOfFiles))) : n || (e.fileTypes.audio = L.parseConfig(e.requestSettings, o, t, i)));
         }
         // prettier-ignore
       }, {
@@ -5666,32 +5683,32 @@ var app = (function () {
           value: function () {
             var _loadModel = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee25(e, t) {
               var _this12 = this;
-              var o, a, l, c, d, i, n, r, _this$getConfig, u, h, p, _u;
+              var o, a, l, c, d, u, p, i, n, r, _this$getConfig, h, g, f, _h;
               return _regeneratorRuntime().wrap(function _callee25$(_context25) {
                 while (1) switch (_context25.prev = _context25.next) {
                   case 0:
                     this.scrollToTop(), M.chat = e, this._isModelLoading = !0;
                     i = ((o = this._webModel.introMessage) == null ? void 0 : o.displayed) === !1;
-                    n = function n(u) {
-                      var h;
-                      (h = _this12._messages) == null || h.addNewMessage({
-                        html: "<div>".concat(u.text, "</div>"),
+                    n = function n(h) {
+                      var g;
+                      (g = _this12._messages) == null || g.addNewMessage({
+                        html: "<div>".concat(h.text, "</div>"),
                         overwrite: !0,
                         sendUpdate: !1
                       }), i && (setTimeout(function () {
-                        var p;
-                        return Y.scrollToBottom((p = _this12._messages) == null ? void 0 : p.elementRef);
+                        var f;
+                        return Y.scrollToBottom((f = _this12._messages) == null ? void 0 : f.elementRef);
                       }), i = !1);
                     };
                     M.chat.setInitProgressCallback(n);
                     _context25.prev = 4;
-                    _this$getConfig = this.getConfig(), u = _this$getConfig.model, h = _this$getConfig.appConfig, p = {};
-                    this._webModel.instruction && (p.conv_config = {
+                    _this$getConfig = this.getConfig(), h = _this$getConfig.model, g = _this$getConfig.appConfig, f = {};
+                    this._webModel.instruction && (f.conv_config = {
                       system: this._webModel.instruction
                     });
-                    this._conversationHistory.length > 0 && (p.conversation_history = this._conversationHistory);
+                    this._conversationHistory.length > 0 && (f.conversation_history = this._conversationHistory);
                     _context25.next = 10;
-                    return M.chat.reload(u, p, h, t);
+                    return M.chat.reload(h, f, g, t);
                   case 10:
                     r = _context25.sent;
                     _context25.next = 16;
@@ -5701,10 +5718,10 @@ var app = (function () {
                     _context25.t0 = _context25["catch"](4);
                     return _context25.abrupt("return", this.unloadChat(_context25.t0));
                   case 16:
-                    if ((a = this._webModel.introMessage) != null && a.removeAfterLoad) this._webModel.introMessage.displayed === !1 ? (c = this._messages) == null || c.removeLastMessage() : (d = this._removeIntro) == null || d.call(this);else {
-                      _u = xn.setUpAfterLoad(r, this._webModel.introMessage, this._chatEl, !!this._webModel.worker);
-                      (l = this._messages) == null || l.addNewMessage({
-                        html: _u,
+                    if ((l = (a = this.deepChat)._validationHandler) == null || l.call(a), (c = this._webModel.introMessage) != null && c.removeAfterLoad) this._webModel.introMessage.displayed === !1 ? (u = this._messages) == null || u.removeLastMessage() : (p = this._removeIntro) == null || p.call(this);else {
+                      _h = xn.setUpAfterLoad(r, this._webModel.introMessage, this._chatEl, !!this._webModel.worker);
+                      (d = this._messages) == null || d.addNewMessage({
+                        html: _h,
                         overwrite: !0,
                         sendUpdate: !1
                       });
@@ -8559,7 +8576,7 @@ var app = (function () {
         key: "extractPollResultData",
         value: function () {
           var _extractPollResultData5 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee79(e) {
-            var r, t, i, n;
+            var r, o, t, i, l, c, d, u, n;
             return _regeneratorRuntime().wrap(function _callee79$(_context79) {
               while (1) switch (_context79.prev = _context79.next) {
                 case 0:
@@ -8573,32 +8590,56 @@ var app = (function () {
                   });
                 case 3:
                   if (!(t === "completed" && this.messages)) {
-                    _context79.next = 10;
+                    _context79.next = 19;
                     break;
                   }
                   this.url = "".concat(ae.THREAD_PREFIX, "/").concat(e.thread_id, "/messages");
                   _context79.next = 7;
                   return O.directFetch(this, {}, "GET");
                 case 7:
-                  _context79.t0 = _context79.sent.data[0].content[0].text.value;
-                  _context79.t1 = this.sessionId;
-                  return _context79.abrupt("return", {
-                    text: _context79.t0,
-                    _sessionId: _context79.t1
+                  l = _context79.sent.data[0];
+                  c = l.content.find(function (p) {
+                    return !!p.text;
                   });
-                case 10:
-                  n = (r = i == null ? void 0 : i.submit_tool_outputs) == null ? void 0 : r.tool_calls;
-                  if (!(t === "requires_action" && n)) {
-                    _context79.next = 15;
+                  d = l.content.filter(function (p) {
+                    var h;
+                    return (h = p.image_file) == null ? void 0 : h.file_id;
+                  }).map(function (p) {
+                    var h;
+                    return (h = p.image_file) == null ? void 0 : h.file_id;
+                  });
+                  if (!(d && d.length > 0)) {
+                    _context79.next = 16;
                     break;
                   }
-                  _context79.next = 14;
-                  return this.handleTools(n);
-                case 14:
-                  return _context79.abrupt("return", _context79.sent);
-                case 15:
-                  throw Error("Thread run status: ".concat(t));
+                  _context79.next = 13;
+                  return this.getFiles(d);
+                case 13:
+                  _context79.t0 = _context79.sent;
+                  _context79.next = 17;
+                  break;
                 case 16:
+                  _context79.t0 = void 0;
+                case 17:
+                  u = _context79.t0;
+                  return _context79.abrupt("return", {
+                    text: ((r = c == null ? void 0 : c.text) == null ? void 0 : r.value) || "",
+                    _sessionId: this.sessionId,
+                    files: u
+                  });
+                case 19:
+                  n = (o = i == null ? void 0 : i.submit_tool_outputs) == null ? void 0 : o.tool_calls;
+                  if (!(t === "requires_action" && n)) {
+                    _context79.next = 24;
+                    break;
+                  }
+                  _context79.next = 23;
+                  return this.handleTools(n);
+                case 23:
+                  return _context79.abrupt("return", _context79.sent);
+                case 24:
+                  throw Error("Thread run status: ".concat(t));
+                case 25:
                 case "end":
                   return _context79.stop();
               }
@@ -8608,17 +8649,60 @@ var app = (function () {
             return _extractPollResultData5.apply(this, arguments);
           }
           return extractPollResultData;
+        }()
+      }, {
+        key: "getFiles",
+        value: function () {
+          var _getFiles = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee80(e) {
+            var _this35 = this;
+            var t, n;
+            return _regeneratorRuntime().wrap(function _callee80$(_context80) {
+              while (1) switch (_context80.prev = _context80.next) {
+                case 0:
+                  t = e.map(function (r) {
+                    return _this35.url = "https://api.openai.com/v1/files/".concat(r, "/content"), new Promise(function (o) {
+                      o(O.directFetch(_this35, void 0, "GET", !1));
+                    });
+                  });
+                  _context80.next = 3;
+                  return Promise.all(t);
+                case 3:
+                  n = _context80.sent.map(function (r) {
+                    return new Promise(function (o) {
+                      var a = new FileReader();
+                      a.readAsDataURL(r), a.onload = function (l) {
+                        o({
+                          src: l.target.result,
+                          type: "image"
+                        });
+                      };
+                    });
+                  });
+                  _context80.next = 6;
+                  return Promise.all(n);
+                case 6:
+                  return _context80.abrupt("return", _context80.sent);
+                case 7:
+                case "end":
+                  return _context80.stop();
+              }
+            }, _callee80);
+          }));
+          function getFiles(_x146) {
+            return _getFiles.apply(this, arguments);
+          }
+          return getFiles;
         }() // prettier-ignore
       }, {
         key: "handleTools",
         value: function () {
-          var _handleTools = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee80(e) {
+          var _handleTools = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee81(e) {
             var t, i, n;
-            return _regeneratorRuntime().wrap(function _callee80$(_context80) {
-              while (1) switch (_context80.prev = _context80.next) {
+            return _regeneratorRuntime().wrap(function _callee81$(_context81) {
+              while (1) switch (_context81.prev = _context81.next) {
                 case 0:
                   if (this._functionHandler) {
-                    _context80.next = 2;
+                    _context81.next = 2;
                     break;
                   }
                   throw Error("Please define the `function_handler` property inside the [openAI](https://deepchat.dev/docs/directConnection/openAI#Assistant) object.");
@@ -8629,14 +8713,14 @@ var app = (function () {
                       arguments: r["function"].arguments
                     };
                   });
-                  _context80.next = 5;
+                  _context81.next = 5;
                   return this._functionHandler(t);
                 case 5:
-                  i = _context80.sent;
+                  i = _context81.sent;
                   if (!(!Array.isArray(i) || i.find(function (r) {
                     return typeof r != "string";
                   }) || e.length !== i.length)) {
-                    _context80.next = 8;
+                    _context81.next = 8;
                     break;
                   }
                   throw Error("Response must contain an array of strings for each individual function/tool_call, see https://deepchat.dev/docs/directConnection/OpenAI/#assistant-functions.");
@@ -8648,21 +8732,21 @@ var app = (function () {
                     };
                   });
                   this.url = "".concat(ae.THREAD_PREFIX, "/").concat(this.sessionId, "/runs/").concat(this.run_id, "/submit_tool_outputs");
-                  _context80.next = 12;
+                  _context81.next = 12;
                   return O.directFetch(this, {
                     tool_outputs: n
                   }, "POST");
                 case 12:
-                  return _context80.abrupt("return", {
+                  return _context81.abrupt("return", {
                     timeoutMS: ae.POLLING_TIMEOUT_MS
                   });
                 case 13:
                 case "end":
-                  return _context80.stop();
+                  return _context81.stop();
               }
-            }, _callee80, this);
+            }, _callee81, this);
           }));
-          function handleTools(_x146) {
+          function handleTools(_x147) {
             return _handleTools.apply(this, arguments);
           }
           return handleTools;
@@ -8677,7 +8761,7 @@ var app = (function () {
       _inherits(Se, _U11);
       var _super33 = _createSuper(Se);
       function Se(e) {
-        var _this35;
+        var _this36;
         _classCallCheck(this, Se);
         var o;
         var t = e.directConnection,
@@ -8690,19 +8774,19 @@ var app = (function () {
               }
             }
           };
-        _this35 = _super33.call(this, e, O.buildKeyVerificationDetails(), O.buildHeaders, i, n), _this35.insertKeyPlaceholderText = "OpenAI API Key", _this35.getKeyLink = "https://platform.openai.com/account/api-keys", _this35.introPanelMarkUp = "\n    <div style=\"width: 100%; text-align: center; margin-left: -10px\"><b>OpenAI DALL\xB7E</b></div>\n    <p><b>Insert text</b> to generate an image.</p>\n    <p><b>Upload 1</b> PNG image to generate its variation and optionally insert text to specify the change.</p>\n    <p><b>Upload 2</b> PNG images where the second is a copy of the first with a transparent area where the edit should\n      take place and text to specify the edit.</p>\n    <p>Click <a href=\"https://platform.openai.com/docs/guides/images/introduction\">here</a> for more info.</p>", _this35.url = "", _this35.permittedErrorPrefixes = ["Incorrect", "Invalid input image"];
+        _this36 = _super33.call(this, e, O.buildKeyVerificationDetails(), O.buildHeaders, i, n), _this36.insertKeyPlaceholderText = "OpenAI API Key", _this36.getKeyLink = "https://platform.openai.com/account/api-keys", _this36.introPanelMarkUp = "\n    <div style=\"width: 100%; text-align: center; margin-left: -10px\"><b>OpenAI DALL\xB7E</b></div>\n    <p><b>Insert text</b> to generate an image.</p>\n    <p><b>Upload 1</b> PNG image to generate its variation and optionally insert text to specify the change.</p>\n    <p><b>Upload 2</b> PNG images where the second is a copy of the first with a transparent area where the edit should\n      take place and text to specify the edit.</p>\n    <p>Click <a href=\"https://platform.openai.com/docs/guides/images/introduction\">here</a> for more info.</p>", _this36.url = "", _this36.permittedErrorPrefixes = ["Incorrect", "Invalid input image"];
         var r = (o = t == null ? void 0 : t.openAI) == null ? void 0 : o.images;
-        if (_this35.camera) {
+        if (_this36.camera) {
           var a = _typeof(r) == "object" && r.size ? Number.parseInt(r.size) : 1024;
-          _this35.camera.files = {
+          _this36.camera.files = {
             dimensions: {
               width: a,
               height: a
             }
           };
         }
-        _typeof(r) == "object" && Object.assign(_this35.rawBody, r), _this35.canSendMessage = Se.canFileSendMessage;
-        return _this35;
+        _typeof(r) == "object" && Object.assign(_this36.rawBody, r), _this36.canSendMessage = Se.canFileSendMessage;
+        return _this36;
       }
       _createClass(Se, [{
         key: "preprocessBody",
@@ -8727,27 +8811,27 @@ var app = (function () {
       }, {
         key: "callServiceAPI",
         value: function () {
-          var _callServiceAPI19 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee81(e, t, i) {
+          var _callServiceAPI19 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee82(e, t, i) {
             var n, r;
-            return _regeneratorRuntime().wrap(function _callee81$(_context81) {
-              while (1) switch (_context81.prev = _context81.next) {
+            return _regeneratorRuntime().wrap(function _callee82$(_context82) {
+              while (1) switch (_context82.prev = _context82.next) {
                 case 0:
                   if ((n = this.requestSettings) != null && n.headers) {
-                    _context81.next = 2;
+                    _context82.next = 2;
                     break;
                   }
                   throw new Error("Request settings have not been set up");
                 case 2:
                   if (!(i != null && i[0])) {
-                    _context81.next = 6;
+                    _context82.next = 6;
                     break;
                   }
                   this.callApiWithImage(e, t, i);
-                  _context81.next = 11;
+                  _context82.next = 11;
                   break;
                 case 6:
                   if (this.requestSettings) {
-                    _context81.next = 8;
+                    _context82.next = 8;
                     break;
                   }
                   throw new Error("Request settings have not been set up");
@@ -8757,11 +8841,11 @@ var app = (function () {
                   _.request(this, r, e);
                 case 11:
                 case "end":
-                  return _context81.stop();
+                  return _context82.stop();
               }
-            }, _callee81, this);
+            }, _callee82, this);
           }));
-          function callServiceAPI(_x147, _x148, _x149) {
+          function callServiceAPI(_x148, _x149, _x150) {
             return _callServiceAPI19.apply(this, arguments);
           }
           return callServiceAPI;
@@ -8769,17 +8853,17 @@ var app = (function () {
       }, {
         key: "extractResultData",
         value: function () {
-          var _extractResultData22 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee82(e) {
-            return _regeneratorRuntime().wrap(function _callee82$(_context82) {
-              while (1) switch (_context82.prev = _context82.next) {
+          var _extractResultData22 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee83(e) {
+            return _regeneratorRuntime().wrap(function _callee83$(_context83) {
+              while (1) switch (_context83.prev = _context83.next) {
                 case 0:
                   if (!e.error) {
-                    _context82.next = 2;
+                    _context83.next = 2;
                     break;
                   }
                   throw e.error.message;
                 case 2:
-                  return _context82.abrupt("return", {
+                  return _context83.abrupt("return", {
                     files: e.data.map(function (i) {
                       return i.url ? {
                         src: i.url,
@@ -8792,11 +8876,11 @@ var app = (function () {
                   });
                 case 3:
                 case "end":
-                  return _context82.stop();
+                  return _context83.stop();
               }
-            }, _callee82);
+            }, _callee83);
           }));
-          function extractResultData(_x150) {
+          function extractResultData(_x151) {
             return _extractResultData22.apply(this, arguments);
           }
           return extractResultData;
@@ -8833,22 +8917,22 @@ var app = (function () {
       _inherits(dt, _U12);
       var _super34 = _createSuper(dt);
       function dt(e) {
-        var _this36$maxMessages, _l$model;
-        var _this36;
+        var _this37$maxMessages, _l$model;
+        var _this37;
         _classCallCheck(this, dt);
         var r, o, a, l;
         var t = JSON.parse(JSON.stringify(e.directConnection)),
           i = t.openAI;
-        _this36 = _super34.call(this, e, O.buildKeyVerificationDetails(), O.buildHeaders, i), _this36.insertKeyPlaceholderText = "OpenAI API Key", _this36.getKeyLink = "https://platform.openai.com/account/api-keys", _this36.url = "https://api.openai.com/v1/chat/completions", _this36.permittedErrorPrefixes = ["Incorrect"], _this36._systemMessage = dt.generateSystemMessage("You are a helpful assistant.");
+        _this37 = _super34.call(this, e, O.buildKeyVerificationDetails(), O.buildHeaders, i), _this37.insertKeyPlaceholderText = "OpenAI API Key", _this37.getKeyLink = "https://platform.openai.com/account/api-keys", _this37.url = "https://api.openai.com/v1/chat/completions", _this37.permittedErrorPrefixes = ["Incorrect"], _this37._systemMessage = dt.generateSystemMessage("You are a helpful assistant.");
         var n = (r = t.openAI) == null ? void 0 : r.chat;
         if (_typeof(n) == "object") {
-          n.system_prompt && (_this36._systemMessage = dt.generateSystemMessage(n.system_prompt));
+          n.system_prompt && (_this37._systemMessage = dt.generateSystemMessage(n.system_prompt));
           var _ref10 = (a = (o = e.directConnection) == null ? void 0 : o.openAI) == null ? void 0 : a.chat,
             c = _ref10.function_handler;
-          c && (_this36._functionHandler = c), _this36.cleanConfig(n), Object.assign(_this36.rawBody, n);
+          c && (_this37._functionHandler = c), _this37.cleanConfig(n), Object.assign(_this37.rawBody, n);
         }
-        (_this36$maxMessages = _this36.maxMessages) !== null && _this36$maxMessages !== void 0 ? _this36$maxMessages : _this36.maxMessages = -1, (_l$model = (l = _this36.rawBody).model) !== null && _l$model !== void 0 ? _l$model : l.model = "gpt-3.5-turbo";
-        return _this36;
+        (_this37$maxMessages = _this37.maxMessages) !== null && _this37$maxMessages !== void 0 ? _this37$maxMessages : _this37.maxMessages = -1, (_l$model = (l = _this37.rawBody).model) !== null && _l$model !== void 0 ? _l$model : l.model = "gpt-3.5-turbo";
+        return _this37;
       }
       _createClass(dt, [{
         key: "cleanConfig",
@@ -8875,13 +8959,13 @@ var app = (function () {
       }, {
         key: "callServiceAPI",
         value: function () {
-          var _callServiceAPI20 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee83(e, t) {
+          var _callServiceAPI20 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee84(e, t) {
             var i, n;
-            return _regeneratorRuntime().wrap(function _callee83$(_context83) {
-              while (1) switch (_context83.prev = _context83.next) {
+            return _regeneratorRuntime().wrap(function _callee84$(_context84) {
+              while (1) switch (_context84.prev = _context84.next) {
                 case 0:
                   if (this.requestSettings) {
-                    _context83.next = 2;
+                    _context84.next = 2;
                     break;
                   }
                   throw new Error("Request settings have not been set up");
@@ -8890,11 +8974,11 @@ var app = (function () {
                   n && (_typeof(n) != "object" || !n.simulation) || i.stream ? (i.stream = !0, I.request(this, i, e)) : _.request(this, i, e);
                 case 4:
                 case "end":
-                  return _context83.stop();
+                  return _context84.stop();
               }
-            }, _callee83, this);
+            }, _callee84, this);
           }));
-          function callServiceAPI(_x151, _x152) {
+          function callServiceAPI(_x152, _x153) {
             return _callServiceAPI20.apply(this, arguments);
           }
           return callServiceAPI;
@@ -8902,17 +8986,17 @@ var app = (function () {
       }, {
         key: "extractResultData",
         value: function () {
-          var _extractResultData23 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee84(e, t, i) {
-            return _regeneratorRuntime().wrap(function _callee84$(_context84) {
-              while (1) switch (_context84.prev = _context84.next) {
+          var _extractResultData23 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee85(e, t, i) {
+            return _regeneratorRuntime().wrap(function _callee85$(_context85) {
+              while (1) switch (_context85.prev = _context85.next) {
                 case 0:
                   if (!e.error) {
-                    _context84.next = 2;
+                    _context85.next = 2;
                     break;
                   }
                   throw e.error.message;
                 case 2:
-                  return _context84.abrupt("return", e.choices[0].delta ? {
+                  return _context85.abrupt("return", e.choices[0].delta ? {
                     text: e.choices[0].delta.content || ""
                   } : e.choices[0].message ? e.choices[0].message.tool_calls ? this.handleTools(e.choices[0].message, t, i) : {
                     text: e.choices[0].message.content
@@ -8921,11 +9005,11 @@ var app = (function () {
                   });
                 case 3:
                 case "end":
-                  return _context84.stop();
+                  return _context85.stop();
               }
-            }, _callee84, this);
+            }, _callee85, this);
           }));
-          function extractResultData(_x153, _x154, _x155) {
+          function extractResultData(_x154, _x155, _x156) {
             return _extractResultData23.apply(this, arguments);
           }
           return extractResultData;
@@ -8933,13 +9017,13 @@ var app = (function () {
       }, {
         key: "handleTools",
         value: function () {
-          var _handleTools2 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee85(e, t, i) {
+          var _handleTools2 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee86(e, t, i) {
             var a, n, r, o, l;
-            return _regeneratorRuntime().wrap(function _callee85$(_context85) {
-              while (1) switch (_context85.prev = _context85.next) {
+            return _regeneratorRuntime().wrap(function _callee86$(_context86) {
+              while (1) switch (_context86.prev = _context86.next) {
                 case 0:
                   if (!(!e.tool_calls || !t || !i || !this._functionHandler)) {
-                    _context85.next = 2;
+                    _context86.next = 2;
                     break;
                   }
                   throw Error("Please define the `function_handler` property inside the [openAI](https://deepchat.dev/docs/directConnection/openAI#Chat) object.");
@@ -8951,27 +9035,27 @@ var app = (function () {
                       arguments: l["function"].arguments
                     };
                   });
-                  _context85.next = 6;
+                  _context86.next = 6;
                   return (a = this._functionHandler) == null ? void 0 : a.call(this, r);
                 case 6:
-                  o = _context85.sent;
+                  o = _context86.sent;
                   if (!o.text) {
-                    _context85.next = 9;
+                    _context86.next = 9;
                     break;
                   }
-                  return _context85.abrupt("return", {
+                  return _context86.abrupt("return", {
                     text: o.text
                   });
                 case 9:
                   if (!(n.messages.push(e), Array.isArray(o) && !o.find(function (l) {
                     return typeof l != "string";
                   }) || r.length === o.length)) {
-                    _context85.next = 17;
+                    _context86.next = 17;
                     break;
                   }
                   o.forEach(function (c, d) {
-                    var h;
-                    var u = (h = e.tool_calls) == null ? void 0 : h[d];
+                    var p;
+                    var u = (p = e.tool_calls) == null ? void 0 : p[d];
                     n == null || n.messages.push({
                       role: "tool",
                       tool_call_id: u == null ? void 0 : u.id,
@@ -8979,30 +9063,30 @@ var app = (function () {
                       content: c.response
                     });
                   }), delete n.tools, delete n.tool_choice;
-                  _context85.next = 13;
+                  _context86.next = 13;
                   return t == null ? void 0 : t(n).then(function (c) {
                     return E.processResponseByType(c);
                   });
                 case 13:
-                  l = _context85.sent;
+                  l = _context86.sent;
                   if (!l.error) {
-                    _context85.next = 16;
+                    _context86.next = 16;
                     break;
                   }
                   throw l.error.message;
                 case 16:
-                  return _context85.abrupt("return", {
+                  return _context86.abrupt("return", {
                     text: l.choices[0].message.content || ""
                   });
                 case 17:
                   throw Error("Response object must either be {response: string}[] for each individual function or {text: string} for a direct response, see https://deepchat.dev/docs/directConnection/OpenAI#FunctionHandler.");
                 case 18:
                 case "end":
-                  return _context85.stop();
+                  return _context86.stop();
               }
-            }, _callee85, this);
+            }, _callee86, this);
           }));
-          function handleTools(_x156, _x157, _x158) {
+          function handleTools(_x157, _x158, _x159) {
             return _handleTools2.apply(this, arguments);
           }
           return handleTools;
@@ -9041,15 +9125,15 @@ var app = (function () {
       _inherits(qo, _Yi3);
       var _super35 = _createSuper(qo);
       function qo(e) {
-        var _this37$maxMessages;
-        var _this37;
+        var _this38$maxMessages;
+        var _this38;
         _classCallCheck(this, qo);
         var r;
         var t = JSON.parse(JSON.stringify(e.directConnection)),
           i = (r = t.cohere) == null ? void 0 : r.chat,
           n = t.cohere;
-        _this37 = _super35.call(this, e, "https://api.cohere.ai/v1/chat", "Ask me anything!", i, n), _typeof(i) == "object" && Object.assign(_this37.rawBody, i), (_this37$maxMessages = _this37.maxMessages) !== null && _this37$maxMessages !== void 0 ? _this37$maxMessages : _this37.maxMessages = -1;
-        return _this37;
+        _this38 = _super35.call(this, e, "https://api.cohere.ai/v1/chat", "Ask me anything!", i, n), _typeof(i) == "object" && Object.assign(_this38.rawBody, i), (_this38$maxMessages = _this38.maxMessages) !== null && _this38$maxMessages !== void 0 ? _this38$maxMessages : _this38.maxMessages = -1;
+        return _this38;
       }
       _createClass(qo, [{
         key: "preprocessBody",
@@ -9068,13 +9152,13 @@ var app = (function () {
       }, {
         key: "callServiceAPI",
         value: function () {
-          var _callServiceAPI21 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee86(e, t) {
+          var _callServiceAPI21 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee87(e, t) {
             var i;
-            return _regeneratorRuntime().wrap(function _callee86$(_context86) {
-              while (1) switch (_context86.prev = _context86.next) {
+            return _regeneratorRuntime().wrap(function _callee87$(_context87) {
+              while (1) switch (_context87.prev = _context87.next) {
                 case 0:
                   if (this.requestSettings) {
-                    _context86.next = 2;
+                    _context87.next = 2;
                     break;
                   }
                   throw new Error("Request settings have not been set up");
@@ -9083,11 +9167,11 @@ var app = (function () {
                   _.request(this, i, e);
                 case 4:
                 case "end":
-                  return _context86.stop();
+                  return _context87.stop();
               }
-            }, _callee86, this);
+            }, _callee87, this);
           }));
-          function callServiceAPI(_x159, _x160) {
+          function callServiceAPI(_x160, _x161) {
             return _callServiceAPI21.apply(this, arguments);
           }
           return callServiceAPI;
@@ -9095,26 +9179,26 @@ var app = (function () {
       }, {
         key: "extractResultData",
         value: function () {
-          var _extractResultData24 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee87(e) {
-            return _regeneratorRuntime().wrap(function _callee87$(_context87) {
-              while (1) switch (_context87.prev = _context87.next) {
+          var _extractResultData24 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee88(e) {
+            return _regeneratorRuntime().wrap(function _callee88$(_context88) {
+              while (1) switch (_context88.prev = _context88.next) {
                 case 0:
                   if (!e.message) {
-                    _context87.next = 2;
+                    _context88.next = 2;
                     break;
                   }
                   throw e.message;
                 case 2:
-                  return _context87.abrupt("return", {
+                  return _context88.abrupt("return", {
                     text: e.text
                   });
                 case 3:
                 case "end":
-                  return _context87.stop();
+                  return _context88.stop();
               }
-            }, _callee87);
+            }, _callee88);
           }));
-          function extractResultData(_x161) {
+          function extractResultData(_x162) {
             return _extractResultData24.apply(this, arguments);
           }
           return extractResultData;
@@ -9302,20 +9386,20 @@ var app = (function () {
       }, {
         key: "addNewImageMessage",
         value: function () {
-          var _addNewImageMessage = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee88(e, t, i) {
+          var _addNewImageMessage = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee89(e, t, i) {
             var n, r;
-            return _regeneratorRuntime().wrap(function _callee88$(_context88) {
-              while (1) switch (_context88.prev = _context88.next) {
+            return _regeneratorRuntime().wrap(function _callee89$(_context89) {
+              while (1) switch (_context89.prev = _context89.next) {
                 case 0:
                   n = fe.createImage(t, e.elementRef), r = e.createNewMessageElement("", i);
                   r.bubbleElement.appendChild(n), r.bubbleElement.classList.add("image-message"), ne.addMessage(e, r, "image", i);
                 case 2:
                 case "end":
-                  return _context88.stop();
+                  return _context89.stop();
               }
-            }, _callee88);
+            }, _callee89);
           }));
-          function addNewImageMessage(_x162, _x163, _x164) {
+          function addNewImageMessage(_x163, _x164, _x165) {
             return _addNewImageMessage.apply(this, arguments);
           }
           return addNewImageMessage;
@@ -9368,23 +9452,23 @@ var app = (function () {
       _inherits(me, _Ke);
       var _super36 = _createSuper(me);
       function me(e, t, i) {
-        var _this38;
+        var _this39;
         _classCallCheck(this, me);
         var a, l;
-        _this38 = _super36.call(this, e);
+        _this39 = _super36.call(this, e);
         var n = t.permittedErrorPrefixes,
           r = t.introPanelMarkUp,
           o = t.demo;
-        _this38._errorMessageOverrides = (a = e.errorMessages) == null ? void 0 : a.overrides, _this38._onClearMessages = jt.onClearMessages.bind(_assertThisInitialized(_this38), e), _this38._onError = jt.onError.bind(_assertThisInitialized(_this38), e), _this38._displayLoadingMessage = me.getDisplayLoadingMessage(e, t), _this38._permittedErrorPrefixes = n, _this38.addSetupMessageIfNeeded(e, t) || _this38.populateIntroPanel(i, r, e.introPanelStyle), _this38.addIntroductoryMessage(e, t), e.initialMessages && _this38.populateInitialMessages(e.initialMessages), _this38._displayServiceErrorMessages = (l = e.errorMessages) == null ? void 0 : l.displayServiceErrorMessages, e.getMessages = function () {
-          return JSON.parse(JSON.stringify(_this38.messages));
-        }, e.clearMessages = _this38.clearMessages.bind(_assertThisInitialized(_this38), t), e.refreshMessages = _this38.refreshTextMessages.bind(_assertThisInitialized(_this38)), e.scrollToBottom = Y.scrollToBottom.bind(_assertThisInitialized(_this38), _this38.elementRef), e._addMessage = function (c, d) {
-          _this38.addNewMessage(_objectSpread(_objectSpread({}, c), {}, {
+        _this39._errorMessageOverrides = (a = e.errorMessages) == null ? void 0 : a.overrides, _this39._onClearMessages = jt.onClearMessages.bind(_assertThisInitialized(_this39), e), _this39._onError = jt.onError.bind(_assertThisInitialized(_this39), e), _this39._displayLoadingMessage = me.getDisplayLoadingMessage(e, t), _this39._permittedErrorPrefixes = n, _this39.addSetupMessageIfNeeded(e, t) || _this39.populateIntroPanel(i, r, e.introPanelStyle), _this39.addIntroductoryMessage(e, t), e.initialMessages && _this39.populateInitialMessages(e.initialMessages), _this39._displayServiceErrorMessages = (l = e.errorMessages) == null ? void 0 : l.displayServiceErrorMessages, e.getMessages = function () {
+          return JSON.parse(JSON.stringify(_this39.messages));
+        }, e.clearMessages = _this39.clearMessages.bind(_assertThisInitialized(_this39), t), e.refreshMessages = _this39.refreshTextMessages.bind(_assertThisInitialized(_this39)), e.scrollToBottom = Y.scrollToBottom.bind(_assertThisInitialized(_this39), _this39.elementRef), e._addMessage = function (c, d) {
+          _this39.addNewMessage(_objectSpread(_objectSpread({}, c), {}, {
             sendUpdate: !!d
           }), !d);
-        }, t.isWebModel() && t.setUpMessages(_assertThisInitialized(_this38)), o && _this38.prepareDemo(o), e.textToSpeech && Nt.processConfig(e.textToSpeech, function (c) {
-          _this38.textToSpeech = c;
+        }, t.isWebModel() && t.setUpMessages(_assertThisInitialized(_this39)), o && _this39.prepareDemo(o), e.textToSpeech && Nt.processConfig(e.textToSpeech, function (c) {
+          _this39.textToSpeech = c;
         });
-        return _this38;
+        return _this39;
       }
       _createClass(me, [{
         key: "prepareDemo",
@@ -9423,11 +9507,11 @@ var app = (function () {
       }, {
         key: "populateInitialMessages",
         value: function populateInitialMessages(e) {
-          var _this39 = this;
+          var _this40 = this;
           e.forEach(function (t) {
-            ke.processInitialMessageFile(t), _this39.addNewMessage(t, !0);
+            ke.processInitialMessageFile(t), _this40.addNewMessage(t, !0);
           }), setTimeout(function () {
-            return Y.scrollToBottom(_this39.elementRef);
+            return Y.scrollToBottom(_this40.elementRef);
           }, 0);
         }
         // this should not be activated by streamed messages
@@ -9469,7 +9553,7 @@ var app = (function () {
       }, {
         key: "addNewErrorMessage",
         value: function addNewErrorMessage(e, t) {
-          var l, c, d, u, h;
+          var l, c, d, u, p;
           this.removeMessageOnError();
           var i = me.createBaseElements(),
             n = i.outerContainer,
@@ -9478,7 +9562,7 @@ var app = (function () {
           var o = this.getPermittedMessage(t) || ((l = this._errorMessageOverrides) == null ? void 0 : l[e]) || ((c = this._errorMessageOverrides) == null ? void 0 : c["default"]) || "Error, please try again.";
           this.renderText(r, o);
           var a = D.extractParticularSharedStyles(["fontSize", "fontFamily"], (d = this.messageStyles) == null ? void 0 : d["default"]);
-          D.applyCustomStylesToElements(i, !1, a), D.applyCustomStylesToElements(i, !1, (u = this.messageStyles) == null ? void 0 : u.error), this.elementRef.appendChild(n), Y.scrollToBottom(this.elementRef), this.textToSpeech && Nt.speak(o, this.textToSpeech), (h = this._onError) == null || h.call(this, o);
+          D.applyCustomStylesToElements(i, !1, a), D.applyCustomStylesToElements(i, !1, (u = this.messageStyles) == null ? void 0 : u.error), this.elementRef.appendChild(n), Y.scrollToBottom(this.elementRef), this.textToSpeech && Nt.speak(o, this.textToSpeech), (p = this._onError) == null || p.call(this, o);
         }
       }, {
         key: "getPermittedMessage",
@@ -9525,11 +9609,11 @@ var app = (function () {
       }, {
         key: "addMultipleFiles",
         value: function () {
-          var _addMultipleFiles = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee89(e) {
-            return _regeneratorRuntime().wrap(function _callee89$(_context89) {
-              while (1) switch (_context89.prev = _context89.next) {
+          var _addMultipleFiles = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee90(e) {
+            return _regeneratorRuntime().wrap(function _callee90$(_context90) {
+              while (1) switch (_context90.prev = _context90.next) {
                 case 0:
-                  return _context89.abrupt("return", Promise.all((e || []).map(function (t) {
+                  return _context90.abrupt("return", Promise.all((e || []).map(function (t) {
                     return new Promise(function (i) {
                       if (!t.type || t.type === "any") {
                         var n = t.file.name || ne.DEFAULT_FILE_NAME;
@@ -9552,11 +9636,11 @@ var app = (function () {
                   })));
                 case 1:
                 case "end":
-                  return _context89.stop();
+                  return _context90.stop();
               }
-            }, _callee89);
+            }, _callee90);
           }));
-          function addMultipleFiles(_x165) {
+          function addMultipleFiles(_x166) {
             return _addMultipleFiles.apply(this, arguments);
           }
           return addMultipleFiles;
@@ -9878,11 +9962,11 @@ var app = (function () {
     }();
     var tn = /*#__PURE__*/function () {
       function tn(e, t) {
-        var _this40 = this;
+        var _this41 = this;
         _classCallCheck(this, tn);
         var i;
         this._isOpen = !0, this._styles = t, this.elementRef = tn.createElement((i = this._styles) == null ? void 0 : i.container), this.close(), setTimeout(function () {
-          return _this40.addWindowEvents(e);
+          return _this41.addWindowEvents(e);
         });
       }
       _createClass(tn, [{
@@ -9938,15 +10022,15 @@ var app = (function () {
       _inherits(Je, _wt);
       var _super37 = _createSuper(Je);
       function Je(e, t) {
-        var _this41;
+        var _this42;
         _classCallCheck(this, Je);
         var n;
-        _this41 = _super37.call(this, Je.createButtonElement(), void 0, {
+        _this42 = _super37.call(this, Je.createButtonElement(), void 0, {
           styles: (n = t == null ? void 0 : t.button) == null ? void 0 : n.styles
         });
-        var i = _this41.createInnerElements(_this41._customStyles);
-        _this41._menu = new tn(e, t == null ? void 0 : t.menu), _this41.addClickEvent(), _this41.buttonContainer = Je.createButtonContainer(), _this41.elementRef.appendChild(i.styles), _this41.buttonContainer.appendChild(_this41.elementRef), _this41.elementRef.classList.add("dropup-icon", "upload-file-button"), _this41.buttonContainer.appendChild(_this41._menu.elementRef), _this41.reapplyStateStyle("styles"), _this41.addContainerEvents(e);
-        return _this41;
+        var i = _this42.createInnerElements(_this42._customStyles);
+        _this42._menu = new tn(e, t == null ? void 0 : t.menu), _this42.addClickEvent(), _this42.buttonContainer = Je.createButtonContainer(), _this42.elementRef.appendChild(i.styles), _this42.buttonContainer.appendChild(_this42.elementRef), _this42.elementRef.classList.add("dropup-icon", "upload-file-button"), _this42.buttonContainer.appendChild(_this42._menu.elementRef), _this42.reapplyStateStyle("styles"), _this42.addContainerEvents(e);
+        return _this42;
       }
       _createClass(Je, [{
         key: "createInnerElements",
@@ -9973,9 +10057,9 @@ var app = (function () {
       }, {
         key: "addContainerEvents",
         value: function addContainerEvents(e) {
-          var _this42 = this;
+          var _this43 = this;
           e.addEventListener("click", function (t) {
-            t.target.classList.contains("dropup-icon") || _this42._menu.close();
+            t.target.classList.contains("dropup-icon") || _this43._menu.close();
           });
         }
       }], [{
@@ -10110,10 +10194,10 @@ var app = (function () {
     var ue = /*#__PURE__*/function () {
       // prettier-ignore
       function ue(e, t, i, n) {
-        var _this43 = this;
+        var _this44 = this;
         _classCallCheck(this, ue);
         this._attachments = [], this._fileCountLimit = 99, this._acceptedFormat = "", t.maxNumberOfFiles && (this._fileCountLimit = t.maxNumberOfFiles), this._toggleContainerDisplay = i, this._fileAttachmentsContainerRef = n, t.acceptedFormats && (this._acceptedFormat = t.acceptedFormats), setTimeout(function () {
-          _this43._validationHandler = e._validationHandler;
+          _this44._validationHandler = e._validationHandler;
         });
       }
       _createClass(ue, [{
@@ -10254,12 +10338,12 @@ var app = (function () {
         _createClass(we, [{
           key: "createTimer",
           value: function createTimer(e, t) {
-            var _this44 = this;
+            var _this45 = this;
             var i = 0;
             var n = t !== void 0 && t < we.TIMER_LIMIT_S ? t : we.TIMER_LIMIT_S;
             return setInterval(function () {
               var a;
-              i += 1, i === n && ((a = _this44.stopPlaceholderCallback) == null || a.call(_this44), _this44.clearTimer()), i === 600 && e.classList.add("audio-placeholder-text-4-digits");
+              i += 1, i === n && ((a = _this45.stopPlaceholderCallback) == null || a.call(_this45), _this45.clearTimer()), i === 600 && e.classList.add("audio-placeholder-text-4-digits");
               var r = Math.floor(i / 60),
                 o = (i % 60).toString().padStart(2, "0");
               e.textContent = "".concat(r, ":").concat(o);
@@ -10279,7 +10363,7 @@ var app = (function () {
         }, {
           key: "addPlaceholderAudioAttachmentEvents",
           value: function addPlaceholderAudioAttachmentEvents(e, t, i) {
-            var _this45 = this;
+            var _this46 = this;
             var n = function n() {
               return e.replaceChildren(t);
             };
@@ -10290,7 +10374,7 @@ var app = (function () {
             e.addEventListener("mouseleave", r);
             var o = function o() {
               var a;
-              return (a = _this45.stopPlaceholderCallback) == null ? void 0 : a.call(_this45);
+              return (a = _this46.stopPlaceholderCallback) == null ? void 0 : a.call(_this46);
             };
             e.addEventListener("click", o);
           }
@@ -10409,33 +10493,33 @@ var app = (function () {
       }, {
         key: "completePlaceholders",
         value: function () {
-          var _completePlaceholders = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee91() {
-            return _regeneratorRuntime().wrap(function _callee91$(_context91) {
-              while (1) switch (_context91.prev = _context91.next) {
+          var _completePlaceholders = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee92() {
+            return _regeneratorRuntime().wrap(function _callee92$(_context92) {
+              while (1) switch (_context92.prev = _context92.next) {
                 case 0:
-                  _context91.next = 2;
+                  _context92.next = 2;
                   return Promise.all(this._fileAttachmentsTypes.map( /*#__PURE__*/function () {
-                    var _ref11 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee90(e) {
+                    var _ref11 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee91(e) {
                       var t;
-                      return _regeneratorRuntime().wrap(function _callee90$(_context90) {
-                        while (1) switch (_context90.prev = _context90.next) {
+                      return _regeneratorRuntime().wrap(function _callee91$(_context91) {
+                        while (1) switch (_context91.prev = _context91.next) {
                           case 0:
-                            return _context90.abrupt("return", (t = e.stopPlaceholderCallback) == null ? void 0 : t.call(e));
+                            return _context91.abrupt("return", (t = e.stopPlaceholderCallback) == null ? void 0 : t.call(e));
                           case 1:
                           case "end":
-                            return _context90.stop();
+                            return _context91.stop();
                         }
-                      }, _callee90);
+                      }, _callee91);
                     }));
-                    return function (_x166) {
+                    return function (_x167) {
                       return _ref11.apply(this, arguments);
                     };
                   }()));
                 case 2:
                 case "end":
-                  return _context91.stop();
+                  return _context92.stop();
               }
-            }, _callee91, this);
+            }, _callee92, this);
           }));
           function completePlaceholders() {
             return _completePlaceholders.apply(this, arguments);
@@ -10485,20 +10569,20 @@ var app = (function () {
       }, {
         key: "addButtons",
         value: function addButtons() {
-          var _this46 = this;
+          var _this47 = this;
           for (var _len2 = arguments.length, e = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
             e[_key2] = arguments[_key2];
           }
           e.forEach(function (t) {
-            return _this46._buttonPanel.appendChild(t);
+            return _this47._buttonPanel.appendChild(t);
           });
         }
       }, {
         key: "close",
         value: function close() {
-          var _this47 = this;
+          var _this48 = this;
           this._elementRef.classList.remove("show-modal"), this._elementRef.classList.add("hide-modal"), this._backgroundPanelRef.classList.remove("show-modal-background"), this._backgroundPanelRef.classList.add("hide-modal-background"), this._isOpen = !1, setTimeout(function () {
-            _this47._elementRef.style.display = "none", _this47._backgroundPanelRef.style.display = "none";
+            _this48._elementRef.style.display = "none", _this48._backgroundPanelRef.style.display = "none";
           }, le.MODAL_CLOSE_TIMEOUT_MS);
         }
       }, {
@@ -10514,10 +10598,10 @@ var app = (function () {
       }, {
         key: "addCloseButton",
         value: function addCloseButton(e, t, i) {
-          var _this48 = this;
+          var _this49 = this;
           var n = t ? le.createSVGButton(e) : le.createTextButton(e);
           return this.addButtons(n), n.onclick = function () {
-            _this48.close(), setTimeout(function () {
+            _this49.close(), setTimeout(function () {
               i == null || i();
             }, 140);
           }, n;
@@ -10591,13 +10675,13 @@ var app = (function () {
       var _super39 = _createSuper(ut);
       // prettier-ignore
       function ut(e, t, i, n, r, o) {
-        var _this49;
+        var _this50;
         _classCallCheck(this, ut);
-        var l, c, d, u, h, p;
-        _this49 = _super39.call(this, ut.createButtonElement(), (l = i.button) == null ? void 0 : l.position, i.button, o);
-        var a = _this49.createInnerElements(n, r, _this49._customStyles);
-        _this49._inputElement = ut.createInputElement((c = i == null ? void 0 : i.files) == null ? void 0 : c.acceptedFormats), _this49.addClickEvent(e, i), _this49.elementRef.replaceChildren(a.styles), _this49.reapplyStateStyle("styles"), _this49._fileAttachmentsType = t, _this49._openModalOnce = ((u = (d = i.files) == null ? void 0 : d.infoModal) == null ? void 0 : u.openModalOnce) === !1 || (p = (h = i.files) == null ? void 0 : h.infoModal) == null ? void 0 : p.openModalOnce;
-        return _this49;
+        var l, c, d, u, p, h;
+        _this50 = _super39.call(this, ut.createButtonElement(), (l = i.button) == null ? void 0 : l.position, i.button, o);
+        var a = _this50.createInnerElements(n, r, _this50._customStyles);
+        _this50._inputElement = ut.createInputElement((c = i == null ? void 0 : i.files) == null ? void 0 : c.acceptedFormats), _this50.addClickEvent(e, i), _this50.elementRef.replaceChildren(a.styles), _this50.reapplyStateStyle("styles"), _this50._fileAttachmentsType = t, _this50._openModalOnce = ((u = (d = i.files) == null ? void 0 : d.infoModal) == null ? void 0 : u.openModalOnce) === !1 || (h = (p = i.files) == null ? void 0 : p.infoModal) == null ? void 0 : h.openModalOnce;
+        return _this50;
       }
       _createClass(ut, [{
         key: "createInnerElements",
@@ -10725,26 +10809,26 @@ var app = (function () {
       }, {
         key: "useValidationFunc",
         value: function () {
-          var _useValidationFunc = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee92(e, t, i, n) {
+          var _useValidationFunc = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee93(e, t, i, n) {
             var r, o, a, l;
-            return _regeneratorRuntime().wrap(function _callee92$(_context92) {
-              while (1) switch (_context92.prev = _context92.next) {
+            return _regeneratorRuntime().wrap(function _callee93$(_context93) {
+              while (1) switch (_context93.prev = _context93.next) {
                 case 0:
                   r = t.inputElementRef, o = r.classList.contains("text-input-placeholder") ? "" : r.textContent;
-                  _context92.next = 3;
+                  _context93.next = 3;
                   return i.completePlaceholders();
                 case 3:
                   a = i.getAllFileData(), l = a == null ? void 0 : a.map(function (c) {
                     return c.file;
                   });
-                  return _context92.abrupt("return", Me.validate(e, n, o, l));
+                  return _context93.abrupt("return", Me.validate(e, n, o, l));
                 case 5:
                 case "end":
-                  return _context92.stop();
+                  return _context93.stop();
               }
-            }, _callee92);
+            }, _callee93);
           }));
-          function useValidationFunc(_x167, _x168, _x169, _x170) {
+          function useValidationFunc(_x168, _x169, _x170, _x171) {
             return _useValidationFunc.apply(this, arguments);
           }
           return useValidationFunc;
@@ -10752,22 +10836,22 @@ var app = (function () {
       }, {
         key: "useValidationFuncProgrammatic",
         value: function () {
-          var _useValidationFuncProgrammatic = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee93(e, t, i) {
+          var _useValidationFuncProgrammatic = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee94(e, t, i) {
             var r, n;
-            return _regeneratorRuntime().wrap(function _callee93$(_context93) {
-              while (1) switch (_context93.prev = _context93.next) {
+            return _regeneratorRuntime().wrap(function _callee94$(_context94) {
+              while (1) switch (_context94.prev = _context94.next) {
                 case 0:
                   n = (r = t.files) == null ? void 0 : r.map(function (o) {
                     return o.file;
                   });
-                  return _context93.abrupt("return", Me.validate(e, i, t.text, n, !0));
+                  return _context94.abrupt("return", Me.validate(e, i, t.text, n, !0));
                 case 2:
                 case "end":
-                  return _context93.stop();
+                  return _context94.stop();
               }
-            }, _callee93);
+            }, _callee94);
           }));
-          function useValidationFuncProgrammatic(_x171, _x172, _x173) {
+          function useValidationFuncProgrammatic(_x172, _x173, _x174) {
             return _useValidationFuncProgrammatic.apply(this, arguments);
           }
           return useValidationFuncProgrammatic;
@@ -10783,26 +10867,26 @@ var app = (function () {
         value: function attach(e, t, i, n, r) {
           var o = e.validateInput || ke.processValidateInput(e);
           e._validationHandler = /*#__PURE__*/function () {
-            var _ref12 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee94(a) {
+            var _ref12 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee95(a) {
               var l;
-              return _regeneratorRuntime().wrap(function _callee94$(_context94) {
-                while (1) switch (_context94.prev = _context94.next) {
+              return _regeneratorRuntime().wrap(function _callee95$(_context95) {
+                while (1) switch (_context95.prev = _context95.next) {
                   case 0:
                     if (!(r.status.loadingActive || r.status.requestInProgress || t.isSubmitProgrammaticallyDisabled === !0 || !Me.validateWebsocket(t, r))) {
-                      _context94.next = 2;
+                      _context95.next = 2;
                       break;
                     }
-                    return _context94.abrupt("return", !1);
+                    return _context95.abrupt("return", !1);
                   case 2:
                     l = o || t.canSendMessage;
-                    return _context94.abrupt("return", l ? a ? Me.useValidationFuncProgrammatic(l, a, r) : Me.useValidationFunc(l, i, n, r) : null);
+                    return _context95.abrupt("return", l ? a ? Me.useValidationFuncProgrammatic(l, a, r) : Me.useValidationFunc(l, i, n, r) : null);
                   case 4:
                   case "end":
-                    return _context94.stop();
+                    return _context95.stop();
                 }
-              }, _callee94);
+              }, _callee95);
             }));
-            return function (_x174) {
+            return function (_x175) {
               return _ref12.apply(this, arguments);
             };
           }();
@@ -10815,10 +10899,10 @@ var app = (function () {
       _inherits(bt, _wt3);
       var _super40 = _createSuper(bt);
       function bt(e) {
-        var _this50;
+        var _this51;
         _classCallCheck(this, bt);
-        (e == null ? void 0 : e.position) === "dropup-menu" && (e.position = "outside-right"), _this50 = _super40.call(this, bt.createMicrophoneElement(), e == null ? void 0 : e.position, e), _this50.isActive = !1, _this50._innerElements = _this50.createInnerElements(_this50._customStyles), _this50.changeToDefault();
-        return _this50;
+        (e == null ? void 0 : e.position) === "dropup-menu" && (e.position = "outside-right"), _this51 = _super40.call(this, bt.createMicrophoneElement(), e == null ? void 0 : e.position, e), _this51.isActive = !1, _this51._innerElements = _this51.createInnerElements(_this51._customStyles), _this51.changeToDefault();
+        return _this51;
       }
       _createClass(bt, [{
         key: "createInnerElements",
@@ -11025,9 +11109,9 @@ var app = (function () {
       }, {
         key: "keyDownWindow",
         value: function keyDownWindow(e) {
-          var _this51 = this;
+          var _this52 = this;
           e.element && J.getElementIfFocusedOnAvailable(e.element, document.activeElement) && (J.KEY_DOWN_TIMEOUT !== null && clearTimeout(J.KEY_DOWN_TIMEOUT), J.KEY_DOWN_TIMEOUT = setTimeout(function () {
-            J.KEY_DOWN_TIMEOUT = null, _this51.resetRecording(e);
+            J.KEY_DOWN_TIMEOUT = null, _this52.resetRecording(e);
           }, 500));
         }
       }, {
@@ -11332,31 +11416,31 @@ var app = (function () {
           if (!c || !n || !i) return;
           var d = ((o = c.settings) === null || o === void 0 ? void 0 : o.caseSensitive) === !0 ? t : t.toLowerCase(),
             u = Cn.Text.breakupIntoWordsArr(d),
-            h = ((a = c.settings) === null || a === void 0 ? void 0 : a.substrings) === !1 ? K.checkIfMatchesWord : K.checkIfMatchesSubstring;
-          if (c.commandMode && h(c.commandMode, d, u)) return e.setInterimColorToFinal(), setTimeout(function () {
+            p = ((a = c.settings) === null || a === void 0 ? void 0 : a.substrings) === !1 ? K.checkIfMatchesWord : K.checkIfMatchesSubstring;
+          if (c.commandMode && p(c.commandMode, d, u)) return e.setInterimColorToFinal(), setTimeout(function () {
             return K.toggleCommandModeOn(e);
           }), {
             doNotProcessTranscription: !1
           };
           if (!(c.commandMode && !e.isWaitingForCommand)) {
-            if (c.stop && h(c.stop, d, u)) return K.toggleCommandModeOff(e), setTimeout(function () {
+            if (c.stop && p(c.stop, d, u)) return K.toggleCommandModeOff(e), setTimeout(function () {
               return e.stop();
             }), {
               doNotProcessTranscription: !1
             };
-            if (c.pause && h(c.pause, d, u)) return K.toggleCommandModeOff(e), e.setInterimColorToFinal(), setTimeout(function () {
-              var p;
-              e.isPaused = !0, (p = e.onPauseTrigger) === null || p === void 0 || p.call(e, !0);
+            if (c.pause && p(c.pause, d, u)) return K.toggleCommandModeOff(e), e.setInterimColorToFinal(), setTimeout(function () {
+              var h;
+              e.isPaused = !0, (h = e.onPauseTrigger) === null || h === void 0 || h.call(e, !0);
             }), {
               doNotProcessTranscription: !1
             };
-            if (c.resume && h(c.resume, d, u)) return e.isPaused = !1, (l = e.onPauseTrigger) === null || l === void 0 || l.call(e, !1), K.toggleCommandModeOff(e), e.resetRecording(i), {
+            if (c.resume && p(c.resume, d, u)) return e.isPaused = !1, (l = e.onPauseTrigger) === null || l === void 0 || l.call(e, !1), K.toggleCommandModeOff(e), e.resetRecording(i), {
               doNotProcessTranscription: !0
             };
-            if (c.reset && h(c.reset, d, u)) return r !== void 0 && K.setText(e, i, r, n), {
+            if (c.reset && p(c.reset, d, u)) return r !== void 0 && K.setText(e, i, r, n), {
               doNotProcessTranscription: !0
             };
-            if (c.removeAllText && h(c.removeAllText, d, u)) return K.setText(e, i, "", n), {
+            if (c.removeAllText && p(c.removeAllText, d, u)) return K.setText(e, i, "", n), {
               doNotProcessTranscription: !0
             };
           }
@@ -11648,22 +11732,22 @@ var app = (function () {
       }, {
         key: "setEvents",
         value: function setEvents() {
-          var _this52 = this;
+          var _this53 = this;
           this._service && (this._service.onstart = function () {
-            _this52.setStateOnStart();
+            _this53.setStateOnStart();
           }, this._service.onerror = function (e) {
-            Nn.Browser.IS_SAFARI() && e.message === "Another request is started" || e.error === "aborted" && _this52.isRestarting || e.error !== "no-speech" && _this52.error(e.message || e.error);
+            Nn.Browser.IS_SAFARI() && e.message === "Another request is started" || e.error === "aborted" && _this53.isRestarting || e.error !== "no-speech" && _this53.error(e.message || e.error);
           }, this._service.onaudioend = function () {
-            _this52.setStateOnStop();
+            _this53.setStateOnStop();
           }, this._service.onend = function () {
-            _this52._stopping = !1;
+            _this53._stopping = !1;
           }, this._service.onresult = function (e) {
-            if (_typeof(e.results) > "u" && _this52._service) _this52._service.onend = null, _this52._service.stop();else if (_this52._extractText && !_this52._stopping) {
-              var _this52$_extractText = _this52._extractText(e, _this52.finalTranscript, _this52._translations),
-                t = _this52$_extractText.interimTranscript,
-                _i17 = _this52$_extractText.finalTranscript,
-                n = _this52$_extractText.newText;
-              _this52.updateElements(t, _i17, n);
+            if (_typeof(e.results) > "u" && _this53._service) _this53._service.onend = null, _this53._service.stop();else if (_this53._extractText && !_this53._stopping) {
+              var _this53$_extractText = _this53._extractText(e, _this53.finalTranscript, _this53._translations),
+                t = _this53$_extractText.interimTranscript,
+                _i17 = _this53$_extractText.finalTranscript,
+                n = _this53$_extractText.newText;
+              _this53.updateElements(t, _i17, n);
             }
           });
         }
@@ -11758,26 +11842,26 @@ var app = (function () {
       }, {
         key: "getNewSpeechConfig",
         value: function () {
-          var _getNewSpeechConfig = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee95(e, t) {
-            return _regeneratorRuntime().wrap(function _callee95$(_context95) {
-              while (1) switch (_context95.prev = _context95.next) {
+          var _getNewSpeechConfig = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee96(e, t) {
+            return _regeneratorRuntime().wrap(function _callee96$(_context96) {
+              while (1) switch (_context96.prev = _context96.next) {
                 case 0:
                   if (!t.region) {
-                    _context95.next = 2;
+                    _context96.next = 2;
                     break;
                   }
-                  return _context95.abrupt("return", t.subscriptionKey ? e.fromSubscription(t.subscriptionKey.trim(), t.region.trim()) : t.token ? e.fromAuthorizationToken(t.token.trim(), t.region.trim()) : t.retrieveToken ? t.retrieveToken().then(function (i) {
+                  return _context96.abrupt("return", t.subscriptionKey ? e.fromSubscription(t.subscriptionKey.trim(), t.region.trim()) : t.token ? e.fromAuthorizationToken(t.token.trim(), t.region.trim()) : t.retrieveToken ? t.retrieveToken().then(function (i) {
                     return t.region ? e.fromAuthorizationToken((i == null ? void 0 : i.trim()) || "", t.region.trim()) : null;
                   })["catch"](function (i) {
                     return console.error(i), null;
                   }) : null);
                 case 2:
                 case "end":
-                  return _context95.stop();
+                  return _context96.stop();
               }
-            }, _callee95);
+            }, _callee96);
           }));
-          function getNewSpeechConfig(_x175, _x176) {
+          function getNewSpeechConfig(_x176, _x177) {
             return _getNewSpeechConfig.apply(this, arguments);
           }
           return getNewSpeechConfig;
@@ -11790,23 +11874,23 @@ var app = (function () {
       }, {
         key: "get",
         value: function () {
-          var _get = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee96(e, t) {
+          var _get = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee97(e, t) {
             var i;
-            return _regeneratorRuntime().wrap(function _callee96$(_context96) {
-              while (1) switch (_context96.prev = _context96.next) {
+            return _regeneratorRuntime().wrap(function _callee97$(_context97) {
+              while (1) switch (_context97.prev = _context97.next) {
                 case 0:
-                  _context96.next = 2;
+                  _context97.next = 2;
                   return $t.getNewSpeechConfig(e, t);
                 case 2:
-                  i = _context96.sent;
-                  return _context96.abrupt("return", (i && $t.process(i, t), i));
+                  i = _context97.sent;
+                  return _context97.abrupt("return", (i && $t.process(i, t), i));
                 case 4:
                 case "end":
-                  return _context96.stop();
+                  return _context97.stop();
               }
-            }, _callee96);
+            }, _callee97);
           }));
-          function get(_x177, _x178) {
+          function get(_x178, _x179) {
             return _get.apply(this, arguments);
           }
           return get;
@@ -11883,10 +11967,10 @@ var app = (function () {
       _inherits(Yt, _va$Speech);
       var _super42 = _createSuper(Yt);
       function Yt() {
-        var _this53;
+        var _this54;
         _classCallCheck(this, Yt);
-        _this53 = _super42.apply(this, arguments), _this53._newTextPadding = "";
-        return _this53;
+        _this54 = _super42.apply(this, arguments), _this54._newTextPadding = "";
+        return _this54;
       }
       _createClass(Yt, [{
         key: "start",
@@ -11896,28 +11980,28 @@ var app = (function () {
       }, {
         key: "startAsync",
         value: function () {
-          var _startAsync = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee97(e) {
+          var _startAsync = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee98(e) {
             var t;
-            return _regeneratorRuntime().wrap(function _callee97$(_context97) {
-              while (1) switch (_context97.prev = _context97.next) {
+            return _regeneratorRuntime().wrap(function _callee98$(_context98) {
+              while (1) switch (_context98.prev = _context98.next) {
                 case 0:
-                  _context97.t0 = this.validate(e);
-                  if (!_context97.t0) {
-                    _context97.next = 6;
+                  _context98.t0 = this.validate(e);
+                  if (!_context98.t0) {
+                    _context98.next = 6;
                     break;
                   }
-                  _context97.next = 4;
+                  _context98.next = 4;
                   return this.instantiateService(e);
                 case 4:
                   this._translations = e == null ? void 0 : e.translations;
                   (t = this._service) === null || t === void 0 || t.startContinuousRecognitionAsync(function () {}, this.error);
                 case 6:
                 case "end":
-                  return _context97.stop();
+                  return _context98.stop();
               }
-            }, _callee97, this);
+            }, _callee98, this);
           }));
-          function startAsync(_x179) {
+          function startAsync(_x180) {
             return _startAsync.apply(this, arguments);
           }
           return startAsync;
@@ -11930,28 +12014,28 @@ var app = (function () {
       }, {
         key: "instantiateService",
         value: function () {
-          var _instantiateService = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee98(e) {
+          var _instantiateService = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee99(e) {
             var t, i, n, r;
-            return _regeneratorRuntime().wrap(function _callee98$(_context98) {
-              while (1) switch (_context98.prev = _context98.next) {
+            return _regeneratorRuntime().wrap(function _callee99$(_context99) {
+              while (1) switch (_context99.prev = _context99.next) {
                 case 0:
                   t = Yt.getAPI();
                   i = t.AudioConfig.fromDefaultMicrophoneInput();
-                  _context98.next = 4;
+                  _context99.next = 4;
                   return Dn.AzureSpeechConfig.get(t.SpeechConfig, e);
                 case 4:
-                  n = _context98.sent;
+                  n = _context99.sent;
                   if (n) {
                     r = new t.SpeechRecognizer(n, i);
                     this.setEvents(r), this._service = r, e.retrieveToken && this.retrieveTokenInterval(e.retrieveToken);
                   } else this.error("Unable to contact Azure server");
                 case 6:
                 case "end":
-                  return _context98.stop();
+                  return _context99.stop();
               }
-            }, _callee98, this);
+            }, _callee99, this);
           }));
-          function instantiateService(_x180) {
+          function instantiateService(_x181) {
             return _instantiateService.apply(this, arguments);
           }
           return instantiateService;
@@ -12014,12 +12098,12 @@ var app = (function () {
       }, {
         key: "retrieveTokenInterval",
         value: function retrieveTokenInterval(e) {
-          var _this54 = this;
+          var _this55 = this;
           this._retrieveTokenInterval = setInterval(function () {
             e == null || e().then(function (t) {
-              _this54._service && (_this54._service.authorizationToken = (t == null ? void 0 : t.trim()) || "");
+              _this55._service && (_this55._service.authorizationToken = (t == null ? void 0 : t.trim()) || "");
             })["catch"](function (t) {
-              _this54.error(t);
+              _this55.error(t);
             });
           }, 1e4);
         }
@@ -12101,18 +12185,18 @@ var app = (function () {
       _inherits(Zt, _bt);
       var _super43 = _createSuper(Zt);
       function Zt(e, t, i) {
-        var _this55;
+        var _this56;
         _classCallCheck(this, Zt);
         var o;
-        _this55 = _super43.call(this, _typeof(e.speechToText) == "object" ? (o = e.speechToText) == null ? void 0 : o.button : {});
+        _this56 = _super43.call(this, _typeof(e.speechToText) == "object" ? (o = e.speechToText) == null ? void 0 : o.button : {});
         var _Zt$processConfigurat = Zt.processConfiguration(t, e.speechToText),
           n = _Zt$processConfigurat.serviceName,
           r = _Zt$processConfigurat.processedConfig;
-        if (_this55._addErrorMessage = i, n === "webspeech" && !Li.isWebSpeechSupported()) _this55.changeToUnsupported();else {
+        if (_this56._addErrorMessage = i, n === "webspeech" && !Li.isWebSpeechSupported()) _this56.changeToUnsupported();else {
           var a = !e.textInput || !e.textInput.disabled;
-          _this55.elementRef.onclick = _this55.buttonClick.bind(_assertThisInitialized(_this55), t, a, n, r);
+          _this56.elementRef.onclick = _this56.buttonClick.bind(_assertThisInitialized(_this56), t, a, n, r);
         }
-        return _this55;
+        return _this56;
       }
       // prettier-ignore
       _createClass(Zt, [{
@@ -12193,11 +12277,11 @@ var app = (function () {
       _inherits(Ea, _bt2);
       var _super44 = _createSuper(Ea);
       function Ea(e, t) {
-        var _this56;
+        var _this57;
         _classCallCheck(this, Ea);
         var i, n;
-        _this56 = _super44.call(this, t.button), _this56._waitingForBrowserApproval = !1, _this56._audioType = e, _this56._extension = ((i = t.files) == null ? void 0 : i.format) || "mp3", _this56._maxDurationSeconds = (n = t.files) == null ? void 0 : n.maxDurationSeconds, _this56.elementRef.onclick = _this56.buttonClick.bind(_assertThisInitialized(_this56));
-        return _this56;
+        _this57 = _super44.call(this, t.button), _this57._waitingForBrowserApproval = !1, _this57._audioType = e, _this57._extension = ((i = t.files) == null ? void 0 : i.format) || "mp3", _this57._maxDurationSeconds = (n = t.files) == null ? void 0 : n.maxDurationSeconds, _this57.elementRef.onclick = _this57.buttonClick.bind(_assertThisInitialized(_this57));
+        return _this57;
       }
       _createClass(Ea, [{
         key: "buttonClick",
@@ -12207,10 +12291,10 @@ var app = (function () {
       }, {
         key: "stop",
         value: function stop() {
-          var _this57 = this;
+          var _this58 = this;
           return new Promise(function (e) {
             var t, i;
-            _this57.changeToDefault(), (t = _this57._mediaRecorder) == null || t.stop(), (i = _this57._mediaStream) == null || i.getTracks().forEach(function (n) {
+            _this58.changeToDefault(), (t = _this58._mediaRecorder) == null || t.stop(), (i = _this58._mediaStream) == null || i.getTracks().forEach(function (n) {
               return n.stop();
             }), setTimeout(function () {
               e();
@@ -12220,23 +12304,23 @@ var app = (function () {
       }, {
         key: "record",
         value: function record() {
-          var _this58 = this;
+          var _this59 = this;
           navigator.mediaDevices.getUserMedia({
             audio: !0
           }).then(function (e) {
-            _this58.changeToActive(), _this58._mediaRecorder = new MediaRecorder(e), _this58._audioType.addPlaceholderAttachment(_this58.stop.bind(_this58), _this58._maxDurationSeconds), _this58._mediaStream = e, _this58._mediaRecorder.addEventListener("dataavailable", function (t) {
-              _this58.createFile(t);
-            }), _this58._mediaRecorder.start();
+            _this59.changeToActive(), _this59._mediaRecorder = new MediaRecorder(e), _this59._audioType.addPlaceholderAttachment(_this59.stop.bind(_this59), _this59._maxDurationSeconds), _this59._mediaStream = e, _this59._mediaRecorder.addEventListener("dataavailable", function (t) {
+              _this59.createFile(t);
+            }), _this59._mediaRecorder.start();
           })["catch"](function (e) {
-            console.error(e), _this58.stop();
+            console.error(e), _this59.stop();
           })["finally"](function () {
-            _this58._waitingForBrowserApproval = !1;
+            _this59._waitingForBrowserApproval = !1;
           });
         }
       }, {
         key: "createFile",
         value: function createFile(e) {
-          var _this59 = this;
+          var _this60 = this;
           var t = new Blob([e.data], {
               type: "audio/".concat(this._extension)
             }),
@@ -12246,7 +12330,7 @@ var app = (function () {
             }),
             r = new FileReader();
           r.readAsDataURL(n), r.onload = function (o) {
-            _this59._audioType.completePlaceholderAttachment(n, o.target.result);
+            _this60._audioType.completePlaceholderAttachment(n, o.target.result);
           };
         }
       }]);
@@ -12326,19 +12410,19 @@ var app = (function () {
       var _super45 = _createSuper(k);
       // prettier-ignore
       function k(e, t, i, n, r) {
-        var _this60;
+        var _this61;
         _classCallCheck(this, k);
         var o = Ce.process(e.submitButtonStyles);
-        _this60 = _super45.call(this, k.createButtonContainerElement(), o == null ? void 0 : o.position, o), _this60._isSVGLoadingIconOverriden = !1, _this60.status = {
+        _this61 = _super45.call(this, k.createButtonContainerElement(), o == null ? void 0 : o.position, o), _this61._isSVGLoadingIconOverriden = !1, _this61.status = {
           requestInProgress: !1,
           loadingActive: !1
-        }, _this60._messages = i, _this60._inputElementRef = t, _this60._fileAttachments = r, _this60._innerElements = _this60.createInnerElements(), _this60._abortStream = new AbortController(), _this60._stopClicked = {
+        }, _this61._messages = i, _this61._inputElementRef = t, _this61._fileAttachments = r, _this61._innerElements = _this61.createInnerElements(), _this61._abortStream = new AbortController(), _this61._stopClicked = {
           listener: function listener() {}
-        }, _this60._serviceIO = n, _this60._alwaysEnabled = !!(o != null && o.alwaysEnabled), e.disableSubmitButton = _this60.disableSubmitButton.bind(_assertThisInitialized(_this60), n), _this60.attemptOverwriteLoadingStyle(e), setTimeout(function () {
+        }, _this61._serviceIO = n, _this61._alwaysEnabled = !!(o != null && o.alwaysEnabled), e.disableSubmitButton = _this61.disableSubmitButton.bind(_assertThisInitialized(_this61), n), _this61.attemptOverwriteLoadingStyle(e), setTimeout(function () {
           var a;
-          _this60._validationHandler = e._validationHandler, _this60.assignHandlers(_this60._validationHandler), (a = _this60._validationHandler) == null || a.call(_assertThisInitialized(_this60));
+          _this61._validationHandler = e._validationHandler, _this61.assignHandlers(_this61._validationHandler), (a = _this61._validationHandler) == null || a.call(_assertThisInitialized(_this61));
         });
-        return _this60;
+        return _this61;
       }
       // prettier-ignore
       _createClass(k, [{
@@ -12393,12 +12477,12 @@ var app = (function () {
       }, {
         key: "submitFromInput",
         value: function () {
-          var _submitFromInput = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee99() {
+          var _submitFromInput = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee100() {
             var t, e, _i18;
-            return _regeneratorRuntime().wrap(function _callee99$(_context99) {
-              while (1) switch (_context99.prev = _context99.next) {
+            return _regeneratorRuntime().wrap(function _callee100$(_context100) {
+              while (1) switch (_context100.prev = _context100.next) {
                 case 0:
-                  _context99.next = 2;
+                  _context100.next = 2;
                   return this._fileAttachments.completePlaceholders();
                 case 2:
                   e = this._fileAttachments.getAllFileData();
@@ -12414,9 +12498,9 @@ var app = (function () {
                   }
                 case 4:
                 case "end":
-                  return _context99.stop();
+                  return _context100.stop();
               }
-            }, _callee99, this);
+            }, _callee100, this);
           }));
           function submitFromInput() {
             return _submitFromInput.apply(this, arguments);
@@ -12426,11 +12510,11 @@ var app = (function () {
       }, {
         key: "programmaticSubmit",
         value: function () {
-          var _programmaticSubmit = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee100(e) {
-            var _this61 = this;
+          var _programmaticSubmit = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee101(e) {
+            var _this62 = this;
             var t;
-            return _regeneratorRuntime().wrap(function _callee100$(_context100) {
-              while (1) switch (_context100.prev = _context100.next) {
+            return _regeneratorRuntime().wrap(function _callee101$(_context101) {
+              while (1) switch (_context101.prev = _context101.next) {
                 case 0:
                   typeof e == "string" && (e = ke.processSubmitUserMessage(e));
                   t = {
@@ -12442,15 +12526,15 @@ var app = (function () {
                       type: ue.getTypeFromBlob(i)
                     };
                   })), setTimeout(function () {
-                    return _this61.attemptSubmit(t, !0);
+                    return _this62.attemptSubmit(t, !0);
                   });
                 case 3:
                 case "end":
-                  return _context100.stop();
+                  return _context101.stop();
               }
-            }, _callee100);
+            }, _callee101);
           }));
-          function programmaticSubmit(_x181) {
+          function programmaticSubmit(_x182) {
             return _programmaticSubmit.apply(this, arguments);
           }
           return programmaticSubmit;
@@ -12458,31 +12542,31 @@ var app = (function () {
       }, {
         key: "attemptSubmit",
         value: function () {
-          var _attemptSubmit = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee101(e) {
+          var _attemptSubmit = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee102(e) {
             var t,
               r,
               o,
               a,
               i,
               n,
-              _args101 = arguments;
-            return _regeneratorRuntime().wrap(function _callee101$(_context101) {
-              while (1) switch (_context101.prev = _context101.next) {
+              _args102 = arguments;
+            return _regeneratorRuntime().wrap(function _callee102$(_context102) {
+              while (1) switch (_context102.prev = _context102.next) {
                 case 0:
-                  t = _args101.length > 1 && _args101[1] !== undefined ? _args101[1] : !1;
-                  _context101.next = 3;
+                  t = _args102.length > 1 && _args102[1] !== undefined ? _args102[1] : !1;
+                  _context102.next = 3;
                   return (r = this._validationHandler) == null ? void 0 : r.call(this, t ? e : void 0);
                 case 3:
-                  _context101.t0 = _context101.sent;
-                  _context101.t1 = !1;
-                  if (!(_context101.t0 === _context101.t1)) {
-                    _context101.next = 7;
+                  _context102.t0 = _context102.sent;
+                  _context102.t1 = !1;
+                  if (!(_context102.t0 === _context102.t1)) {
+                    _context102.next = 7;
                     break;
                   }
-                  return _context101.abrupt("return");
+                  return _context102.abrupt("return");
                 case 7:
                   this.changeToLoadingIcon();
-                  _context101.next = 10;
+                  _context102.next = 10;
                   return this.addNewMessage(e);
                 case 10:
                   this._serviceIO.isWebModel() || this._messages.addLoadingMessage();
@@ -12493,17 +12577,17 @@ var app = (function () {
                     text: e.text === "" ? void 0 : e.text,
                     files: i
                   };
-                  _context101.next = 15;
+                  _context102.next = 15;
                   return this._serviceIO.callAPI(n, this._messages);
                 case 15:
                   (a = this._fileAttachments) == null || a.removeAllFiles();
                 case 16:
                 case "end":
-                  return _context101.stop();
+                  return _context102.stop();
               }
-            }, _callee101, this);
+            }, _callee102, this);
           }));
-          function attemptSubmit(_x182) {
+          function attemptSubmit(_x183) {
             return _attemptSubmit.apply(this, arguments);
           }
           return attemptSubmit;
@@ -12511,35 +12595,35 @@ var app = (function () {
       }, {
         key: "addNewMessage",
         value: function () {
-          var _addNewMessage = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee102(_ref13) {
+          var _addNewMessage = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee103(_ref13) {
             var e, t, i;
-            return _regeneratorRuntime().wrap(function _callee102$(_context102) {
-              while (1) switch (_context102.prev = _context102.next) {
+            return _regeneratorRuntime().wrap(function _callee103$(_context103) {
+              while (1) switch (_context103.prev = _context103.next) {
                 case 0:
                   e = _ref13.text, t = _ref13.files;
                   i = {
                     role: v.USER_ROLE
                   };
                   e && (i.text = e);
-                  _context102.t0 = t;
-                  if (!_context102.t0) {
-                    _context102.next = 8;
+                  _context103.t0 = t;
+                  if (!_context103.t0) {
+                    _context103.next = 8;
                     break;
                   }
-                  _context102.next = 7;
+                  _context103.next = 7;
                   return this._messages.addMultipleFiles(t);
                 case 7:
-                  i.files = _context102.sent;
+                  i.files = _context103.sent;
                 case 8:
                   this._serviceIO.sessionId && (i._sessionId = this._serviceIO.sessionId);
                   Object.keys(i).length > 0 && this._messages.addNewMessage(i);
                 case 10:
                 case "end":
-                  return _context102.stop();
+                  return _context103.stop();
               }
-            }, _callee102, this);
+            }, _callee103, this);
           }));
-          function addNewMessage(_x183) {
+          function addNewMessage(_x184) {
             return _addNewMessage.apply(this, arguments);
           }
           return addNewMessage;
@@ -12620,14 +12704,14 @@ var app = (function () {
       var _super46 = _createSuper(sn);
       // prettier-ignore
       function sn(e, t, i, n) {
-        var _this62;
+        var _this63;
         _classCallCheck(this, sn);
-        _this62 = _super46.call(this, e, ["modal-content", "modal-camera-content"], i), _this62._stopped = !1, _this62._format = "image/png", _this62._canvas = document.createElement("canvas"), _this62._canvas.classList.add("camera-modal-canvas");
-        var _this62$addButtonsAnd = _this62.addButtonsAndTheirEvents(t),
-          r = _this62$addButtonsAnd.captureButton,
-          o = _this62$addButtonsAnd.submitButton;
-        _this62._captureButton = r, _this62._submitButton = o, _this62._captureIcon = _this62._captureButton.children[0], _this62._refreshIcon = q.createSVGElement(_a), _this62._refreshIcon.classList.add("modal-svg-button-icon", "modal-svg-refresh-icon"), (n == null ? void 0 : n.format) === "jpeg" && (_this62._format = "image/jpeg"), n != null && n.dimensions && (_this62._dimensions = n.dimensions), _this62._contentRef.appendChild(_this62._canvas), _this62.extensionCloseCallback = _this62.stop;
-        return _this62;
+        _this63 = _super46.call(this, e, ["modal-content", "modal-camera-content"], i), _this63._stopped = !1, _this63._format = "image/png", _this63._canvas = document.createElement("canvas"), _this63._canvas.classList.add("camera-modal-canvas");
+        var _this63$addButtonsAnd = _this63.addButtonsAndTheirEvents(t),
+          r = _this63$addButtonsAnd.captureButton,
+          o = _this63$addButtonsAnd.submitButton;
+        _this63._captureButton = r, _this63._submitButton = o, _this63._captureIcon = _this63._captureButton.children[0], _this63._refreshIcon = q.createSVGElement(_a), _this63._refreshIcon.classList.add("modal-svg-button-icon", "modal-svg-refresh-icon"), (n == null ? void 0 : n.format) === "jpeg" && (_this63._format = "image/jpeg"), n != null && n.dimensions && (_this63._dimensions = n.dimensions), _this63._contentRef.appendChild(_this63._canvas), _this63.extensionCloseCallback = _this63.stop;
+        return _this63;
       }
       _createClass(sn, [{
         key: "addButtonsAndTheirEvents",
@@ -12646,38 +12730,38 @@ var app = (function () {
       }, {
         key: "addButtonEvents",
         value: function addButtonEvents(e, t, i, n) {
-          var _this63 = this;
+          var _this64 = this;
           e.onclick = function () {
-            _this63.capture();
+            _this64.capture();
           }, t.addEventListener("click", this.stop.bind(this)), i.onclick = function () {
-            var r = _this63.getFile();
-            r && _t.addFilesToType([r], [n]), _this63.stop(), _this63.close();
+            var r = _this64.getFile();
+            r && _t.addFilesToType([r], [n]), _this64.stop(), _this64.close();
           };
         }
       }, {
         key: "stop",
         value: function stop() {
-          var _this64 = this;
+          var _this65 = this;
           this._mediaStream && this._mediaStream.getTracks().forEach(function (e) {
             return e.stop();
           }), this._stopped = !0, setTimeout(function () {
-            _this64._captureButton.replaceChildren(_this64._captureIcon), _this64._captureButton.classList.replace("modal-svg-refresh-button", "modal-svg-camera-button");
-            var e = _this64._canvas.getContext("2d");
-            e == null || e.clearRect(0, 0, _this64._canvas.width, _this64._canvas.height);
+            _this65._captureButton.replaceChildren(_this65._captureIcon), _this65._captureButton.classList.replace("modal-svg-refresh-button", "modal-svg-camera-button");
+            var e = _this65._canvas.getContext("2d");
+            e == null || e.clearRect(0, 0, _this65._canvas.width, _this65._canvas.height);
           }, at.MODAL_CLOSE_TIMEOUT_MS);
         }
       }, {
         key: "start",
         value: function start() {
-          var _this65 = this;
+          var _this66 = this;
           this._dataURL = void 0, this._submitButton.classList.add("modal-svg-submit-disabled"), this._stopped = !1, navigator.mediaDevices.getUserMedia({
             video: this._dimensions || !0
           }).then(function (e) {
-            if (_this65._mediaStream = e, !_this65.isOpen()) return _this65.stop();
+            if (_this66._mediaStream = e, !_this66.isOpen()) return _this66.stop();
             var t = document.createElement("video");
-            t.srcObject = e, t.play(), requestAnimationFrame(_this65.updateCanvas.bind(_this65, t, _this65._canvas));
+            t.srcObject = e, t.play(), requestAnimationFrame(_this66.updateCanvas.bind(_this66, t, _this66._canvas));
           })["catch"](function (e) {
-            console.error(e), _this65.stop(), _this65.close();
+            console.error(e), _this66.stop(), _this66.close();
           });
         }
       }, {
@@ -12735,13 +12819,13 @@ var app = (function () {
       _inherits(Xt, _wt5);
       var _super47 = _createSuper(Xt);
       function Xt(e, t, i) {
-        var _this66;
+        var _this67;
         _classCallCheck(this, Xt);
         var r;
-        _this66 = _super47.call(this, Xt.createButtonElement(), (r = i == null ? void 0 : i.button) == null ? void 0 : r.position, (i == null ? void 0 : i.button) || {}, "Photo");
-        var n = _this66.createInnerElements(_this66._customStyles);
-        i && _this66.addClickEvent(e, t, i.modalContainerStyle, i.files), _this66.elementRef.classList.add("upload-file-button"), _this66.elementRef.appendChild(n.styles), _this66.reapplyStateStyle("styles");
-        return _this66;
+        _this67 = _super47.call(this, Xt.createButtonElement(), (r = i == null ? void 0 : i.button) == null ? void 0 : r.position, (i == null ? void 0 : i.button) || {}, "Photo");
+        var n = _this67.createInnerElements(_this67._customStyles);
+        i && _this67.addClickEvent(e, t, i.modalContainerStyle, i.files), _this67.elementRef.classList.add("upload-file-button"), _this67.elementRef.appendChild(n.styles), _this67.reapplyStateStyle("styles");
+        return _this67;
       }
       _createClass(Xt, [{
         key: "createInnerElements",
@@ -12779,7 +12863,6 @@ var app = (function () {
       return Xt;
     }(wt);
     var pt = /*#__PURE__*/function () {
-      // prettier-ignore
       function pt(e, t, i, n) {
         _classCallCheck(this, pt);
         this.elementRef = pt.createPanelElement(e.inputAreaStyle);
@@ -12833,10 +12916,10 @@ var app = (function () {
                 _Qo$a = Qo[a],
                 d = _Qo$a.id,
                 u = _Qo$a.svgString,
-                h = _Qo$a.dropupText,
-                p = new ut(n, c, l, d, u, h);
+                p = _Qo$a.dropupText,
+                h = new ut(n, c, l, d, u, p);
               r[a] = {
-                button: p,
+                button: h,
                 fileType: c
               };
             }
@@ -12888,22 +12971,22 @@ var app = (function () {
       _inherits(b, _vo);
       var _super48 = _createSuper(b);
       function b() {
-        var _this67;
+        var _this68;
         _classCallCheck(this, b);
-        _this67 = _super48.call(this), _this67.getMessages = function () {
+        _this68 = _super48.call(this), _this68.getMessages = function () {
           return [];
-        }, _this67.submitUserMessage = function () {
+        }, _this68.submitUserMessage = function () {
           return console.warn("submitUserMessage failed - please wait for chat view to render before calling this property.");
-        }, _this67.focusInput = function () {
-          return Qt.focusFromParentElement(_this67._elementRef);
-        }, _this67.refreshMessages = function () {}, _this67.clearMessages = function () {}, _this67.scrollToBottom = function () {}, _this67.disableSubmitButton = function () {}, _this67._hasBeenRendered = !1, _this67._auxiliaryStyleApplied = !1, _this67._addMessage = function () {
+        }, _this68.focusInput = function () {
+          return Qt.focusFromParentElement(_this68._elementRef);
+        }, _this68.refreshMessages = function () {}, _this68.clearMessages = function () {}, _this68.scrollToBottom = function () {}, _this68.disableSubmitButton = function () {}, _this68._hasBeenRendered = !1, _this68._auxiliaryStyleApplied = !1, _this68._addMessage = function () {
           return console.warn("addMessage failed - please wait for chat view to render before calling this property.");
-        }, Go.appendStyleSheetToHead(), _this67._elementRef = document.createElement("div"), _this67._elementRef.id = "container", _this67.attachShadow({
+        }, Go.appendStyleSheetToHead(), _this68._elementRef = document.createElement("div"), _this68._elementRef.id = "container", _this68.attachShadow({
           mode: "open"
-        }).appendChild(_this67._elementRef), Ei.apply(ka, _this67.shadowRoot), setTimeout(function () {
-          _this67._hasBeenRendered || _this67.onRender();
+        }).appendChild(_this68._elementRef), Ei.apply(ka, _this68.shadowRoot), setTimeout(function () {
+          _this68._hasBeenRendered || _this68.onRender();
         }, 20);
-        return _this67;
+        return _this68;
       }
       _createClass(b, [{
         key: "changeToChatView",
@@ -12984,9 +13067,11 @@ var app = (function () {
     		c: function create() {
     			main = element("main");
     			deep_chat = element("deep-chat");
+    			set_custom_element_data(deep_chat, "id", "chat-element");
 
     			set_custom_element_data(deep_chat, "directconnection", deep_chat_directconnection_value = {
     				openAI: {
+    					key: localStorage.getItem('openai-key'),
     					validateKeyProperty: true,
     					assistant: {
     						assistant_id: "asst_0qjNhzjIMuwfjJJ2e4Cl8vdY",
@@ -13014,9 +13099,9 @@ var app = (function () {
     				default: { shared: { bubble: { maxWidth: "75%" } } }
     			});
 
-    			add_location(deep_chat, file, 67, 4, 3661);
+    			add_location(deep_chat, file, 92, 4, 4590);
     			attr_dev(main, "class", "svelte-u93l4o");
-    			add_location(main, file, 35, 2, 1913);
+    			add_location(main, file, 60, 2, 2842);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -13087,6 +13172,31 @@ var app = (function () {
     		}
     	];
 
+    	onMount(async () => {
+    		// runs after the component has finished loading.
+    		const deepChatRef = document.getElementById('chat-element');
+
+    		deepChatRef.onNewMessage = message => {
+    			
+    		}; // save messages to localStorage.
+    		// this function is called once for each message including initialMessages, ai messages, and user messages.
+
+    		deepChatRef.onComponentRender = () => {
+    			// save key to localStorage.
+    			// The event occurs before key is set, and again, after key is set.
+    			if (deepChatRef._activeService.key) {
+    				if (localStorage.getItem("openai-key") === null) {
+    					localStorage.setItem('openai-key', deepChatRef._activeService.key);
+    				}
+    			}
+    		};
+
+    		deepChatRef.responseInterceptor = response => {
+    			//console.log(response); // printed above
+    			return response;
+    		};
+    	});
+
     	const writable_props = [];
 
     	Object.keys($$props).forEach(key => {
@@ -13109,6 +13219,7 @@ var app = (function () {
 
     	$$self.$capture_state = () => ({
     		DeepChat: b,
+    		onMount,
     		initialMessages,
     		getCurrentWeather,
     		getCurrentTime
