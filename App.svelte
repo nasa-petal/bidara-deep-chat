@@ -156,7 +156,7 @@
               right: "calc(10% + 0.4em)",
               bottom: ".9em",
               borderRadius: "100vmax",
-              padding: ".3em",
+              padding: "0.3em 0.3em 0.34em 0.32em",
               backgroundColor: "rgb(0, 132, 255)"
             }
           },
