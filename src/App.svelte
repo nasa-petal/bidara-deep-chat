@@ -124,6 +124,27 @@
       demo={false}
       mixedFiles={{
         button: {
+          styles: {
+            container: {
+              default: {
+                width: "1em",
+                height: "1em",
+                right: "calc(10% + 0.5em)",
+                bottom: ".7em",
+                borderRadius: "100vmax",
+                padding: "0.5em",
+                backgroundColor: "rgba(0, 0, 0, 0.1)"
+              }
+            },
+            svg: {
+              styles: {
+                default: {
+                  bottom: "0.3em",
+                  left: "0.4em"
+                }
+              }
+            }
+          },
           position: "outside-left"
         }
       }}
