@@ -124,7 +124,10 @@
       }}
       _insertKeyViewStyles={{displayCautionText: false}}
       demo={false}
-      textToSpeech="true"
+      textToSpeech={{
+        pitch: "1.4",
+        rate: "1.4"
+      }}
       speechToText={{
         webSpeech: "true",
         commands: {
