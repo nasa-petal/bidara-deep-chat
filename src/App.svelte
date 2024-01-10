@@ -131,7 +131,7 @@
               default: {
                 width: "1em",
                 height: "1em",
-                right: "calc(10% + 0.4em)",
+                right: "calc(10%)",
                 bottom: ".7em",
                 borderRadius: "100vmax",
                 padding: "0.5em",
@@ -162,7 +162,8 @@
           container: {
             boxShadow: "none",
             borderRadius: "1em",
-            border: "1px solid rgba(0,0,0,0.2)"
+            border: "1px solid rgba(0,0,0,0.2)",
+            left: "10px"
           },
           text: {
             padding: "0.4em 2.5em 0.4em 0.8em",
@@ -203,7 +204,7 @@
             default: {
               width: "1em",
               height: "1em",
-              right: "calc(10% + 0.3em)",
+              right: "calc(10% - 0.3em)",
               bottom: ".85em",
               borderRadius: "100vmax",
               padding: "0.3em",
