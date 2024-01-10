@@ -4,6 +4,8 @@
   <script>
     import { DeepChat } from "deep-chat-dev";
     import { onMount } from 'svelte';
+    import hljs from "highlight.js";
+    window.hljs = hljs;
   
     const initialMessages = [
       { role: "ai", text: "Hi, I'm **BIDARA**, bio-inspired design and research assisant. I'm an OpenAI [GPT-4](https://openai.com/research/gpt-4) [assistant](https://platform.openai.com/docs/assistants/how-it-works), that was instructed by [NASA's PeTaL initiative](https://www1.grc.nasa.gov/research-and-engineering/vine/petal/) to help others understand, learn from, and emulate the strategies used by living things to create sustainable designs and technologies using the [Biomimicry Institute's design process](https://toolbox.biomimicry.org/methods/process/)." },
