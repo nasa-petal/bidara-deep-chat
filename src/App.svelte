@@ -165,8 +165,7 @@
             border: "1px solid rgba(0,0,0,0.2)"
           },
           text: {
-            padding: "0.4em 0.8em",
-            paddingRight: "2.5em"
+            padding: "0.4em 2.5em 0.4em 0.8em",
           }
         },
         placeholder:{text: "How might we..."}
@@ -174,8 +173,7 @@
       initialMessages={initialMessages}
       chatStyle={{
         width: "96vw",
-        height: "calc(100vh - 10px)",
-        paddingTop: "10px",
+        height: "100vh",
         backgroundColor: "white",
         border: "none",
         fontSize: "16px",
