@@ -132,10 +132,19 @@
               default: {
                 width: "1em",
                 height: "1em",
+                bottom: ".7em",
                 borderRadius: "100vmax",
-                padding: "0.4em",
+                padding: "0.5em",
                 backgroundColor: "rgba(0, 0, 0, 0.1)",
                 left: "calc(11px - 0.25em)"
+              }
+            },
+            svg: {
+              styles: {
+                default: {
+                  bottom: "0.35em",
+                  left: "0.4em"
+                }
               }
             }
           },
@@ -159,7 +168,7 @@
             svg: {
               styles: {
                 default: {
-                  bottom: "0.3em",
+                  bottom: "0.35em",
                   left: "0.4em"
                 }
               }
@@ -173,8 +182,7 @@
         borderRadius: "5px 5px 0 0",
         border: "1px solid rgba(0,0,0,0.2)",
         top: "-2.55em",
-        height: "4em",
-        left: "10vw"
+        height: "4em"
       }}
       textInput={{
         styles: {
