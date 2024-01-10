@@ -154,9 +154,9 @@
         backgroundColor: "rgba(255, 255, 255, 0.6)",
         borderRadius: "5px 5px 0 0",
         border: "1px solid rgba(0,0,0,0.2)",
-        top: "-2.6em",
+        top: "-2.55em",
         height: "4em",
-        left: "10vw"
+        left: "9.96vw"
       }}
       textInput={{
         styles: {
@@ -206,7 +206,7 @@
               width: "1em",
               height: "1em",
               right: "calc(10% - 0.3em)",
-              bottom: ".85em",
+              bottom: ".87em",
               borderRadius: "100vmax",
               padding: "0.3em",
               backgroundColor: "rgb(0, 132, 255)"
