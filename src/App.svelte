@@ -124,6 +124,24 @@
       }}
       _insertKeyViewStyles={{displayCautionText: false}}
       demo={false}
+      speechToText={{
+        webSpeech: "true",
+        button: {
+          default: {
+            container: {
+              default: {
+                width: "1em",
+                height: "1em",
+                borderRadius: "100vmax",
+                padding: "0.4em",
+                backgroundColor: "rgba(0, 0, 0, 0.1)",
+                left: "calc(11px - 0.25em)"
+              }
+            }
+          },
+          position: "outside-right"
+        }
+      }}
       mixedFiles={{
         button: {
           styles: {
@@ -131,7 +149,7 @@
               default: {
                 width: "1em",
                 height: "1em",
-                right: "calc(10%)",
+                right: "calc(10% + 0.4em)",
                 bottom: ".7em",
                 borderRadius: "100vmax",
                 padding: "0.5em",
@@ -156,15 +174,14 @@
         border: "1px solid rgba(0,0,0,0.2)",
         top: "-2.55em",
         height: "4em",
-        left: "9.96vw"
+        left: "10vw"
       }}
       textInput={{
         styles: {
           container: {
             boxShadow: "none",
             borderRadius: "1em",
-            border: "1px solid rgba(0,0,0,0.2)",
-            left: "10px"
+            border: "1px solid rgba(0,0,0,0.2)"
           },
           text: {
             padding: "0.4em 2.5em 0.4em 0.8em",
@@ -205,7 +222,7 @@
             default: {
               width: "1em",
               height: "1em",
-              right: "calc(10% - 0.3em)",
+              right: "calc(10% + 0.3em)",
               bottom: ".87em",
               borderRadius: "100vmax",
               padding: "0.3em",
