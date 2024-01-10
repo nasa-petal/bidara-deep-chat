@@ -187,6 +187,7 @@
       textInput={{
         styles: {
           container: {
+            width: "calc(100% - 6em)",
             boxShadow: "none",
             borderRadius: "1em",
             border: "1px solid rgba(0,0,0,0.2)"
