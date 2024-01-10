@@ -172,9 +172,9 @@
       }}
       initialMessages={initialMessages}
       chatStyle={{
-        width: "96vw",
+        width: "100%",
         height: "100vh",
-        backgroundColor: "white",
+        backgroundColor: "red",
         border: "none",
         fontSize: "16px",
         fontFamily: 'system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"'
