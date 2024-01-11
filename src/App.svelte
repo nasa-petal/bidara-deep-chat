@@ -192,7 +192,8 @@
         borderRadius: "5px 5px 0 0",
         border: "1px solid rgba(0,0,0,0.2)",
         top: "-2.55em",
-        height: "4em"
+        height: "4em",
+        width: "calc(100% - 6.2em)",
       }}
       textInput={{
         styles: {
