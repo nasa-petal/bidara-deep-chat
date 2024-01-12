@@ -45,8 +45,12 @@
     async function ssSearch(params) {
       //call api and return results
       let searchParams = JSON.parse(params);
-      let fields = searchParams.fields.split(",");
-      fields.push("url","title","year","abstract","authors","venue"); // minimum set of fields we want, just in case OpenAI doesn't request them. Which happens alot.
+      searchParams = searchParams.parameters;
+      let fields = [];
+      if (typeof searchParams.fields === 'string' || searchParams.fields instanceof String) {
+        fields = searchParams.fields.split(",");
+      }
+      fields.push("url","title","year","abstract","authors","venue","openAccessPdf"); // minimum set of fields we want, just in case OpenAI doesn't request them. Which happens alot.
       fields = [...new Set(fields)]; //remove duplicates
       searchParams.fields = fields.join();
       searchParams = new URLSearchParams(searchParams);
