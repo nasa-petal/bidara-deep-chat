@@ -45,7 +45,9 @@
     async function ssSearch(params) {
       //call api and return results
       let searchParams = JSON.parse(params);
-      searchParams = searchParams.parameters;
+      if ("parameters" in searchParams) {
+        searchParams = searchParams.parameters;
+      }
       let fields = [];
       if (typeof searchParams.fields === 'string' || searchParams.fields instanceof String) {
         fields = searchParams.fields.split(",");
