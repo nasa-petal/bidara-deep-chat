@@ -42,6 +42,38 @@
       }
     }
 
+    async function ssSearch(params) {
+      //call api and return results
+      let searchParams = JSON.parse(params);
+      let fields = searchParams.fields.split(",");
+      fields.push("url","title","year","abstract","authors","venue"); // minimum set of fields we want, just in case OpenAI doesn't request them. Which happens alot.
+      fields = [...new Set(fields)]; //remove duplicates
+      searchParams.fields = fields.join();
+      searchParams = new URLSearchParams(searchParams);
+      const response = await fetch("https://api.semanticscholar.org/graph/v1/paper/search?" + searchParams);
+      const papers = await response.json();
+      return JSON.stringify(papers);
+    }
+
+    async function callFunc(functionDetails) {
+      let tmp = '';
+      if(functionDetails.name == "get_graph_paper_relevance_search") {
+        tmp = await ssSearch(functionDetails.arguments);
+      }
+      else if(functionDetails.name == "get_weather") {
+        tmp = getCurrentWeather(functionDetails.arguments);
+      }
+      else if(functionDetails.name == "get_time") {
+        tmp = getCurrentTime(functionDetails.arguments);
+      }
+      return tmp;
+    }
+
+    async function funcCalling(functionsDetails) {
+      let tmp = await Promise.all(functionsDetails.map(callFunc));
+      return tmp;
+    }
+
     onMount(async () => { // runs after the component has finished loading.
       const deepChatRef = document.getElementById('chat-element');
 
@@ -107,18 +139,7 @@
           validateKeyProperty: true,
           assistant: {
             assistant_id: "asst_0qjNhzjIMuwfjJJ2e4Cl8vdY",
-            function_handler: (functionsDetails) => {
-              return functionsDetails.map((functionDetails) => {
-                let tmp = null;
-                if(functionDetails.name == "get_weather") {
-                  tmp = getCurrentWeather(functionDetails.arguments);
-                }
-                else if(functionDetails.name == "get_time") {
-                  tmp = getCurrentTime(functionDetails.arguments);
-                }
-                return tmp;
-              });
-            }
+            function_handler: funcCalling
           }
         }
       }}

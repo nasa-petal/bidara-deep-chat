@@ -24,3 +24,21 @@ Template based on https://github.com/sveltejs/template
 npm install
 npm run dev
 ```
+
+### Known issues
+
+- deep-chat speechToText: submit command word is sent in message on safari and chrome on iOS.
+
+- deep-chat textToSpeech: doesn't read messages aloud on safari or chrome on iOS.
+
+### Nice to haves
+
+- Show the quote from the file used to generate the response when BIDARA uses knowledge retrieval. https://platform.openai.com/docs/assistants/how-it-works/message-annotations 
+
+- DALLE-3 support for image generation. (Coming soon to Assistants API, or could implement using Function Calling) https://cookbook.openai.com/examples/creating_slides_with_assistants_api_and_dall-e3
+
+- GPT-4 vision support so it can 'see' images, including ones uploaded by users.
+
+- Functions:
+
+- get pdf of paper from semantic scholar link and upload to assistant.thread.messages.files for retrieval.
