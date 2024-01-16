@@ -41,4 +41,4 @@ npm run dev
 
 - Functions:
 
-- get pdf of paper from semantic scholar link and upload to assistant.thread.messages.files for retrieval.
+- get pdf of paper from semantic scholar link and upload to assistant.thread.messages.files for retrieval. as a temp workaround can use openAccessPdf links to download pdfs on client, and then upload them on client directly to openai assistant.
