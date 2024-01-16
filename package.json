@@ -14,7 +14,7 @@
     "svelte": "^4.0.0"
   },
   "dependencies": {
-    "deep-chat-dev": "^9.0.105",
+    "deep-chat": "^1.4.7",
     "sirv-cli": "^2.0.0"
   },
   "scripts": {
