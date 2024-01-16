@@ -2,7 +2,7 @@
   https://codesandbox.io/p/sandbox/deep-chat-sveltekit-fn8h6x -->
 
   <script>
-    import { DeepChat } from "deep-chat";
+    import { DeepChat } from "deep-chat-dev";
     import { onMount } from 'svelte';
     import hljs from "highlight.js";
     window.hljs = hljs;
