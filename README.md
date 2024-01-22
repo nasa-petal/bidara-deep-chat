@@ -33,6 +33,8 @@ npm run dev
 
 ### Nice to haves
 
+- Proxy requests to OpenAI through an authenticated API. Users can request access. Ability to generate api keys once authenticated. Authorized API keys required to communicate with API.
+
 - Show the quote from the file used to generate the response when BIDARA uses knowledge retrieval. https://platform.openai.com/docs/assistants/how-it-works/message-annotations 
 
 - DALLE-3 support for image generation. (Coming soon to Assistants API, or could implement using Function Calling) https://cookbook.openai.com/examples/creating_slides_with_assistants_api_and_dall-e3
@@ -41,6 +43,10 @@ npm run dev
 
 - Functions:
 
+- patent search - https://developer.uspto.gov/api-catalog/bulk-search-and-download, https://patentsview.org/apis/api-faqs, https://www.npmjs.com/package/uspto-patents-view-api 
+
 - get pdf of paper from semantic scholar link and upload to assistant.thread.messages.files for retrieval. as a temp workaround can use openAccessPdf links to download pdfs on client, and then upload them on client directly to openai assistant.
 
 - get all messages using openai API. Then BIDARA can use the list of messages to summarize the conversation, or save the conversation history to PDF. 
+
+- get all code interpreter code. useful to check its work.
