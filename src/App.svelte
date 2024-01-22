@@ -4,6 +4,7 @@
   <script>
     import { DeepChat } from "deep-chat-dev";
     import { onMount } from 'svelte';
+    import { BIDARA_SYS, PAPER_SEARCH_FUNC } from './bidara';
     import hljs from "highlight.js";
     window.hljs = hljs;
   
@@ -19,6 +20,8 @@
     if (openai_key === null) {
       openai_key = localStorage.getItem('openai-key');
     }
+
+    let openai_asst_id = localStorage.getItem('openai-asst-id');
 
     function getCurrentWeather(location) {
       location = location.toLowerCase();
@@ -86,6 +89,11 @@
       deepChatRef.onNewMessage = (message) => {
         // save messages to localStorage.
         // this function is called once for each message including initialMessages, ai messages, and user messages.
+        if (deepChatRef._activeService.rawBody.assistant_id) {
+          if (localStorage.getItem("openai-asst-id") === null) {
+            localStorage.setItem('openai-asst-id', deepChatRef._activeService.rawBody.assistant_id);
+          }
+        }
       };
 
       deepChatRef.onComponentRender = () => {
@@ -98,10 +106,10 @@
         }
       };
 
-      deepChatRef.responseInterceptor = (response) => {
+      /*deepChatRef.responseInterceptor = (response) => {
         //console.log(response); // printed above
         return response;
-      };
+      };*/
     });    
   </script>
   
@@ -144,7 +152,20 @@
           key: openai_key,
           validateKeyProperty: true,
           assistant: {
-            assistant_id: "asst_0qjNhzjIMuwfjJJ2e4Cl8vdY",
+            assistant_id: openai_asst_id,
+            new_assistant: {
+              model: "gpt-4-1106-preview",
+              name: "BIDARA",
+              instructions: BIDARA_SYS,
+              tools: [
+                { type: "code_interpreter" },
+                { type: "retrieval" },
+                { 
+                  type: "function",
+                  function: PAPER_SEARCH_FUNC
+                }
+              ]
+            },
             function_handler: funcCalling
           }
         }
