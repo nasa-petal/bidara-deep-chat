@@ -6,7 +6,16 @@
 
 BIDARA can guide users through the Biomimicry Institute’s [Design Process](https://toolbox.biomimicry.org/methods/process/), a step-by-step method to propose biomimetic solutions to challenges. This process includes defining the problem, biologizing the challenge, discovering natural models, abstracting design strategies, and emulating nature's lessons.
 
-`bidara-deep-chat` uses [a web interface](https://github.com/OvidijusParsiunas/deep-chat) to connect to BIDARA over the OpenAI Assistants API. To use it, you need to register for [an OpenAI API key](https://platform.openai.com/account/api-keys) first. All messages are sent directly from your web browser to OpenAI and back.
+`bidara-deep-chat` uses [a web interface](https://github.com/OvidijusParsiunas/deep-chat) to connect to BIDARA over the OpenAI Assistants API. To use it, you need to:
+
+1. [Create an OpenAI account](https://platform.openai.com/signup)
+2. [Login to OpenAI Platform](https://platform.openai.com/login)
+3. In the left sidebar, navigate to 'Settings -> Billing'
+4. Click the 'Add payment details' button
+5. Add a minimum of $5 in credits. It is required to spend a minimum of $5 to [access GPT-4](https://platform.openai.com/docs/guides/rate-limits/usage-tiers?context=tier-free).
+6. In the left sidebar, navigate to 'API Keys'
+7. Verify your phone number, then click the 'Create new secret key' button.
+8. Copy your secret key and enter it into BIDARA.
 
 ## :fire: Features enabled
 
