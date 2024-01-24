@@ -14,8 +14,10 @@ BIDARA can guide users through the Biomimicry Institute’s [Design Process](htt
 6. In the left sidebar, navigate to [API Keys](https://platform.openai.com/api-keys)
 7. Verify your phone number, then click the 'Create new secret key' button.
 8. Copy your secret key.
-9. **[Open the BIDARA website](https://nasa-petal.github.io/bidara-deep-chat/)**, and paste your key into the input field.
-10. With OpenAI API you only pay for what you use. Track your usage and costs on the [Usage page](https://platform.openai.com/usage).
+9. **[Open the BIDARA website](https://nasa-petal.github.io/bidara-deep-chat/)**, and paste your key into the input field. Your browser will save the key, so you only have to enter it once.
+
+- With OpenAI API you only pay for what you use. Track your usage and costs on the [Usage page](https://platform.openai.com/usage).
+- After you send your first message to BIDARA, it will also be available to interact with through the [OpenAI Assistants Playground](https://platform.openai.com/assistants). This interface is more complex, but also provides more customizability. Just select BIDARA, then click the 'Test' button.
 
 ## :fire: Features enabled
 
