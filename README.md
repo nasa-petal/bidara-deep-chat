@@ -2,20 +2,20 @@
 
 ### BIDARA is a GPT-4 chatbot that was instructed to help scientists and engineers understand, learn from, and emulate the strategies used by living things to create sustainable designs and technologies.
 
-:rocket: **[Try it out](https://nasa-petal.github.io/bidara-deep-chat/)**
-
 BIDARA can guide users through the Biomimicry Institute’s [Design Process](https://toolbox.biomimicry.org/methods/process/), a step-by-step method to propose biomimetic solutions to challenges. This process includes defining the problem, biologizing the challenge, discovering natural models, abstracting design strategies, and emulating nature's lessons.
 
-`bidara-deep-chat` uses [a web interface](https://github.com/OvidijusParsiunas/deep-chat) to connect to BIDARA over the OpenAI Assistants API. To use it, you need to:
+## :rocket: How to access
 
 1. [Create an OpenAI account](https://platform.openai.com/signup)
 2. [Login to OpenAI Platform](https://platform.openai.com/login)
-3. In the left sidebar, navigate to 'Settings -> Billing'
+3. In the left sidebar, navigate to [Settings -> Billing](https://platform.openai.com/account/billing/overview)
 4. Click the 'Add payment details' button
 5. Add a minimum of $5 in credits. It is required to spend a minimum of $5 to [access GPT-4](https://platform.openai.com/docs/guides/rate-limits/usage-tiers?context=tier-free).
-6. In the left sidebar, navigate to 'API Keys'
+6. In the left sidebar, navigate to [API Keys](https://platform.openai.com/api-keys)
 7. Verify your phone number, then click the 'Create new secret key' button.
-8. Copy your secret key and enter it into BIDARA.
+8. Copy your secret key.
+9. **[Open the BIDARA website](https://nasa-petal.github.io/bidara-deep-chat/)**, and paste your key into the input field.
+10. With OpenAI API you only pay for what you use. Track your usage and costs on the [Usage page](https://platform.openai.com/usage).
 
 ## :fire: Features enabled
 
@@ -25,7 +25,7 @@ BIDARA can guide users through the Biomimicry Institute’s [Design Process](htt
 
 ## :computer: For developers
 
-Uses Svelte and [deep-chat](https://github.com/OvidijusParsiunas/deep-chat)    
+`bidara-deep-chat` uses Svelte and [the deep-chat web component](https://github.com/OvidijusParsiunas/deep-chat) to connect to BIDARA over the OpenAI Assistants API.
 Template based on https://github.com/sveltejs/template
 
 ### Run locally
