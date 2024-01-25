@@ -85,6 +85,7 @@
 
     onMount(async () => { // runs after the component has finished loading.
       const deepChatRef = document.getElementById('chat-element');
+      const welcomeRef = document.getElementById('welcome');
       let openAIKeySet = false;
       let openAIAsstSet = false;
 
@@ -95,6 +96,7 @@
       deepChatRef.onNewMessage = (message) => {
         // save messages to localStorage.
         // this function is called once for each message including initialMessages, ai messages, and user messages.
+        welcomeRef.remove();
         if (!openAIAsstSet && deepChatRef._activeService.rawBody.assistant_id) {
           localStorage.setItem('openai-asst-id', deepChatRef._activeService.rawBody.assistant_id);
           openAIAsstSet = true;
@@ -147,6 +149,23 @@
           </div>
         </div>
       </div>-->
+    <div id="welcome">
+      <h2>Welcome to BIDARA</h2>
+      <h3>How to access</h3>
+      <ol>
+        <li><a href="https://platform.openai.com/signup">Create an OpenAI account</a></li>
+        <li><a href="https://platform.openai.com/login">Login to OpenAI Platform</a></li>
+        <li>In the left sidebar, navigate to <a href="https://platform.openai.com/account/billing/overview">Settings -&gt; Billing</a></li> <li>Click the 'Add payment details' button</li>
+        <li>Add a minimum of $5 in credits. It is required to spend a minimum of $5 to <a href="https://platform.openai.com/docs/guides/rate-limits/usage-tiers?context=tier-free">access GPT-4</a>.</li>
+        <li>In the left sidebar, navigate to <a href="https://platform.openai.com/api-keys">API Keys</a></li>
+        <li>Verify your phone number, then click the 'Create new secret key' button.</li> <li>Copy your secret key.</li>
+        <li>Paste your key into the input field below. Your browser will save the key, so you only have to enter it once.</li>
+      </ol>
+      <ul>
+        <li>With OpenAI API you only pay for what you use. Track your usage and costs on the <a href="https://platform.openai.com/usage">Usage page</a>.</li>
+        <li>After you send your first message to BIDARA, it will also be available to interact with through the <a href="https://platform.openai.com/assistants">OpenAI Assistants Playground</a>. This interface is more complex, but also provides more customizability. Just select BIDARA, then click the 'Test' button.</li>
+      </ul>
+    </div>
     <!-- demo/textInput are examples of passing an object directly into a property -->
     <!-- initialMessages is an example of passing a state object into a property -->
     <deep-chat
@@ -176,10 +195,6 @@
       }}
       _insertKeyViewStyles={{displayCautionText: false}}
       demo={false}
-      textToSpeech={{
-        pitch: "1.4",
-        rate: "1.4"
-      }}
       speechToText={{
         webSpeech: "true",
         commands: {
@@ -313,6 +328,19 @@
     main {
       font-family: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
       display: grid;
+    }
+
+    #welcome {
+      margin-bottom: -30dvh;
+      z-index: 1;
+      line-height: 1.5em;
+    }
+    #welcome h2 {
+      padding-left: .5em;
+    }
+
+    #welcome h3 {
+      padding-left: 1em;
     }
   </style>
 
