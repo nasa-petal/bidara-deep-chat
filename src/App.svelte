@@ -85,24 +85,28 @@
 
     onMount(async () => { // runs after the component has finished loading.
       const deepChatRef = document.getElementById('chat-element');
+      let openAIKeySet = false;
+      let openAIAsstSet = false;
+
+      deepChatRef.onError = (error) => {
+        console.log(error);
+      }
 
       deepChatRef.onNewMessage = (message) => {
         // save messages to localStorage.
         // this function is called once for each message including initialMessages, ai messages, and user messages.
-        if (deepChatRef._activeService.rawBody.assistant_id) {
-          if (localStorage.getItem("openai-asst-id") === null) {
-            localStorage.setItem('openai-asst-id', deepChatRef._activeService.rawBody.assistant_id);
-          }
+        if (!openAIAsstSet && deepChatRef._activeService.rawBody.assistant_id) {
+          localStorage.setItem('openai-asst-id', deepChatRef._activeService.rawBody.assistant_id);
+          openAIAsstSet = true;
         }
       };
 
       deepChatRef.onComponentRender = () => {
         // save key to localStorage.
         // The event occurs before key is set, and again, after key is set.
-        if (deepChatRef._activeService.key) {
-          if (localStorage.getItem("openai-key") === null) {
-            localStorage.setItem('openai-key', deepChatRef._activeService.key);
-          }
+        if (!openAIKeySet && deepChatRef._activeService.key) {
+          localStorage.setItem('openai-key', deepChatRef._activeService.key);
+          openAIKeySet = true;
         }
       };
 
