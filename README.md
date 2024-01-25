@@ -31,8 +31,14 @@ npm run dev
 
 - deep-chat textToSpeech: doesn't read messages aloud on safari or chrome on iOS.
 
+- if user has used bidara (assistant id is set in localStorage), then if they delete the assistant, they will get an error. Only way to get rid of error is to delete the assistant id from localStorage. Try to catch the error, and delete the localStorage for them.
+
 ### Nice to haves
 
+- save chat logs.
+- ability rate responses and add feedback.
+- ability to send ratings, feedback and chat log to us.
+- don't do TtS unless StT has been used.
 - Proxy requests to OpenAI through an authenticated API. Users can request access. Ability to generate api keys once authenticated. Authorized API keys required to communicate with API.
 
 - Show the quote from the file used to generate the response when BIDARA uses knowledge retrieval. https://platform.openai.com/docs/assistants/how-it-works/message-annotations 

@@ -77,7 +77,7 @@ const PAPER_SEARCH_FUNC = {
         "properties": {
           "query": {
             "type": "string",
-            "description": "A plain-text search query string.\n* No special query syntax is supported.\n* Hyphenated query terms yield no matches (replace it with space to find matches)\n\nSee our <a href=\"https://medium.com/ai2-blog/building-a-better-search-engine-for-semantic-scholar-ea23a0b661e7\">blog post</a>\nfor a description of our search relevance algorithm.\n\nBecause of the subtleties of finding partial phrase matches in different parts of the document,\nbe cautious about interpreting the <code>total</code> field as a count of documents containing\nany particular word in the query."
+            "description": "A plain-text search query string.\n* No special query syntax is supported.\n* Hyphenated query terms yield no matches (replace it with space to find matches)\n\nBecause of the subtleties of finding partial phrase matches in different parts of the document,\nbe cautious about interpreting the <code>total</code> field as a count of documents containing\nany particular word in the query."
           },
           "fields": {
             "type": "string",
