@@ -334,13 +334,12 @@
       margin-bottom: -30dvh;
       z-index: 1;
       line-height: 1.5em;
-    }
-    #welcome h2 {
-      padding-left: .5em;
+      padding-left: 1em;
+      padding-right: 1em;
     }
 
     #welcome h3 {
-      padding-left: 1em;
+      padding-left: .5em;
     }
   </style>
 
