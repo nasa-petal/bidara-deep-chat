@@ -66,4 +66,4 @@ npm run dev
 
 - get all messages using openai API. Then BIDARA can use the list of messages to summarize the conversation, or save the conversation history to PDF. 
 
-- get all code interpreter code. useful to check its work.
+- get all code interpreter code. useful to check its work..
