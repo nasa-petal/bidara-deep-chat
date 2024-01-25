@@ -23,6 +23,12 @@
 
     let openai_asst_id = localStorage.getItem('openai-asst-id');
 
+    function test() {
+      fetch("./test")
+        .then(d => d.text())
+        .then(d => console.log(d));
+    }
+
     function getCurrentWeather(location) {
       location = location.toLowerCase();
       if (location.includes('tokyo')) {
@@ -84,6 +90,8 @@
     }
 
     onMount(async () => { // runs after the component has finished loading.
+      test();
+
       const deepChatRef = document.getElementById('chat-element');
 
       deepChatRef.onNewMessage = (message) => {
