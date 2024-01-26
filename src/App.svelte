@@ -96,7 +96,6 @@
       deepChatRef.onNewMessage = (message) => {
         // save messages to localStorage.
         // this function is called once for each message including initialMessages, ai messages, and user messages.
-        welcomeRef.remove();
         if (!openAIAsstSet && deepChatRef._activeService.rawBody.assistant_id) {
           localStorage.setItem('openai-asst-id', deepChatRef._activeService.rawBody.assistant_id);
           openAIAsstSet = true;
@@ -109,6 +108,12 @@
         if (!openAIKeySet && deepChatRef._activeService.key) {
           localStorage.setItem('openai-key', deepChatRef._activeService.key);
           openAIKeySet = true;
+        }
+        if(!openAIKeySet) {
+          welcomeRef.style.display = "block";
+        }
+        else {
+          welcomeRef.style.display = "none";
         }
       };
 
@@ -336,6 +341,7 @@
       line-height: 1.5em;
       padding-left: 1em;
       padding-right: 1em;
+      display: none;
     }
 
     #welcome h3 {
