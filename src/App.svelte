@@ -345,7 +345,7 @@
     }
 
     #welcome ol, #welcome ul {
-      padding-inline-start: 20px;
+      padding-inline-start: 1.5em;
     }
 
     #welcome h2 {
