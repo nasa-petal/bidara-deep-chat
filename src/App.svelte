@@ -155,7 +155,7 @@
         </div>
       </div>-->
     <div id="welcome">
-      <h2>Welcome to BIDARA</h2>
+      <h2><img src="bidara.png" alt="girl with dark hair" height="50" width="50" />BIDARA <span class="small">Bio-Inspired Design and Research Assistant</span></h2>
       <h3>How to access</h3>
       <ol>
         <li><a href="https://platform.openai.com/signup">Create an OpenAI account</a></li>
@@ -344,8 +344,21 @@
       display: none;
     }
 
-    #welcome h3 {
-      padding-left: .5em;
+    #welcome h2 {
+      font-weight: 200;
+      font-size: 1.7em;
+    }
+
+    #welcome h2 img {
+      vertical-align: middle;
+      margin-right: .1em;
+    }
+
+    #welcome h2 .small {
+      font-size: .5em;
+      font-weight: 300;
+      position: relative;
+      top: -.2em;
     }
   </style>
 
