@@ -345,7 +345,7 @@
     }
 
     #welcome ol, #welcome ul {
-      padding-inline-start: 1.5em;
+      padding-inline-start: 1.7em;
     }
 
     #welcome h2 {
@@ -353,6 +353,10 @@
       font-size: 2em;
       line-height: 1em;
       display: inline;
+    }
+
+    #welcome h3 {
+      margin-inline-start: .25em;
     }
 
     #header {
