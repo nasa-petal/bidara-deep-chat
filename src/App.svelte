@@ -344,6 +344,10 @@
       display: none;
     }
 
+    #welcome ol, #welcome ul {
+      padding-inline-start: 1.2em;
+    }
+
     #welcome h2 {
       font-weight: 200;
       font-size: 2em;
