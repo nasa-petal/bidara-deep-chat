@@ -4,156 +4,53 @@
   <script>
     import { DeepChat } from "deep-chat-dev";
     import { onMount } from 'svelte';
-    import OpenAI from "openai";
     import { BIDARA_SYS, PAPER_SEARCH_FUNC, GEN_IMAGE_FUNC } from './bidara';
-    import { genNImages } from './image_gen';
+    import { funcCalling } from './bidaraFunctions';
+    import { getKeyAndAsst } from './openaiUtils';
     import hljs from "highlight.js";
     window.hljs = hljs;
   
     const initialMessages = [
-      { role: "ai", text: "Hi, I'm **BIDARA**, bio-inspired design and research assisant. I'm an OpenAI [GPT-4](https://openai.com/research/gpt-4) [assistant](https://platform.openai.com/docs/assistants/how-it-works), that was instructed by [NASA's PeTaL initiative](https://www1.grc.nasa.gov/research-and-engineering/vine/petal/) to help others understand, learn from, and emulate the strategies used by living things to create sustainable designs and technologies using the [Biomimicry Institute's design process](https://toolbox.biomimicry.org/methods/process/)." },
+      { role: "ai", text: "Hi, I'm **BIDARA**, Bio-Inspired Design and Research Assisant. I'm an OpenAI [GPT-4](https://openai.com/research/gpt-4) [assistant](https://platform.openai.com/docs/assistants/how-it-works), that was instructed by [NASA's PeTaL initiative](https://www1.grc.nasa.gov/research-and-engineering/vine/petal/) to help others understand, learn from, and emulate the strategies used by living things to create sustainable designs and technologies using the [Biomimicry Institute's design process](https://toolbox.biomimicry.org/methods/process/)." },
       { role: "ai", text: "Before we begin, please be advised:\n\n‣ **Do not share any sensitive information** in your conversations including but not limited to, personal information, sensitive or non-public government/company data, ITAR, CUI, export controlled, or trade secrets.  \n‣ While OpenAI has safeguards in place, BIDARA may occasionally generate incorrect or misleading information and produce offensive or biased content." },
       { role: "ai", text: "How can I assist you today?" }
     ];
 
-    const queryString = window.location.search;
-    const urlParams = new URLSearchParams(queryString);
-    let openai_key = urlParams.get('key')
-    if (openai_key === null) {
-      openai_key = localStorage.getItem('openai-key');
+    let openAIKeySet = false;
+    let openAIAsstSet = false;
+    let deepChatRef;
+    let welcomeRef;
+
+    function onError(error) {
+      console.log(error);
     }
 
-    let openai_asst_id = localStorage.getItem('openai-asst-id');
-
-
-    // I believe deepchat is doing similar anyway.
-    let openai_client = new OpenAI({"apiKey": openai_key, dangerouslyAllowBrowser: true});
-
-    function getCurrentWeather(location) {
-      location = location.toLowerCase();
-      if (location.includes('tokyo')) {
-        return 'Good';
-      } else if (location.includes('san francisco')) {
-        return 'Mild';
-      } else {
-        return 'Very Hot';
+    function onNewMessage(message) {
+      // save asst id to localStorage.
+      // this function is called once for each message including initialMessages, ai messages, and user messages.
+      if (!openAIAsstSet && deepChatRef._activeService.rawBody.assistant_id) {
+        localStorage.setItem('openai-asst-id', deepChatRef._activeService.rawBody.assistant_id);
+        openAIAsstSet = true;
       }
     }
 
-    function getCurrentTime(location) {
-      location = location.toLowerCase();
-      if (location.includes('tokyo')) {
-        return '10p';
-      } else if (location.includes('san francisco')) {
-        return '6p';
-      } else {
-        return '12p';
+    function onComponentRender() {
+      // save key to localStorage.
+      // The event occurs before key is set, and again, after key is set.
+      if (!openAIKeySet && deepChatRef._activeService.key) {
+        localStorage.setItem('openai-key', deepChatRef._activeService.key);
+        openAIKeySet = true;
+      }
+      if(!openAIKeySet) {
+        welcomeRef.style.display = "block";
+      }
+      else {
+        welcomeRef.style.display = "none";
       }
     }
 
-    async function ssSearch(params) {
-      //call api and return results
-      let searchParams = JSON.parse(params);
-      if ("parameters" in searchParams) {
-        searchParams = searchParams.parameters;
-      }
-      let fields = [];
-      if (typeof searchParams.fields === 'string' || searchParams.fields instanceof String) {
-        fields = searchParams.fields.split(",");
-      }
-      fields.push("url","title","year","abstract","authors","venue","openAccessPdf"); // minimum set of fields we want, just in case OpenAI doesn't request them. Which happens alot.
-      fields = [...new Set(fields)]; //remove duplicates
-      searchParams.fields = fields.join();
-      searchParams = new URLSearchParams(searchParams);
-      const response = await fetch("https://api.semanticscholar.org/graph/v1/paper/search?" + searchParams);
-      const papers = await response.json();
-      return JSON.stringify(papers);
-    }
-
-    async function genImage(params) {
-
-      var imageParams = JSON.parse(params);
-
-      if ("parameters" in imageParams) {
-        imageParams = imageParams.parameters;
-      }
-
-      var imageDescription = JSON.stringify(imageParams.description);
-
-      if (!imageDescription && "prompt" in imageParams) {
-        imageDescription = JSON.stringify(imageParams.prompt);
-      }
-
-      const imageURLs = await genNImages(openai_client, imageDescription, 1);
-
-      const imageURL = imageURLs[0];
-
-      const imageWidth = 256;
-      const imageHeight = 256;
-      const imageTag = `<img src=${imageURL} alt='Image of: ${imageDescription}. Generated by AI.' width='${imageWidth}' height='${imageHeight}'/>`;
-      const message = {html: imageTag, role: "ai"};
-
-      const deepChatRef = document.getElementById('chat-element');
-      deepChatRef._addMessage(message);
-
-      return "The image has been inserted into the chat, respond by tieing this image back into the Biomimicry Design Process. DO NOT RESPOND WITH AN IMAGE, URL, OR MARKDOWN.";
-    }
-
-    async function callFunc(functionDetails) {
-      let tmp = '';
-      if(functionDetails.name == "get_graph_paper_relevance_search") {
-        tmp = await ssSearch(functionDetails.arguments);
-      }
-      else if (functionDetails.name == "generate_image_from_description") {
-        tmp = await genImage(functionDetails.arguments);
-      }
-      else if(functionDetails.name == "get_weather") {
-        tmp = getCurrentWeather(functionDetails.arguments);
-      }
-      else if(functionDetails.name == "get_time") {
-        tmp = getCurrentTime(functionDetails.arguments);
-      }
-      return tmp;
-    }
-
-    async function funcCalling(functionsDetails) {
-      let tmp = await Promise.all(functionsDetails.map(callFunc));
-      return tmp;
-    }
-
-    onMount(async () => { // runs after the component has finished loading.
-      const deepChatRef = document.getElementById('chat-element');
-      let openAIKeySet = false;
-      let openAIAsstSet = false;
-
-      deepChatRef.onError = (error) => {
-        console.log(error);
-      }
-
-      deepChatRef.onNewMessage = (message) => {
-        // save messages to localStorage.
-        // this function is called once for each message including initialMessages, ai messages, and user messages.
-        if (!openAIAsstSet && deepChatRef._activeService.rawBody.assistant_id) {
-          localStorage.setItem('openai-asst-id', deepChatRef._activeService.rawBody.assistant_id);
-          openAIAsstSet = true;
-        }
-      };
-
-      deepChatRef.onComponentRender = () => {
-        // save key to localStorage.
-        // The event occurs before key is set, and again, after key is set.
-        if (!openAIKeySet && deepChatRef._activeService.key) {
-          localStorage.setItem('openai-key', deepChatRef._activeService.key);
-          openAIKeySet = true;
-        }
-      };
-
-      /*deepChatRef.responseInterceptor = (response) => {
-        //console.log(response); // printed above
-        return response;
-      };*/
-    });    
   </script>
+
   
   <main>
     <!--
@@ -185,16 +82,34 @@
           </div>
         </div>
       </div>-->
+    <div id="welcome" bind:this={welcomeRef}>
+      <div id="header"><img src="bidara.png" alt="girl with dark hair" height="57" width="57" /><h2>BIDARA</h2><br/><span class="small">Bio-Inspired Design and Research Assistant</span></div>
+      <h3>How to access</h3>
+      <ol>
+        <li><a href="https://platform.openai.com/signup">Create an OpenAI account</a></li>
+        <li><a href="https://platform.openai.com/login">Login to OpenAI Platform</a></li>
+        <li>In the left sidebar, navigate to <a href="https://platform.openai.com/account/billing/overview">Settings -&gt; Billing</a></li> <li>Click the 'Add payment details' button</li>
+        <li>Add a minimum of $5 in credits. It is required to spend a minimum of $5 to <a href="https://platform.openai.com/docs/guides/rate-limits/usage-tiers?context=tier-free">access GPT-4</a>.</li>
+        <li>In the left sidebar, navigate to <a href="https://platform.openai.com/api-keys">API Keys</a></li>
+        <li>Verify your phone number, then click the 'Create new secret key' button.</li> <li>Copy your secret key.</li>
+        <li>Paste your key into the input field below. Your browser will save the key, so you only have to enter it once.</li>
+      </ol>
+      <ul>
+        <li>With OpenAI API you only pay for what you use. Track your usage and costs on the <a href="https://platform.openai.com/usage">Usage page</a>.</li>
+        <li>After you send your first message to BIDARA, it will also be available to interact with through the <a href="https://platform.openai.com/assistants">OpenAI Assistants Playground</a>. This interface is more complex, but also provides more customizability. Just select BIDARA, then click the 'Test' button.</li>
+      </ul>
+    </div>
     <!-- demo/textInput are examples of passing an object directly into a property -->
     <!-- initialMessages is an example of passing a state object into a property -->
-    <deep-chat
+    {#await getKeyAndAsst() then keyAndAsst}
+    <deep-chat bind:this={deepChatRef}
       id="chat-element"
       directConnection={{
         openAI: {
-          key: openai_key,
-          validateKeyProperty: true,
+          key: keyAndAsst[0],
+          validateKeyProperty: keyAndAsst[0] ? false : true, // if apiKey is not null it has already been validated.
           assistant: {
-            assistant_id: openai_asst_id,
+            assistant_id: keyAndAsst[1],
             new_assistant: {
               model: "gpt-4-1106-preview",
               name: "BIDARA",
@@ -216,12 +131,14 @@
           }
         }
       }}
+      errorMessages={{
+        displayServiceErrorMessages: true
+      }}
+      onError={onError}
+      onNewMessage={onNewMessage}
+      onComponentRender={onComponentRender}
       _insertKeyViewStyles={{displayCautionText: false}}
       demo={false}
-      textToSpeech={{
-        pitch: "1.4",
-        rate: "1.4"
-      }}
       speechToText={{
         webSpeech: "true",
         commands: {
@@ -349,12 +266,54 @@
         }
       }}
     />
+    {/await}
+    
   </main>
+
 
   <style>
     main {
       font-family: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
       display: grid;
+    }
+
+    #welcome {
+      margin-bottom: -30dvh;
+      z-index: 1;
+      line-height: 1.5em;
+      padding-left: 1em;
+      padding-right: 1em;
+      display: none;
+    }
+
+    #welcome ol, #welcome ul {
+      padding-inline-start: 1.7em;
+    }
+
+    #welcome h2 {
+      font-weight: 200;
+      font-size: 2em;
+      line-height: 1em;
+      display: inline;
+    }
+
+    #welcome h3 {
+      margin-inline-start: .25em;
+    }
+
+    #header {
+      padding-top: 1.3em;
+      line-height: 1.15em;
+    }
+
+    #welcome #header img {
+      float: left;
+      margin-right: .1em;
+    }
+
+    #welcome #header .small {
+      font-size: .8em;
+      font-weight: 300;
     }
   </style>
 
