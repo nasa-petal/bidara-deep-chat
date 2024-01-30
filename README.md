@@ -29,8 +29,6 @@ npm run dev
 
 - deep-chat textToSpeech: doesn't read messages aloud on safari or chrome on iOS.
 
-- if user has used bidara (assistant id is set in localStorage), then if they delete the assistant, they will get an error. Only way to get rid of error is to delete the assistant id from localStorage. Try to catch the error, and delete the localStorage for them. https://deepchat.dev/docs/messages/#errorMessages
-
 ### Nice to haves
 
 - save chat logs.
