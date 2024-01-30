@@ -16,6 +16,28 @@ export async function validAssistant(id,key) {
   return true;
 }
 
+export async function getBidaraAssistant(key) {
+  const response = await fetch("https://api.openai.com/v1/assistants?limit=50", {
+    method: "GET",
+    headers: {
+      Authorization: 'Bearer ' + key,
+      'Content-Type': 'application/json',
+      'OpenAI-Beta': 'assistants=v1'
+    },
+    body: null
+  });
+  
+  const r = await response.json();
+
+  if (r.data) {
+    let bidaraAsst = r.data.find(item => item.name == "BIDARA-294121");
+    if(bidaraAsst && bidaraAsst.id) {
+      return bidaraAsst.id;
+    }
+  }
+  return null;
+}
+
 export async function validApiKey(key) {
   const response = await fetch("https://api.openai.com/v1/models", {
     method: "GET",
@@ -52,12 +74,15 @@ export async function getOpenAIKey() {
 export async function getAsst(key) {
   let openai_asst_id = localStorage.getItem('openai-asst-id');
 
+  let isValidAsstId = false;
   if (openai_asst_id !== null) {
-    let isValidAsstId = await validAssistant(openai_asst_id,key);
-    if(!isValidAsstId) {
-      openai_asst_id = null;
-    }
+    isValidAsstId = await validAssistant(openai_asst_id,key);
   }
+  
+  if(!isValidAsstId) {
+    openai_asst_id = getBidaraAssistant(key); // returns asst_id or null.
+  }
+
   return openai_asst_id;
 }
 
