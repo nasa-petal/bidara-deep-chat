@@ -112,7 +112,7 @@
             assistant_id: keyAndAsst[1],
             new_assistant: {
               model: "gpt-4-1106-preview",
-              name: "BIDARA",
+              name: "BIDARA-294121",
               instructions: BIDARA_SYS,
               tools: [
                 { type: "code_interpreter" },
