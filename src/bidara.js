@@ -1,4 +1,6 @@
-const BIDARA_SYS = `You are BIDARA, a biomimetic designer and research assistant, and a leading expert in biomimicry, biology, engineering, industrial design, environmental science, physiology, and paleontology. You were instructed by NASA's PeTaL project (https://www1.grc.nasa.gov/research-and-engineering/vine/petal/) to understand, learn from, and emulate the strategies used by living things to help users create sustainable designs and technologies.
+export const BIDARA_VERSION = "1.0" //
+
+export const BIDARA_SYS = `You are BIDARA, a biomimetic designer and research assistant, and a leading expert in biomimicry, biology, engineering, industrial design, environmental science, physiology, and paleontology. You were instructed by NASA's PeTaL project (https://www1.grc.nasa.gov/research-and-engineering/vine/petal/) to understand, learn from, and emulate the strategies used by living things to help users create sustainable designs and technologies.
 
 Your goal is to help the user work in a step by step way through the Biomimicry Design Process (https://toolbox.biomimicry.org/methods/process/) to propose biomimetic solutions to a challenge. Cite peer reviewed sources for your information. Stop often (at a minimum after every step) to ask the user for feedback or clarification.
 
@@ -66,7 +68,7 @@ Nature builds using abundant resources, incorporating rare resources only sparin
 Nature is locally attuned and responsive.
 Nature uses shape to determine functionality.`;
 
-const PAPER_SEARCH_FUNC = {
+export const PAPER_SEARCH_FUNC = {
   "name": "get_graph_paper_relevance_search",
   "description": "Search for academic papers. Examples:\n<ul>\n  <li><code>https://api.semanticscholar.org/graph/v1/paper/search?query=covid+vaccination&offset=100&limit=3</code></li>\n  <ul>\n    <li>Returns with total=576278, offset=100, next=103, and data is a list of 3 papers.</li>\n    <li>Each paper has its paperId and title.  </li>\n  </ul>\n  <li><code>https://api.semanticscholar.org/graph/v1/paper/search?query=covid&fields=url,abstract,authors</code></li>\n  <ul>\n    <li>Returns with total=639637, offset=0, next=100, and data is a list of 100 papers.</li>\n    <li>Each paper has paperId, url, abstract, and a list of authors.</li>\n    <li>Each author under that list has authorId and name.</li>\n  </ul>\n  <li><code>https://api.semanticscholar.org/graph/v1/paper/search?query=totalGarbageNonsense</code></li>\n  <ul>\n    <li>Returns with total=0, offset=0, and data is a list of 0 papers.</li>\n  </ul>\n  <li><code>https://api.semanticscholar.org/graph/v1/paper/search?query=covid&year=2020-2023&openAccessPdf&fieldsOfStudy=Physics,Philosophy&fields=title,year,authors</code></li>\n  <ul>\n    <li>Returns with total=8471, offset=0, next=10, and data is a list of 10 papers. </li>\n    <li>Filters to include only papers published between 2020-2023.</li>\n    <li>Filters to include only papers with open access PDFs.</li>\n    <li>Filters to include only papers that have a field of study either matching Physics or Philosophy.</li>\n    <li>Each paper has the fields paperId, title, year, and authors.</li>\n  </ul>\n  <br>\n    Limitations:\n    <ul>\n        <li>Can only return up to 1,000 relevance-ranked results. For larger queries, see \"/search/bulk\" or the Datasets API.</li>\n        <li>Can only return up to 10 MB of data at a time.</li>\n    </ul>\n</ul>",
   "parameters": {
@@ -126,4 +128,16 @@ const PAPER_SEARCH_FUNC = {
   }
 }
 
-export { BIDARA_SYS, PAPER_SEARCH_FUNC };
+export const BIDARA_CONFIG = {
+  model: "gpt-4-turbo-preview",
+  name: "BIDARAv"+BIDARA_VERSION,
+  instructions: BIDARA_SYS,
+  tools: [
+    { type: "code_interpreter" },
+    { type: "retrieval" },
+    { 
+      type: "function",
+      function: PAPER_SEARCH_FUNC
+    }
+  ]
+}
