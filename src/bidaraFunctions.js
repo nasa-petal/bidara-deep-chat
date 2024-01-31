@@ -49,14 +49,15 @@ async function genImage(params) {
     imageParams = imageParams.parameters;
   }
 
-  var imageDescription = JSON.stringify(imageParams.description);
+  var imageDescription = JSON.stringify(imageParams.description) + " Realistic depiction of the object and its environment. Stay true to science, engineering, and biology. DO NOT INCLUDE ANY WORDS OR BRANDING."
 
   const res = await getDalleImageGeneration(imageDescription);
-  const imageURL = res.data[0].url;
 
-  if (!imageURL) {
+  if (!res) {
     return "We are having trouble generating images at this time.";
   }
+
+  const imageURL = res.data[0].url;
 
   const imageWidth = 256;
   const imageHeight = 256;
@@ -75,7 +76,6 @@ export async function callFunc(functionDetails) {
     tmp = await ssSearch(functionDetails.arguments);
   }
   else if(functionDetails.name == "generate_image_from_description") {
-    console.log("gen_img")
     tmp = await genImage(functionDetails.arguments);
   }
   else if(functionDetails.name == "get_weather") {

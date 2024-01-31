@@ -101,30 +101,40 @@ export async function getDalleImageGeneration(prompt, image_size = null, image_q
   if (!image_quality) image_quality = "standard";
   if (!num_images) num_images = 1;
 
-  const key = await getOpenAIKey();
-  if (!key) {
+  try {
+    const key = await getOpenAIKey();
+    if (!key) {
+      return null;
+    }
+
+    const requestURL = "https://api.openai.com/v1/images/generations";
+
+    const request = {
+      method: "POST",
+      headers: {
+        'Authorization': 'Bearer ' + key,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: "dall-e-3",
+        prompt: prompt,
+        n: num_images,
+        size: image_size,
+        quality: image_quality
+      })
+    }
+
+    const response = await fetch(requestURL, request);
+
+    const r = await response.json();
+    if (r.error && r.error.type === 'invalid_request_error') {
+      return null;
+    }
+
+    return r;
+
+  } catch (e) {
+
     return null;
   }
-
-  const response = await fetch("https://api.openai.com/v1/images/generations", {
-    method: "POST",
-    headers: {
-      'Authorization': 'Bearer ' + key,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: "dall-e-3",
-      prompt: prompt,
-      n: num_images,
-      size: image_size,
-      quality: image_quality
-    })
-  });
-  
-  const r = await response.json();
-  if (r.error && r.error.type === 'invalid_request_error') {
-    return null;
-  }
-
-  return r;
 }
