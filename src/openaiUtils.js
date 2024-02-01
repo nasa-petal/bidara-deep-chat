@@ -1,10 +1,16 @@
 import * as bidara from "./bidara";
 
-export async function validAssistant(id,key) {
+let openaiKey = null;
+let openaiAsst = null;
+
+export async function validAssistant(id) {
+  if(!openaiKey) {
+    throw new Error('openai key not set. cannot validate assistant.');
+  }
   const response = await fetch("https://api.openai.com/v1/assistants/"+id, {
     method: "GET",
     headers: {
-      Authorization: 'Bearer ' + key,
+      Authorization: 'Bearer ' + openaiKey,
       'Content-Type': 'application/json',
       'OpenAI-Beta': 'assistants=v1'
     },
@@ -22,12 +28,15 @@ export async function validAssistant(id,key) {
   return false;
 }
 
-export async function updateAssistant(id,key) {
-  // returns true on successful update, false otherwise.
+export async function updateAssistant(id) {
+  // returns id on successful update, null otherwise.
+  if(!openaiKey) {
+    throw new Error('openai key not set. cannot update assistant.');
+  }
   const response = await fetch("https://api.openai.com/v1/assistants/"+id, {
     method: "POST",
     headers: {
-      Authorization: 'Bearer ' + key,
+      Authorization: 'Bearer ' + openaiKey,
       'Content-Type': 'application/json',
       'OpenAI-Beta': 'assistants=v1'
     },
@@ -36,18 +45,20 @@ export async function updateAssistant(id,key) {
   
   const r = await response.json();
   if (r.hasOwnProperty('id')) {
-    return true;
+    return r.id;
   }
-  return false;
+  return null;
 }
 
-export async function getBidaraAssistant(key) {
-
+export async function getBidaraAssistant() {
+  if(!openaiKey) {
+    throw new Error('openai key not set. cannot search for bidara assistant.');
+  }
   // get assistants
   const response = await fetch("https://api.openai.com/v1/assistants?limit=50", {
     method: "GET",
     headers: {
-      Authorization: 'Bearer ' + key,
+      Authorization: 'Bearer ' + openaiKey,
       'Content-Type': 'application/json',
       'OpenAI-Beta': 'assistants=v1'
     },
@@ -69,7 +80,8 @@ export async function getBidaraAssistant(key) {
       }
       else {
       // otherwise update it.
-        updateAssistant(bidaraAsst.id,key);
+        bidaraAsst.id = await updateAssistant(bidaraAsst.id);
+        return bidaraAsst.id;
       }
     }
   }
@@ -91,37 +103,68 @@ export async function validApiKey(key) {
 }
 
 export async function getOpenAIKey() {
+
+  // if openAIKey has already been validated, return it.
+  if (openaiKey) {
+    return openaiKey;
+  }
+
   const queryString = window.location.search;
   const urlParams = new URLSearchParams(queryString);
 
-  let openai_key = urlParams.get('key');
+  let localOpenAiKey = urlParams.get('key');
 
-  if (openai_key === null) {
-    openai_key = localStorage.getItem('openai-key');
+  if (localOpenAiKey === null) {
+    localOpenAiKey = localStorage.getItem('openai-key');
   }
-  if (openai_key !== null) {
+  if (localOpenAiKey !== null) {
     // validate key. if invalid set openai_key to null
-    let isValidApiKey = await validApiKey(openai_key);
+    let isValidApiKey = await validApiKey(localOpenAiKey);
     if(!isValidApiKey) {
-      openai_key = null;
+      openaiKey = null;
+    }
+    else {
+      openaiKey = localOpenAiKey;
     }
   }
-  return openai_key;
+  else {
+    openaiKey = null;
+  }
+  return openaiKey;
 }
 
-export async function getAsst(key) {
-  let openai_asst_id = localStorage.getItem('openai-asst-id');
+export function setOpenAIKey(key) {
+  // key must have already been validated
+  openaiKey = key;
+  localStorage.setItem('openai-key', openaiKey);
+}
+
+export async function getAsst() {
+  if(!openaiKey) {
+    throw new Error('openai key not set. cannot get assistant.');
+  }
+  if (openaiAsst) {
+    return openaiAsst;
+  }
+
+  openaiAsst = localStorage.getItem('openai-asst-id');
 
   let isValidAsstId = false;
-  if (openai_asst_id !== null) {
-    isValidAsstId = await validAssistant(openai_asst_id,key);
+  if (openaiAsst !== null) {
+    isValidAsstId = await validAssistant(openaiAsst);
   }
   
   if(!isValidAsstId) {
-    openai_asst_id = getBidaraAssistant(key); // returns asst_id or null.
+    openaiAsst = getBidaraAssistant(); // returns asst_id or null.
   }
 
-  return openai_asst_id;
+  return openaiAsst;
+}
+
+export function setAsst(id) {
+  // assistant id must have already been validated
+  openaiAsst = id;
+  localStorage.setItem('openai-asst-id', openaiAsst);
 }
 
 export async function getKeyAndAsst() {
@@ -130,6 +173,6 @@ export async function getKeyAndAsst() {
     return [null, null]
   }
 
-  let asst = await getAsst(key);
+  let asst = await getAsst();
   return [key, asst]
 }

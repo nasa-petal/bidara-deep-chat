@@ -6,7 +6,7 @@
     import { onMount } from 'svelte';
     import { BIDARA_CONFIG } from './bidara';
     import { funcCalling } from './bidaraFunctions';
-    import { getKeyAndAsst } from './openaiUtils';
+    import { setOpenAIKey, setAsst, getKeyAndAsst } from './openaiUtils';
     import hljs from "highlight.js";
     window.hljs = hljs;
   
@@ -17,7 +17,7 @@
     ];
 
     let openAIKeySet = false;
-    let openAIAsstSet = false;
+    let openAIAsstIdSet = false;
     let deepChatRef;
     let welcomeRef;
 
@@ -28,9 +28,9 @@
     function onNewMessage(message) {
       // save asst id to localStorage.
       // this function is called once for each message including initialMessages, ai messages, and user messages.
-      if (!openAIAsstSet && deepChatRef._activeService.rawBody.assistant_id) {
-        localStorage.setItem('openai-asst-id', deepChatRef._activeService.rawBody.assistant_id);
-        openAIAsstSet = true;
+      if (!openAIAsstIdSet && deepChatRef._activeService.rawBody.assistant_id) {
+        setAsst(deepChatRef._activeService.rawBody.assistant_id)
+        openAIAsstIdSet = true;
       }
     }
 
@@ -38,7 +38,7 @@
       // save key to localStorage.
       // The event occurs before key is set, and again, after key is set.
       if (!openAIKeySet && deepChatRef._activeService.key) {
-        localStorage.setItem('openai-key', deepChatRef._activeService.key);
+        setOpenAIKey(deepChatRef._activeService.key);
         openAIKeySet = true;
       }
       if(!openAIKeySet) {
