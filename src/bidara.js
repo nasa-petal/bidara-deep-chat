@@ -129,7 +129,7 @@ export const PAPER_SEARCH_FUNC = {
 }
 
 export const BIDARA_CONFIG = {
-  model: "gpt-4-turbo-preview",
+  model: "gpt-4-0125-preview",
   name: "BIDARAv"+BIDARA_VERSION,
   instructions: BIDARA_SYS,
   tools: [
