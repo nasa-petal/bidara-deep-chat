@@ -4,9 +4,9 @@
   <script>
     import { DeepChat } from "deep-chat-dev";
     import { onMount } from 'svelte';
-    import { BIDARA_SYS, PAPER_SEARCH_FUNC, GEN_IMAGE_FUNC } from './bidara';
+    import { BIDARA_CONFIG } from './bidara';
     import { funcCalling } from './bidaraFunctions';
-    import { getKeyAndAsst } from './openaiUtils';
+    import { setOpenAIKey, setAsst, getKeyAndAsst } from './openaiUtils';
     import hljs from "highlight.js";
     window.hljs = hljs;
   
@@ -17,7 +17,7 @@
     ];
 
     let openAIKeySet = false;
-    let openAIAsstSet = false;
+    let openAIAsstIdSet = false;
     let deepChatRef;
     let welcomeRef;
 
@@ -28,9 +28,9 @@
     function onNewMessage(message) {
       // save asst id to localStorage.
       // this function is called once for each message including initialMessages, ai messages, and user messages.
-      if (!openAIAsstSet && deepChatRef._activeService.rawBody.assistant_id) {
-        localStorage.setItem('openai-asst-id', deepChatRef._activeService.rawBody.assistant_id);
-        openAIAsstSet = true;
+      if (!openAIAsstIdSet && deepChatRef._activeService.rawBody.assistant_id) {
+        setAsst(deepChatRef._activeService.rawBody.assistant_id)
+        openAIAsstIdSet = true;
       }
     }
 
@@ -38,7 +38,7 @@
       // save key to localStorage.
       // The event occurs before key is set, and again, after key is set.
       if (!openAIKeySet && deepChatRef._activeService.key) {
-        localStorage.setItem('openai-key', deepChatRef._activeService.key);
+        setOpenAIKey(deepChatRef._activeService.key);
         openAIKeySet = true;
       }
       if(!openAIKeySet) {
@@ -110,23 +110,7 @@
           validateKeyProperty: keyAndAsst[0] ? false : true, // if apiKey is not null it has already been validated.
           assistant: {
             assistant_id: keyAndAsst[1],
-            new_assistant: {
-              model: "gpt-4-1106-preview",
-              name: "BIDARA-294121",
-              instructions: BIDARA_SYS,
-              tools: [
-                { type: "code_interpreter" },
-                { type: "retrieval" },
-                { 
-                  type: "function",
-                  function: PAPER_SEARCH_FUNC
-                },
-                {
-                  type: "function",
-                  function: GEN_IMAGE_FUNC
-                },
-              ]
-            },
+            new_assistant: BIDARA_CONFIG,
             function_handler: funcCalling
           }
         }
