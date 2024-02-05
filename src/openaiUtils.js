@@ -163,8 +163,10 @@ export async function getAsst() {
 
 export function setAsst(id) {
   // assistant id must have already been validated
-  openaiAsst = id;
-  localStorage.setItem('openai-asst-id', openaiAsst);
+  if(id) {
+    openaiAsst = id;
+    localStorage.setItem('openai-asst-id', openaiAsst);
+  }
 }
 
 export async function getKeyAndAsst() {
