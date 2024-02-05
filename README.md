@@ -24,7 +24,6 @@ npm run dev
 ```
 
 ### Known issues
-- if key is not saved in url or localStorage, a new assistant will be created even if one already exists. https://github.com/OvidijusParsiunas/deep-chat/issues/110
 - deep-chat speechToText: submit command word is sent in message on safari and chrome on iOS.
 
 - deep-chat textToSpeech: doesn't read messages aloud on safari or chrome on iOS.
