@@ -46,6 +46,7 @@
       // check for existing BIDARA asst, if user enters key in UI.
       if(openAIKeySet && !this._activeService.config.assistant_id) {
         this._activeService.config.assistant_id = await getBidaraAssistant();
+        this.directConnection.openAI.assistant.assistant_id = this._activeService.config.assistant_id
         setAsst(this._activeService.config.assistant_id);
       }
 
