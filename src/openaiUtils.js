@@ -178,3 +178,45 @@ export async function getKeyAndAsst() {
   let asst = await getAsst();
   return [key, asst]
 }
+
+export async function getDalleImageGeneration(prompt, image_size = null, image_quality = null, num_images = null) {
+  if (!image_size) image_size = "1024x1024";
+  if (!image_quality) image_quality = "standard";
+  if (!num_images) num_images = 1;
+
+  try {
+    if (!openaiKey) {
+      return null;
+    }
+
+    const requestURL = "https://api.openai.com/v1/images/generations";
+
+    const request = {
+      method: "POST",
+      headers: {
+        'Authorization': 'Bearer ' + openaiKey,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: "dall-e-3",
+        prompt: prompt,
+        n: num_images,
+        size: image_size,
+        quality: image_quality
+      })
+    }
+
+    const response = await fetch(requestURL, request);
+
+    const r = await response.json();
+    if (r.error && r.error.type === 'invalid_request_error') {
+      return null;
+    }
+
+    return r;
+
+  } catch (e) {
+
+    return null;
+  }
+}
