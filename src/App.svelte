@@ -6,7 +6,7 @@
     import { onMount } from 'svelte';
     import { BIDARA_CONFIG } from './bidara';
     import { funcCalling } from './bidaraFunctions';
-    import { setOpenAIKey, setAsst, getKeyAndAsst } from './openaiUtils';
+    import { setOpenAIKey, setAsst, getKeyAndAsst, getBidaraAssistant } from './openaiUtils';
     import hljs from "highlight.js";
     window.hljs = hljs;
   
@@ -18,29 +18,38 @@
 
     let openAIKeySet = false;
     let openAIAsstIdSet = false;
-    let deepChatRef;
     let welcomeRef;
 
     function onError(error) {
       console.log(error);
     }
 
-    function onNewMessage(message) {
-      // save asst id to localStorage.
+    function onNewMessage(message) { 
       // this function is called once for each message including initialMessages, ai messages, and user messages.
-      if (!openAIAsstIdSet && deepChatRef._activeService.rawBody.assistant_id) {
-        setAsst(deepChatRef._activeService.rawBody.assistant_id)
+
+      // save asst id to localStorage when new Assistant is made.
+      if (!openAIAsstIdSet && this._activeService.rawBody.assistant_id) {
+        setAsst(this._activeService.rawBody.assistant_id)
         openAIAsstIdSet = true;
       }
     }
 
-    function onComponentRender() {
+    async function onComponentRender() {
       // save key to localStorage.
       // The event occurs before key is set, and again, after key is set.
-      if (!openAIKeySet && deepChatRef._activeService.key) {
-        setOpenAIKey(deepChatRef._activeService.key);
+      if (!openAIKeySet && this._activeService.key) {
+        // if key set through UI, save it to localStorage.
+        setOpenAIKey(this._activeService.key);
         openAIKeySet = true;
       }
+
+      // check for existing BIDARA asst, if user enters key in UI.
+      if(openAIKeySet && !this._activeService.config.assistant_id) {
+        this._activeService.config.assistant_id = await getBidaraAssistant();
+        this.directConnection.openAI.assistant.assistant_id = this._activeService.config.assistant_id
+        setAsst(this._activeService.config.assistant_id);
+      }
+
       if(!openAIKeySet) {
         welcomeRef.style.display = "block";
       }
@@ -102,7 +111,7 @@
     <!-- demo/textInput are examples of passing an object directly into a property -->
     <!-- initialMessages is an example of passing a state object into a property -->
     {#await getKeyAndAsst() then keyAndAsst}
-    <deep-chat bind:this={deepChatRef}
+    <deep-chat
       id="chat-element"
       directConnection={{
         openAI: {
