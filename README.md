@@ -1,10 +1,13 @@
 ## <img src="https://github.com/nasa-petal/discord_bot/assets/1322063/c34b5526-7186-43fc-b00a-597ee773ca7b" width="40" align="left"/> BIDARA : Bio-Inspired Design and Research Assistant
 
+<img src="https://github.com/nasa-petal/bidara-deep-chat/assets/1322063/70d336c6-eb53-45cf-b3a1-156d6b479434" width="600" align="right"/>
+
 ### BIDARA is a GPT-4 chatbot that was instructed to help scientists and engineers understand, learn from, and emulate the strategies used by living things to create sustainable designs and technologies.
 
-### :rocket: [Try it online!](https://nasa-petal.github.io/bidara-deep-chat/) or [Use BIDARA in your own ChatGPT sessions](https://github.com/nasa-petal/bidara#use-bidara-in-your-own-chatgpt-session)
+### :rocket: [Try it online!](https://nasa-petal.github.io/bidara-deep-chat/) or [Use BIDARA in ChatGPT](https://github.com/nasa-petal/bidara#use-bidara-in-your-own-chatgpt-session)
 
 BIDARA can guide users through the Biomimicry Institute’s [Design Process](https://toolbox.biomimicry.org/methods/process/), a step-by-step method to propose biomimetic solutions to challenges. This process includes defining the problem, biologizing the challenge, discovering natural models, abstracting design strategies, and emulating nature's lessons.
+<br clear="both" />
 
 ## :fire: Features enabled
 
