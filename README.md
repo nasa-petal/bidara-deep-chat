@@ -10,7 +10,9 @@ BIDARA can guide users through the Biomimicry Institute’s [Design Process](htt
 
 &nbsp;&nbsp;&nbsp;&nbsp; :white_check_mark: **Code Interpreter** *[more info](https://platform.openai.com/docs/assistants/tools/code-interpreter), [filetypes supported](https://platform.openai.com/docs/assistants/tools/supported-files)*    
 &nbsp;&nbsp;&nbsp;&nbsp; :white_check_mark: **Knowledge Retrieval** *[more info](https://platform.openai.com/docs/assistants/tools/knowledge-retrieval), [filetypes supported](https://platform.openai.com/docs/assistants/tools/supported-files)*    
-&nbsp;&nbsp;&nbsp;&nbsp; :white_check_mark: **Function Calling** *(Semantic Scholar paper search)*
+&nbsp;&nbsp;&nbsp;&nbsp; :white_check_mark: **Function Calling**    
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; :ballot_box_with_check: *Paper Search with Semantic Scholar*    
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; :ballot_box_with_check: *Image Generation with DALL-E*
 
 ## :computer: For developers
 
@@ -37,8 +39,6 @@ npm run dev
 - Proxy requests to OpenAI through an authenticated API. Users can request access. Ability to generate api keys once authenticated. Authorized API keys required to communicate with API.
 
 - Show the quote from the file used to generate the response when BIDARA uses knowledge retrieval. https://platform.openai.com/docs/assistants/how-it-works/message-annotations 
-
-- DALLE-3 support for image generation. (Coming soon to Assistants API, or could implement using Function Calling) https://cookbook.openai.com/examples/creating_slides_with_assistants_api_and_dall-e3
 
 - GPT-4 vision support so it can 'see' images, including ones uploaded by users.
 
