@@ -6,7 +6,7 @@
     import { onMount } from 'svelte';
     import { BIDARA_CONFIG } from './bidara';
     import { funcCalling } from './bidaraFunctions';
-    import { setOpenAIKey, setAsst, getKeyAndAsst, getBidaraAssistant } from './openaiUtils';
+    import { setOpenAIKey, setAsst, setThread, getKeyAsstAndThread, getThread, getBidaraAssistant } from './openaiUtils';
     import hljs from "highlight.js";
     window.hljs = hljs;
   
@@ -18,19 +18,25 @@
 
     let openAIKeySet = false;
     let openAIAsstIdSet = false;
+    let openAIThreadIdSet = false;
     let welcomeRef;
 
     function onError(error) {
       console.log(error);
     }
 
-    function onNewMessage(message) { 
+    async function onNewMessage(message) { 
       // this function is called once for each message including initialMessages, ai messages, and user messages.
 
       // save asst id to localStorage when new Assistant is made.
       if (!openAIAsstIdSet && this._activeService.rawBody.assistant_id) {
         setAsst(this._activeService.rawBody.assistant_id)
         openAIAsstIdSet = true;
+      }
+
+      if (!openAIThreadIdSet && message.message._sessionId && message.message._sessionId != await getThread()) {
+        setThread(message.message._sessionId);
+        openAIThreadIdSet = true;
       }
     }
 
@@ -110,16 +116,18 @@
     </div>
     <!-- demo/textInput are examples of passing an object directly into a property -->
     <!-- initialMessages is an example of passing a state object into a property -->
-    {#await getKeyAndAsst() then keyAndAsst}
+    {#await getKeyAsstAndThread() then keyAsstAndThread}
     <deep-chat
       id="chat-element"
       directConnection={{
         openAI: {
-          key: keyAndAsst[0],
-          validateKeyProperty: keyAndAsst[0] ? false : true, // if apiKey is not null it has already been validated.
+          key: keyAsstAndThread[0],
+          validateKeyProperty: keyAsstAndThread[0] ? false : true, // if apiKey is not null it has already been validated.
           assistant: {
-            assistant_id: keyAndAsst[1],
+            assistant_id: keyAsstAndThread[1],
             new_assistant: BIDARA_CONFIG,
+            thread_id: keyAsstAndThread[2],
+            load_thread_history: keyAsstAndThread[2] ? true : false,
             function_handler: funcCalling
           }
         }

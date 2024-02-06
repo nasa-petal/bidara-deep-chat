@@ -169,14 +169,70 @@ export function setAsst(id) {
   }
 }
 
-export async function getKeyAndAsst() {
+export async function validThread(thread_id) {
+  if(!openaiKey) {
+    throw new Error('openai key not set. cannot validate thread.');
+  }
+  try {
+    const response = await fetch(`https://api.openai.com/v1/threads/${thread_id}`, {
+      method: "GET",
+      headers: {
+        Authorization: 'Bearer ' + openaiKey,
+        'Content-Type': 'application/json',
+        'OpenAI-Beta': 'assistants=v1'
+      },
+      body: null
+    });
+
+    const r = await response.json();
+    if (r.hasOwnProperty('error') && r.error.type === 'invalid_request_error') {
+      return false;
+    }
+
+    if (r.hasOwnProperty('id')) {
+      return true;
+    }
+    return false;
+  } catch (e) {
+    console.error("ERROR: " + e);
+    return false;
+  }
+}
+
+export async function getThread() {
+  console.log('get thread id');
+  const openaiThread = localStorage.getItem('openai-thread-id');
+
+  let isValidThreadId = false;
+  if (openaiThread !== null) {
+    isValidThreadId = await validThread(openaiThread);
+  }
+
+  if (isValidThreadId) {
+    return openaiThread;
+  }
+
+  return null;
+}
+
+export async function setThread(id) {
+  console.log('set thread id');
+  if (id && id != localStorage.getItem('openai-thread-id')) {
+    localStorage.setItem('openai-thread-id', id);
+  }
+}
+
+export async function getKeyAsstAndThread() {
   let key = await getOpenAIKey();
   if (key === null) {
-    return [null, null]
+    return [null, null, null]
   }
 
   let asst = await getAsst();
-  return [key, asst]
+
+  let thread = await getThread();
+
+  return [key, asst, thread]
 }
 
 export async function getDalleImageGeneration(prompt, image_size = null, image_quality = null, num_images = null) {
