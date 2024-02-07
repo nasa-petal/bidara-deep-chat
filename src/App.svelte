@@ -36,6 +36,7 @@
 
     onMount(async () => {
       keyAsstAndThread = await getKeyAsstAndThread();
+      threads = getThreads();
       chat_name = keyAsstAndThread[2]?.name ? keyAsstAndThread[2].name : "";
     });
 

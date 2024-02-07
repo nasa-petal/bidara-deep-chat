@@ -29,6 +29,8 @@ export async function getThread() {
 
     setThreads([new_thread]);
     setThread(new_thread);
+
+    return new_thread;
   }
 
   return null;
