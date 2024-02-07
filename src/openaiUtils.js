@@ -199,13 +199,37 @@ export async function validThread(thread_id) {
   }
 }
 
+export async function getNewThread() {
+  if (!openaiKey) {
+    throw new Error('openai key not set. cannot get new thread.');
+  }
+  const response = await fetch("https://api.openai.com/v1/threads", {
+    method: "POST",
+    headers: {
+      Authorization: 'Bearer ' + openaiKey,
+      'Content-Type': 'application/json',
+      'OpenAI-Beta': 'assistants=v1'
+    },
+    body: null
+  });
+  
+  const r = await response.json();
+  if (r.hasOwnProperty('error') && r.error.type === 'invalid_request_error') {
+    return null;
+  }
+
+  if (r.hasOwnProperty('id')) {
+    return r.id;
+  }
+  return null;
+}
+
 export async function getThread() {
-  console.log('get thread id');
-  const openaiThread = localStorage.getItem('openai-thread-id');
+  const openaiThread = JSON.parse(localStorage.getItem('openai-thread-id'));
 
   let isValidThreadId = false;
   if (openaiThread !== null) {
-    isValidThreadId = await validThread(openaiThread);
+    isValidThreadId = await validThread(openaiThread.id);
   }
 
   if (isValidThreadId) {
@@ -215,11 +239,36 @@ export async function getThread() {
   return null;
 }
 
-export async function setThread(id) {
-  console.log('set thread id');
-  if (id && id != localStorage.getItem('openai-thread-id')) {
-    localStorage.setItem('openai-thread-id', id);
+export async function setThread(thread) {
+  const current_thread = JSON.parse(localStorage.getItem('openai-thread-id'))
+  if (!current_thread || thread.id != current_thread.id) {
+    localStorage.setItem('openai-thread-id', JSON.stringify(thread));
   }
+}
+
+export function getThreads() {
+  const threads = JSON.parse(localStorage.getItem('threads'));
+
+  if (threads === null) {
+    return [];
+  }
+
+  return threads;
+}
+
+export function setThreads(threads) {
+  const str_threads = JSON.stringify(threads);
+  localStorage.setItem('threads', str_threads);
+}
+
+export function deleteThreadFromThreads(thread_id) {
+  const threads = getThreads();
+
+  const updatedThreads = threads.filter(thread => thread.id !== thread_id);
+
+  setThreads(updatedThreads);
+
+  return updatedThreads;
 }
 
 export async function getKeyAsstAndThread() {
@@ -231,8 +280,15 @@ export async function getKeyAsstAndThread() {
   let asst = await getAsst();
 
   let thread = await getThread();
+  if (thread === null) {
+    const thread_id = await getNewThread();
 
-  return [key, asst, thread]
+    thread = {name: "New Chat", id: thread_id};
+    setThreads([thread]);
+    setThread(thread);
+  }
+
+  return [key, asst, thread?.id]
 }
 
 export async function getDalleImageGeneration(prompt, image_size = null, image_quality = null, num_images = null) {
