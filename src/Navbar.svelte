@@ -1,12 +1,11 @@
 <script>
-  import { onMount } from 'svelte';
     import Logo from './Logo.svelte'
     import Hamburger from './Hamburger.svelte'
 	
     export let sidebar = false
     export let chat_name;
     export let handleRename;
-
+    
     let editing_name = false;
     let editing_button;
 
@@ -21,10 +20,14 @@
     async function handleButtonKeyDown(event) {
       if (event.key === 'Enter') {
         const new_chat_name = event.target.textContent;
-        chat_name = new_chat_name;
+
+        if (new_chat_name) {
+          chat_name = new_chat_name;
+          await handleRename(chat_name);
+        }
+
         editing_name = false;
 
-        await handleRename(chat_name);
       } else if (event.key === ' '){
         event.preventDefault();
         document.execCommand('insertText', false, ' ');
@@ -57,6 +60,10 @@
   header {
     z-index: 10;
     border-bottom: 1px solid rgb(229, 229, 234);
+  }
+
+  button {
+    padding: 0.5em;
   }
 
 </style>

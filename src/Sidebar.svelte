@@ -11,7 +11,7 @@
 
 <sidebar class:open>
   <aside class="absolute full shadow-lg flex flex-col justify-between" class:open>
-    <nav class="pt-2 px-2 w-full">
+    <nav class="px-2 w-full">
       {#if threads !== null}
         {#each threads as thread}
           <Chat handleClick={handleChatSelect} handleDelete={handleChatDelete} bind:thread/>
