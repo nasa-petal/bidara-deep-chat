@@ -8,7 +8,9 @@
     import Navbar from './Navbar.svelte';
     import { BIDARA_CONFIG } from './bidara';
     import { funcCalling } from './bidaraFunctions';
-    import { setOpenAIKey, setAsst, getKeyAsstAndThread, setThread, getThread, deleteThreadFromThreads, getNewThread, getThreads, setThreads, getBidaraAssistant } from './openaiUtils';
+    import { setOpenAIKey, setAsst, getKeyAsstAndThread, getBidaraAssistant } from './openaiUtils';
+    import { setThread, getThread, deleteThreadFromThreads, getNewThread, getThreads, setThreads, setActiveThreadName } from './threadUtils';
+    import { getStoredActiveThread } from './storageUtils';
     import hljs from "highlight.js";
     window.hljs = hljs;
   
@@ -26,6 +28,7 @@
     export let open = false;
 
     let threads = getThreads();
+    let chat_name = "";
     
     function onError(error) {
       console.log(error);
@@ -33,6 +36,7 @@
 
     onMount(async () => {
       keyAsstAndThread = await getKeyAsstAndThread();
+      chat_name = keyAsstAndThread[2]?.name ? keyAsstAndThread[2].name : "";
     });
 
     async function onNewMessage(message) { 
@@ -65,11 +69,7 @@
         this._activeService.config.assistant_id = await getBidaraAssistant();
         this.directConnection.openAI.assistant.assistant_id = this._activeService.config.assistant_id
         await setAsst(this._activeService.config.assistant_id);
-
-        keyAsstAndThread = await getKeyAsstAndThread();
       }
-
-      this.directConnection.openAI.assistant.thread_id = await getThread();
 
       if(!openAIKeySet) {
         welcomeRef.style.display = "block";
@@ -80,9 +80,9 @@
     }
 
     async function newThreadAndSwitch() {
-      const thread_id = await getNewThread();
+      const new_thread = await getNewThread();
 
-      const new_thread = {name: "New Chat", id: thread_id};
+      // force new object so Siderbar rerenders
       threads = [ new_thread ].concat(threads);
 
       setThreads(threads);
@@ -93,24 +93,31 @@
     async function deleteThreadAndSwitch(thread) {
       threads = deleteThreadFromThreads(thread.id);
 
-      const deepChatRef = document.getElementById('chat-element');
+      if (threads && threads.length > 0) {
+        const current_thread = getStoredActiveThread();
+        const candidate_thread = threads[0];
 
-      const candidate_thread = threads[0];
-      const current_thread = deepChatRef.directConnection.openAI.assistant.thread_id
-
-      if (candidate_thread && thread.id === current_thread.id) {
-        switchActiveThread(candidate_thread);
-      } else if (!candidate_thread && thread.id === current_thread.id) {
+        if (candidate_thread && candidate_thread !== current_thread) {
+          switchActiveThread(candidate_thread);
+        }
+      } else {
         newThreadAndSwitch();
       }
     }
     
     async function switchActiveThread(thread) {
-      const deepChatRef = document.getElementById('chat-element');
 
       await setThread(thread);
-      keyAsstAndThread = getKeyAsstAndThread();
+      keyAsstAndThread = await getKeyAsstAndThread();
+      chat_name = thread.name;
+
+      // reload messages
+      const deepChatRef = document.getElementById('chat-element');
       deepChatRef.initialMessages = initialMessages;
+    }
+
+    async function renameActiveThread(name) {
+      threads = await setActiveThreadName(name);
     }
 
   </script>
@@ -167,7 +174,7 @@
         <li>After you send your first message to BIDARA, it will also be available to interact with through the <a href="https://platform.openai.com/assistants">OpenAI Assistants Playground</a>. This interface is more complex, but also provides more customizability. Just select BIDARA, then click the 'Test' button.</li>
       </ul>
     </div>
-    <Navbar bind:sidebar={open}/>   
+    <Navbar bind:chat_name bind:sidebar={open} handleRename={renameActiveThread}/>   
       <div id="content-container" class:open>
         {#key threads.length}
         <Sidebar handleChatSelect={switchActiveThread} handleChatDelete={deleteThreadAndSwitch} handleChatNew={newThreadAndSwitch} bind:threads bind:open/>
@@ -186,7 +193,7 @@
               assistant: {
                 assistant_id: keyAsstAndThread[1],
                 new_assistant: BIDARA_CONFIG,
-                thread_id: keyAsstAndThread[2] ? keyAsstAndThread[2] : null,
+                thread_id: keyAsstAndThread[2] ? keyAsstAndThread[2]?.id : null,
                 load_thread_history: keyAsstAndThread[2] ? true : false,
                 function_handler: funcCalling
               }

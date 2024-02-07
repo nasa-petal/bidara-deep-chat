@@ -23,6 +23,7 @@
 	}
 	
 	button {
+		width: 94px;
 		z-index: 2;
 	}
 	
