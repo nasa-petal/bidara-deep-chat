@@ -1,5 +1,8 @@
 import * as bidara from "./bidara";
 
+import { getStoredAPIKey, getStoredAsstId, setStoredAPIKey, setStoredAsstId } from "./storageUtils";
+import { getThread } from "./threadUtils";
+
 let openaiKey = null;
 let openaiAsst = null;
 
@@ -115,7 +118,7 @@ export async function getOpenAIKey() {
   let localOpenAiKey = urlParams.get('key');
 
   if (localOpenAiKey === null) {
-    localOpenAiKey = localStorage.getItem('openai-key');
+    localOpenAiKey = getStoredAPIKey();
   }
   if (localOpenAiKey !== null) {
     // validate key. if invalid set openai_key to null
@@ -136,7 +139,7 @@ export async function getOpenAIKey() {
 export function setOpenAIKey(key) {
   // key must have already been validated
   openaiKey = key;
-  localStorage.setItem('openai-key', openaiKey);
+  setStoredAPIKey(openaiKey);
 }
 
 export async function getAsst() {
@@ -147,7 +150,7 @@ export async function getAsst() {
     return openaiAsst;
   }
 
-  openaiAsst = localStorage.getItem('openai-asst-id');
+  openaiAsst = getStoredAsstId();
 
   let isValidAsstId = false;
   if (openaiAsst !== null) {
@@ -165,7 +168,7 @@ export function setAsst(id) {
   // assistant id must have already been validated
   if(id) {
     openaiAsst = id;
-    localStorage.setItem('openai-asst-id', openaiAsst);
+    setStoredAsstId(openaiAsst);
   }
 }
 
@@ -199,7 +202,7 @@ export async function validThread(thread_id) {
   }
 }
 
-export async function getNewThread() {
+export async function getNewThreadId() {
   if (!openaiKey) {
     throw new Error('openai key not set. cannot get new thread.');
   }
@@ -224,52 +227,6 @@ export async function getNewThread() {
   return null;
 }
 
-export async function getThread() {
-  const openaiThread = JSON.parse(localStorage.getItem('openai-thread-id'));
-
-  let isValidThreadId = false;
-  if (openaiThread !== null) {
-    isValidThreadId = await validThread(openaiThread.id);
-  }
-
-  if (isValidThreadId) {
-    return openaiThread;
-  }
-
-  return null;
-}
-
-export async function setThread(thread) {
-  const current_thread = JSON.parse(localStorage.getItem('openai-thread-id'))
-  if (!current_thread || thread.id != current_thread.id) {
-    localStorage.setItem('openai-thread-id', JSON.stringify(thread));
-  }
-}
-
-export function getThreads() {
-  const threads = JSON.parse(localStorage.getItem('threads'));
-
-  if (threads === null) {
-    return [];
-  }
-
-  return threads;
-}
-
-export function setThreads(threads) {
-  const str_threads = JSON.stringify(threads);
-  localStorage.setItem('threads', str_threads);
-}
-
-export function deleteThreadFromThreads(thread_id) {
-  const threads = getThreads();
-
-  const updatedThreads = threads.filter(thread => thread.id !== thread_id);
-
-  setThreads(updatedThreads);
-
-  return updatedThreads;
-}
 
 export async function getKeyAsstAndThread() {
   let key = await getOpenAIKey();
@@ -280,15 +237,8 @@ export async function getKeyAsstAndThread() {
   let asst = await getAsst();
 
   let thread = await getThread();
-  if (thread === null) {
-    const thread_id = await getNewThread();
 
-    thread = {name: "New Chat", id: thread_id};
-    setThreads([thread]);
-    setThread(thread);
-  }
-
-  return [key, asst, thread?.id]
+  return [key, asst, thread]
 }
 
 export async function getDalleImageGeneration(prompt, image_size = null, image_quality = null, num_images = null) {
