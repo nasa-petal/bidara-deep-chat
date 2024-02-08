@@ -10,7 +10,7 @@
     import { funcCalling } from './bidaraFunctions';
     import { setOpenAIKey, setAsst, getKeyAsstAndThread, getBidaraAssistant } from './openaiUtils';
     import { setThread, getThread, deleteThreadFromThreads, getNewThread, getThreads, setThreads, setActiveThreadName } from './threadUtils';
-    import { getStoredActiveThread } from './storageUtils';
+    import { filterStoredThreads, getStoredActiveThread } from './storageUtils';
     import hljs from "highlight.js";
     window.hljs = hljs;
   
@@ -81,6 +81,18 @@
     }
 
     async function newThreadAndSwitch() {
+      const deepChatRef = document.getElementById('chat-element');
+      const currrent_messages = deepChatRef.getMessages();
+      if (currrent_messages.length <= initialMessages.length) {
+        return;
+      } else {
+        const new_threads = filterStoredThreads((thread) => thread.name === 'New Chat');
+        if (new_threads.length > 0) {
+          switchActiveThread(new_threads[0]);
+          return;
+        }
+      }
+
       const new_thread = await getNewThread();
 
       // force new object so Siderbar rerenders
@@ -369,7 +381,7 @@
       .open #chat-container {
         margin-left: 0;
       }
-    }   }
+    }
 
     main {
       font-family: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
