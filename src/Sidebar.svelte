@@ -9,9 +9,8 @@
 
 </script>
 
-<sidebar class:open>
   <aside class="absolute full shadow-lg flex flex-col justify-between" class:open>
-    <nav class="px-2 w-full">
+    <nav class="w-full">
       {#if threads !== null}
         {#each threads as thread}
           <Chat handleClick={handleChatSelect} handleDelete={handleChatDelete} bind:thread/>
@@ -20,27 +19,22 @@
     </nav>
     <button class="new-thread text-base font-sans bg-gray-400 p-2 focus:outline-none" on:click={handleChatNew}>New Thread</button>
   </aside>
-</sidebar>
 
 <style>
-	sidebar {
-    z-index: -1;
-	}
 
   aside {
-    width: 16.6%;
+    z-index: 20;
+    width: 20%;
     height: calc(100dvh - 3em);
-		left: -16.7%;
-    transition: ease-out 0.3s;
+    left: -20%;
+    transition: ease 0.3s;
     background-color: rgba(229, 229, 234);
     border-right: 1px solid rgb(209, 209, 214);
-    padding: 0.22em;
   }
 	
-	.open {
+  .open {
     left: 0;
-    z-index: 20;
-	}
+  }
 
   .new-thread {
     line-height: 1em;
@@ -49,9 +43,20 @@
     margin-bottom: 1em;
   }
 
+  @media only screen and (max-width: 1000px) {
+    .open {
+      width: 30%;
+    }
+  }
+
+  @media only screen and (max-width: 900px) {
+    .open {
+      width: 40%;
+    }
+  }
+
   @media only screen and (max-width: 700px) {
     .open {
-      z-index: 20;
       width: 100%;
     }
   }
