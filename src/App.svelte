@@ -364,7 +364,12 @@
       .open #chat-container {
         margin-left: 40%;
       }
-    }
+ 
+    @media only screen and (max-width: 700px) {
+      .open #chat-container {
+        margin-left: 0;
+      }
+    }   }
 
     main {
       font-family: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
