@@ -347,11 +347,23 @@
     
     #chat-container {
       margin-left: 0;
-      transition: margin-left ease-out 0.5s;
+      transition: margin-left ease 0.3s;
+    }
+    
+    .open #chat-container {
+      margin-left: 20%;
     }
 
-    .open {
-      margin-left: 16.6%;
+    @media only screen and (max-width: 1000px) {
+      .open #chat-container {
+        margin-left: 30%;
+      }
+    }
+
+    @media only screen and (max-width: 900px) {
+      .open #chat-container {
+        margin-left: 40%;
+      }
     }
 
     main {
