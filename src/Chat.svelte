@@ -4,15 +4,59 @@
     export let handleClick = null;
     export let handleDelete = null;
 
+
+    import { draggable } from 'svelte-agnostic-draggable'
+
+    /**** map all touch events to mouse events ****/
+
+      import mapTouchToMouseFor from 'svelte-touch-to-mouse'
+    mapTouchToMouseFor('.draggable');
+
+    /**** event handlers ****/
+    let initialLeft = 0;
+    let initialOffset = 0;
+    let deltaX = 0;
+    let touching = false;
+
+    let wasDragged = false
+    function onMouseDown () { 
+        wasDragged = false; 
+    }
+
+    function onDragStart (event) { 
+        touching = true;
+        wasDragged = true;
+    }
+
+    function onDrag(event) {
+        if (!touching || !wasDragged) return;
+
+        const position = event.detail.position.left;
+        deltaX = position - initialLeft;
+
+        if (deltaX >= 0) {
+            event.detail.position.left = 0;
+        }
+    }
+
+    function onMouseUp (event) {
+        if (! wasDragged) {
+          console.log('button was clicked')
+        }
+
+        touching = false;
+    }
 </script>
 
-<div class="container flex items-center">
-    <button class="chat-button flex justify-between text-base font-sans block w-full focus:outline-none" class:open on:click={() => handleClick(thread)}>{thread.name} </button>
-    <a class="trash text-base font-sans bg-gray-400" on:click={() => handleDelete(thread)}>
-        <img class="trash-image unfocused" src="trash-can-red.svg" alt="delete"/>
-        <img class="trash-image focused" src="trash-can-white.svg" alt="delete"/>
-    </a>
-</div>
+<a class="container">
+    <div class="draggable innner-container chat-text flex justify-between items-center py-0" class:touching use:draggable={{axis:'x', revert: 'true', revertDuration:'200'}} on:mousedown={onMouseDown} on:mouseup={onMouseUp} on:drag:start={onDragStart} on:drag:move={onDrag}>
+        <p class="chat-button my-0 text-base font-sans block w-full focus:outline-none" class:open>{thread.name}</p>
+        <img class="drag-image" src="chevron-right-blue.svg" alt="drag"/>
+    </div>
+    <div id="trash" class="trash flex justify-end items-center">
+        <img class="trash-image" src="trash-can-white.svg" alt="trash"/>
+    </div>
+</a>
 
 <style>
     .chat-button {
@@ -23,62 +67,64 @@
     }
 
     .chat-button:active,
-    .chat-button:hover {
+    .chat-button:hover,
+    .chat-button:-moz-drag-over {
         background-color: rgba(0,0,0,0);
     }
 
+    .draggable {
+        left: 0;
+        cursor: grab; pointer-events: auto;
+        z-index: 11;
+        -webkit-touch-callout:none;
+        -ms-touch-action:none; touch-action:none;
+        -moz-user-select:none; -webkit-user-select:none; -ms-user-select:none; user-select:none;
+    }
+
     .container {
-        border-bottom: 1px solid rgb(209, 209, 214);
+        position: relative;
+    }
+
+
+    .chat-text {
         padding: 1em;
-        background-color: rgba(0, 122, 255, 0);
+        background-color: rgb(229, 229, 234);
         transition: background-color 0.1s ease;
-    }
-
-    .unfocused {
-        opacity: 100%;
-        display: block;
-        transition: opacity 0.5s ease display ease 0.5s;
-    }
-
-    .focused {
-        opacity: 0%;
-        display: none;
-        transition: opacity 0.5s ease display ease 0.5s;
     }
 
     .trash-image {
         width: 15px;
         height: 15px;
+        margin-right: 1em;
+    }
+
+    .drag-image {
+        width: 15px;
+        height: 15px;
+        transform: rotate(180deg);
     }
 
     .trash {
-        display: none;
-        border-radius: 2em;
-        background-color: rgba(229, 229, 234);
-        padding: 0.5em;
+        z-index: 9;
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        left: 0;
+        top: 0;
+        background-color: rgb(255, 59, 48);
         transition: background-color 0.3s ease;
     }
 
-    .container:hover {
-        background-color: rgba(0, 122, 255, 0.9);
+    .inner-container {
+        z-index: 10;
+        left: 0;
+        top: 0;
+        position: absolute;
+        border-bottom: 1px solid rgb(209, 209, 214);
     }
-
-    .container:hover .trash {
-        display: block;
-    }
-
-    .trash:hover .unfocused{
-        opacity: 0%;
-        display: none;
-    }
-
-    .trash:hover .focused{
-        opacity: 100%;
-        display: block;
-    }
-
-    .trash:hover {
-        cursor: pointer;
-        background-color: rgb(255, 59, 48);
+    .inner-container:hover,
+    .inner-container:focus,
+    .touching {
+        background-color: rgb(0, 122, 255);
     }
 </style>
