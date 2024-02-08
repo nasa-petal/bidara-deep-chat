@@ -27,6 +27,7 @@
     width: 20%;
     height: calc(100dvh - 3em);
     left: -20%;
+    margin-top: -1px;
     transition: ease 0.3s;
     background-color: rgba(229, 229, 234);
     border-right: 1px solid rgb(209, 209, 214);
