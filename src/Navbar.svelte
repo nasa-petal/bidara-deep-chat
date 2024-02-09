@@ -5,8 +5,6 @@
     export let sidebar = false
     export let chat_name;
     export let handleRename;
-    export let keyat;
-    console.log(keyat);
     
     let editing_name = false;
     let editing_button;

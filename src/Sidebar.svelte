@@ -40,8 +40,7 @@
     width: 20%;
     height: calc(100dvh - 3.1em);
     left: -20%;
-    transition: ease 0.3s;
-    transition: background-color 0.3s ease;
+    transition: width ease 0.3s;
     background-color: rgb(229, 229, 234);
     border-right: 1px solid rgb(199, 199, 204);
   }

@@ -79,7 +79,6 @@
 
     function onMouseUp () {
         if (! wasDragged && ! clicked) {
-            console.log("click");
             handleClick(thread);
             clicked = true;
         }
