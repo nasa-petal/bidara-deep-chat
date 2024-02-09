@@ -25,28 +25,42 @@
     let openAIThreadIdSet = false;
     let keyAsstAndThread = null;
     let welcomeRef;
+    let navbarRef;
+    let sidebarRef;
+    let deepChatRef;
+    let deepChatWidth = "100dvw"
     let contentRef;
     export let open = false;
 
     let threads = getThreads();
     let selectedThreadId;
-    let chatName = "";
+    let selectedThreadName = "";
     
     function onError(error) {
       console.log(error);
     }
 
-    onMount(async () => {
+    async function initKeyAsstAndThreads() {
       keyAsstAndThread = await getKeyAsstAndThread();
-      threads = getThreads();
-      chatName = keyAsstAndThread[2]?.name ? keyAsstAndThread[2].name : "";
-      selectedThreadId = keyAsstAndThread[2]?.id ? keyAsstAndThread[2].id : "";
 
-      if (threads.length <= 0 && chatName) {
-        threads = [keyAsstAndThread[2]];
-        setThreads(threads);
+      if (keyAsstAndThread && keyAsstAndThread[0]) {
+
+        threads = getThreads();
+        selectedThreadName = keyAsstAndThread[2]?.name ? keyAsstAndThread[2].name : "";
+        selectedThreadId = keyAsstAndThread[2]?.id ? keyAsstAndThread[2].id : "";
+
+        if (selectedThreadId) {
+          setThread({name: selectedThreadName, id: selectedThreadId});
+        }
+
+        if (threads.length <= 0 && selectedThreadName) {
+          threads = [keyAsstAndThread[2]];
+          setThreads(threads);
+        }
       }
-    });
+
+      return keyAsstAndThread;
+    }
 
     async function onNewMessage(message) { 
       // this function is called once for each message including initialMessages, ai messages, and user messages.
@@ -85,17 +99,16 @@
 
       if(!openAIKeySet) {
         welcomeRef.style.display = "block";
-        contentRef.style.display = "none";
-        
+        navbarRef.style.display = "none";
       }
       else {
         welcomeRef.style.display = "none";
-        contentRef.style.display = "block";
+        navbarRef.style.display = "block";
+        deepChatWidth = "100%";
       }
     }
 
     async function newThreadAndSwitch() {
-      const deepChatRef = document.getElementById('chat-element');
       const currrent_messages = deepChatRef.getMessages();
 
       if (currrent_messages.length <= initialMessages.length) {
@@ -113,7 +126,6 @@
     }
 
     async function deleteThreadAndSwitch(thread) {
-      const deepChatRef = document.getElementById('chat-element');
       const currrent_messages = deepChatRef.getMessages();
 
 
@@ -121,7 +133,6 @@
         return;
       } 
 
-      console.log("deleting: " + JSON.stringify(thread));
 
       threads = deleteThreadFromThreads(thread.id);
       if (threads && threads.length > 0) {
@@ -138,15 +149,13 @@
     }
     
     async function switchActiveThread(thread) {
-      console.log("switch thread to: " + thread.id);
 
       await setThread(thread);
       keyAsstAndThread = await getKeyAsstAndThread();
       selectedThreadId = keyAsstAndThread[2].id;
-      chatName = thread.name;
+      selectedThreadName = thread.name;
 
       // reload messages
-      const deepChatRef = document.getElementById('chat-element');
       deepChatRef.initialMessages = initialMessages;
     }
 
@@ -191,7 +200,7 @@
           </div>
         </div>
       </div>-->
-    <div id="welcome" bind:this={welcomeRef}>
+      <div id="welcome" style={" display: none "}; bind:this={welcomeRef}>
       <div id="header"><img src="bidara.png" alt="girl with dark hair" height="57" width="57" /><h2>BIDARA</h2><br/><span class="small">Bio-Inspired Design and Research Assistant</span></div>
       <h3>How to access</h3>
       <ol>
@@ -209,18 +218,24 @@
       </ul>
     </div>
     <div>
-    <div id="content-container" bind:this={contentRef} class:open>
-      <Navbar bind:chat_name={chatName} bind:sidebar={open} keyat={keyAsstAndThread} handleRename={renameActiveThread}/>   
+    <div id="content-container" class:open>
+      <div bind:this={navbarRef}>
+      <Navbar bind:this={navbarRef} bind:chat_name={selectedThreadName} bind:sidebar={open} handleRename={renameActiveThread}/>   
+      </div>
+      <div bind:this={sidebarRef}>
         {#key selectedThreadId}
-        <Sidebar handleChatSelect={switchActiveThread} handleChatDelete={deleteThreadAndSwitch} handleChatNew={newThreadAndSwitch} bind:threads bind:open bind:selectedThreadId/>
+        <Sidebar bind:this={sidebarRef} handleChatSelect={switchActiveThread} handleChatDelete={deleteThreadAndSwitch} handleChatNew={newThreadAndSwitch} bind:threads bind:open bind:selectedThreadId/>
         {/key}
+      </div>
+      {#key deepChatWidth}
       <div id="chat-container">
         <!-- demo/textInput are examples of passing an object directly into a property -->
         <!-- initialMessages is an example of passing a state object into a property -->
-        {#if keyAsstAndThread}
         {#key keyAsstAndThread}
+        {#await initKeyAsstAndThreads()}
         <deep-chat
           id="chat-element"
+          bind:this={deepChatRef}
           directConnection={{
             openAI: {
               key: keyAsstAndThread[0],
@@ -325,7 +340,7 @@
           }}
           initialMessages={initialMessages}
           chatStyle={{
-            width: "100%",
+            width: deepChatWidth,
             height: "calc(100dvh - 3em)",
             backgroundColor: "white",
             border: "none",
@@ -369,9 +384,10 @@
             }
           }}
         />
+        {/await}
         {/key}
-        {/if}
       </div>
+      {/key}
     </div>
     </div>
     
@@ -379,24 +395,31 @@
 
 
   <style>
-    
+    #content-container {
+      width: 100dvw;
+    }
+
     #chat-container {
+      width: 100%;
       margin-left: 0;
-      transition: margin-left ease 0.3s;
+      transition: ease 0.3s;
     }
     
     .open #chat-container {
+      width: 80%;
       margin-left: 20%;
     }
 
     @media only screen and (max-width: 1000px) {
       .open #chat-container {
+        width: 70%;
         margin-left: 30%;
       }
     }
 
     @media only screen and (max-width: 900px) {
       .open #chat-container {
+        width: 30;
         margin-left: 40%;
       }
  

@@ -76,7 +76,6 @@ export async function setActiveThreadName(name) {
   })
 
   active_thread.name = name;
-  console.log("thread: " + JSON.stringify(active_thread));
 
   setThread(active_thread);
   setThreads(new_threads);
