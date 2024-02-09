@@ -6,6 +6,7 @@
     export let selected = false;
 
     import { draggable } from 'svelte-agnostic-draggable'
+    import { onMount } from 'svelte';
 
     /**** map all touch events to mouse events ****/
 
@@ -13,19 +14,31 @@
     mapTouchToMouseFor('.draggable');
 
     /**** event handlers ****/
-    let initialLeft = 0;
-    let initialOffset = 0;
-    let deltaX = 0;
-    let touching = false;
 
-    let wasDragged = false
-    let width;
-    let deleteThresh;
-    let maxDrag;
-    let position;
     const chatId = "chat-"+thread.id;
     const trashId = "trash-"+thread.id;
-    
+
+    let touching = false;
+    let wasDragged = false
+    let clicked = selected;
+
+    let deltaX = 0;
+    let maxDrag;
+    let deleteThresh;
+
+    let initialLeft = 0;
+    let width;
+    let position;
+
+    let rendered = false;
+
+    // not a great solution, but forces '.chat-button' to render before '.trash' to prevent flickering
+    onMount(() => {
+        setTimeout(() => {
+            rendered = true;
+        }, 1);
+    })
+
     function onMouseDown () { 
         wasDragged = false; 
     }
@@ -65,10 +78,12 @@
     }
 
     function onMouseUp () {
-        if (! wasDragged) {
-
+        if (! wasDragged && ! clicked) {
+            console.log("click");
             handleClick(thread);
+            clicked = true;
         }
+
 
         if (! touching) {
             return;
@@ -92,12 +107,14 @@
 
 <a class="chat-trash-container">
     <a id={chatId} class="draggable chat-button flex justify-between items-center py-0" class:selected class:touching use:draggable={{axis:'x', revert: 'true', revertDuration:'200'}} on:mousedown={onMouseDown} on:mouseup={onMouseUp} on:drag:start={onDragStart} on:drag:move={onDrag}>
-        <p class="chat-text draggable my-0 text-base font-sans block w-full focus:outline-none" use:draggable={{disabled: 'true'}} on:mousedown={onMouseDown} on:mouseup={onMouseUp} on:drag:start={onDragStart} on:drag:move={onDrag}>{thread.name}</p>
-        <img class="drag-image draggable" src="grip-lines-vertical-gray.svg" alt="drag" use:draggable={{disabled: 'true'}} on:mousedown={onMouseDown} on:mouseup={onMouseUp} on:drag:start={onDragStart} on:drag:move={onDrag}/>
+        <p class="chat-text draggable my-0 text-base font-sans block w-full focus:outline-none" >{thread.name}</p>
+        <img class="drag-image draggable" src="grip-lines-vertical-gray.svg" alt="drag" />
     </a>
+    {#if rendered}
     <div id="trash" class="trash flex justify-end items-center">
         <img id={trashId} class="trash-image" src="trash-can-white.svg" alt="trash"/>
     </div>
+    {/if}
 </a>
 
 <style>
@@ -119,10 +136,12 @@
     .chat-trash-container {
         position: relative;
         cursor: pointer;
+        transition: background-color 0.3s ease;
         transition: margin-right 0.3s ease;
     }
 
     .selected {
+        transition: background-color 0.3s ease;
         background-color: rgb(0, 122, 255) !important;
         color: rgb(242, 242, 247) !important;
     }
@@ -131,10 +150,10 @@
     .chat-button {
         left: 0;
         padding: 1em;
-        z-index: 10;
+        z-index: 22;
         background-color: rgb(229, 229, 234);
         border-bottom: 1px solid rgb(199, 199, 204);
-        transition: background-color 0.1s ease;
+        transition: background-color 0.3s ease;
     }
 
     .trash-image {
@@ -155,7 +174,7 @@
 
     .trash {
         position: absolute;
-        z-index: 9;
+        z-index: 21;
         height: 100%;
         width: 100%;
         left: 0;

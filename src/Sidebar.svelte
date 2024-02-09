@@ -19,6 +19,7 @@
     }, 200);
   }
 
+  console.log("end script");
 </script>
 
   <aside class="absolute full shadow-lg flex flex-col justify-between" class:open>
@@ -40,6 +41,7 @@
     height: calc(100dvh - 3.1em);
     left: -20%;
     transition: ease 0.3s;
+    transition: background-color 0.3s ease;
     background-color: rgb(229, 229, 234);
     border-right: 1px solid rgb(199, 199, 204);
   }
