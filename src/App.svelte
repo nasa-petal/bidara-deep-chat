@@ -51,7 +51,7 @@
       // this function is called once for each message including initialMessages, ai messages, and user messages.
 
       // save asst id to localStorage when new Assistant is made.
-      if (!openAIAsstIdSet && this._activeService.rawBody.assistant_id) {
+      if (!openAIAsstIdSet && this._activeService && this._activeService.rawBody.assistant_id) {
         setAsst(this._activeService.rawBody.assistant_id)
         openAIAsstIdSet = true;
       }
@@ -73,10 +73,13 @@
       }
 
       // check for existing BIDARA asst, if user enters key in UI.
-      if(openAIKeySet && !this._activeService.config.assistant_id) {
-        this._activeService.config.assistant_id = await getBidaraAssistant();
-        this.directConnection.openAI.assistant.assistant_id = this._activeService.config.assistant_id
-        await setAsst(this._activeService.config.assistant_id);
+      if(openAIKeySet && !openAIAsstIdSet) {
+        this.directConnection.openAI.assistant.assistant_id = await getBidaraAssistant();
+        if(this.directConnection.openAI.assistant.assistant_id) {
+          this._activeService = undefined;
+          setAsst(this.directConnection.openAI.assistant.assistant_id);
+          openAIAsstIdSet = true;
+        }
       }
 
       if(!openAIKeySet) {
