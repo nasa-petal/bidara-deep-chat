@@ -25,6 +25,7 @@
     let openAIThreadIdSet = false;
     let keyAsstAndThread = null;
     let welcomeRef;
+    let contentRef;
     export let open = false;
 
     let threads = getThreads();
@@ -84,9 +85,12 @@
 
       if(!openAIKeySet) {
         welcomeRef.style.display = "block";
+        contentRef.style.display = "none";
+        
       }
       else {
         welcomeRef.style.display = "none";
+        contentRef.style.display = "block";
       }
     }
 
@@ -134,6 +138,7 @@
     }
     
     async function switchActiveThread(thread) {
+      console.log("switch thread to: " + thread.id);
 
       await setThread(thread);
       keyAsstAndThread = await getKeyAsstAndThread();
@@ -203,15 +208,16 @@
         <li>After you send your first message to BIDARA, it will also be available to interact with through the <a href="https://platform.openai.com/assistants">OpenAI Assistants Playground</a>. This interface is more complex, but also provides more customizability. Just select BIDARA, then click the 'Test' button.</li>
       </ul>
     </div>
-    <Navbar bind:chat_name={chatName} bind:sidebar={open} handleRename={renameActiveThread}/>   
-      <div id="content-container" class:open>
+    <div>
+    <div id="content-container" bind:this={contentRef} class:open>
+      <Navbar bind:chat_name={chatName} bind:sidebar={open} keyat={keyAsstAndThread} handleRename={renameActiveThread}/>   
         {#key selectedThreadId}
         <Sidebar handleChatSelect={switchActiveThread} handleChatDelete={deleteThreadAndSwitch} handleChatNew={newThreadAndSwitch} bind:threads bind:open bind:selectedThreadId/>
         {/key}
       <div id="chat-container">
         <!-- demo/textInput are examples of passing an object directly into a property -->
         <!-- initialMessages is an example of passing a state object into a property -->
-        {#if keyAsstAndThread !== null}
+        {#if keyAsstAndThread}
         {#key keyAsstAndThread}
         <deep-chat
           id="chat-element"
@@ -366,6 +372,7 @@
         {/key}
         {/if}
       </div>
+    </div>
     </div>
     
   </main>
