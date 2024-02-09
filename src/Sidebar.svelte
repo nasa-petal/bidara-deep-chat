@@ -4,8 +4,20 @@
   export let handleChatSelect = null;
   export let handleChatDelete = null
   export let handleChatNew = null;
+  export let selectedThreadId = true;
 
   import Chat from './Chat.svelte'
+
+  async function handleButtonClick(event) {
+    event.target.style.transition = 'background-color 0.2s ease color 0.2s ease';
+    event.target.style.backgroundColor = 'rgb(209,209,214)';
+
+    handleChatNew();
+
+    setTimeout(() => {
+      event.target.style.backgroundColor = 'rgb(242, 242, 247)';
+    }, 200);
+  }
 
 </script>
 
@@ -13,11 +25,11 @@
     <nav class="w-full">
       {#if threads !== null}
         {#each threads as thread}
-          <Chat handleClick={handleChatSelect} handleDelete={handleChatDelete} bind:thread/>
+          <Chat handleClick={handleChatSelect} handleDelete={handleChatDelete} bind:thread selected={thread.id === selectedThreadId}/>
         {/each}
       {/if}
     </nav>
-    <button class="new-thread text-base font-sans bg-gray-400 p-2 focus:outline-none" on:click={handleChatNew}>New Thread</button>
+    <button class="new-thread mx-2 text-base font-sans p-2 focus:outline-none" on:click={handleButtonClick}>New Thread</button>
   </aside>
 
 <style>
@@ -29,8 +41,13 @@
     left: -20%;
     margin-top: -1px;
     transition: ease 0.3s;
-    background-color: rgba(229, 229, 234);
+    background-color: rgb(229, 229, 234);
     border-right: 1px solid rgb(209, 209, 214);
+  }
+
+
+  button {
+    transition: background-color 0.3s ease;
   }
 	
   .open {
@@ -59,6 +76,9 @@
   @media only screen and (max-width: 700px) {
     .open {
       width: 100%;
+    }
+    aside {
+      border-right: none;
     }
   }
 </style>

@@ -29,4 +29,11 @@
         transform: rotate(180deg);
     }
 
+    @media only screen and (max-width: 700px) {
+        .container {
+            margin-right: 0;
+        }
+    }
+
+
 </style>
