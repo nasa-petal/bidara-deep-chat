@@ -28,7 +28,8 @@
     export let open = false;
 
     let threads = getThreads();
-    let chat_name = "";
+    let selectedThreadId;
+    let chatName = "";
     
     function onError(error) {
       console.log(error);
@@ -37,7 +38,13 @@
     onMount(async () => {
       keyAsstAndThread = await getKeyAsstAndThread();
       threads = getThreads();
-      chat_name = keyAsstAndThread[2]?.name ? keyAsstAndThread[2].name : "";
+      chatName = keyAsstAndThread[2]?.name ? keyAsstAndThread[2].name : "";
+      selectedThreadId = keyAsstAndThread[2]?.id ? keyAsstAndThread[2].id : "";
+
+      if (threads.length <= 0 && chatName) {
+        threads = [keyAsstAndThread[2]];
+        setThreads(threads);
+      }
     });
 
     async function onNewMessage(message) { 
@@ -50,8 +57,8 @@
       }
 
       if (!openAIThreadIdSet && message.message._sessionId && message.message._sessionId != await getThread()) {
-        const new_thread = {name: "New Chat", id: message.message._sessionId}
-        setThread(new_thread);
+        const newThread = {name: "New Chat", id: message.message._sessionId}
+        setThread(newThread);
         openAIThreadIdSet = true;
       }
     }
@@ -83,36 +90,41 @@
     async function newThreadAndSwitch() {
       const deepChatRef = document.getElementById('chat-element');
       const currrent_messages = deepChatRef.getMessages();
+
       if (currrent_messages.length <= initialMessages.length) {
         return;
-      } else {
-        const new_threads = filterStoredThreads((thread) => thread.name === 'New Chat');
-        if (new_threads.length > 0) {
-          switchActiveThread(new_threads[0]);
-          return;
-        }
-      }
+      } 
 
-      const new_thread = await getNewThread();
+
+      const newThread = await getNewThread();
 
       // force new object so Siderbar rerenders
-      threads = [ new_thread ].concat(threads);
+      threads = [ newThread ].concat(threads);
+      switchActiveThread(newThread);
 
       setThreads(threads);
-
-      switchActiveThread(new_thread);
     }
 
     async function deleteThreadAndSwitch(thread) {
-      threads = deleteThreadFromThreads(thread.id);
+      const deepChatRef = document.getElementById('chat-element');
+      const currrent_messages = deepChatRef.getMessages();
 
+
+      if (threads.length <= 1 && currrent_messages.length <= initialMessages.length) {
+        return;
+      } 
+
+      console.log("deleting: " + JSON.stringify(thread));
+
+      threads = deleteThreadFromThreads(thread.id);
       if (threads && threads.length > 0) {
         const current_thread = getStoredActiveThread();
-        const candidate_thread = threads[0];
+        const candidateThread = threads[0];
 
-        if (candidate_thread && candidate_thread !== current_thread) {
-          switchActiveThread(candidate_thread);
+        if (candidateThread && candidateThread !== current_thread) {
+          switchActiveThread(candidateThread);
         }
+
       } else {
         newThreadAndSwitch();
       }
@@ -122,7 +134,8 @@
 
       await setThread(thread);
       keyAsstAndThread = await getKeyAsstAndThread();
-      chat_name = thread.name;
+      selectedThreadId = keyAsstAndThread[2].id;
+      chatName = thread.name;
 
       // reload messages
       const deepChatRef = document.getElementById('chat-element');
@@ -187,10 +200,10 @@
         <li>After you send your first message to BIDARA, it will also be available to interact with through the <a href="https://platform.openai.com/assistants">OpenAI Assistants Playground</a>. This interface is more complex, but also provides more customizability. Just select BIDARA, then click the 'Test' button.</li>
       </ul>
     </div>
-    <Navbar bind:chat_name bind:sidebar={open} handleRename={renameActiveThread}/>   
+    <Navbar bind:chat_name={chatName} bind:sidebar={open} handleRename={renameActiveThread}/>   
       <div id="content-container" class:open>
-        {#key threads.length}
-        <Sidebar handleChatSelect={switchActiveThread} handleChatDelete={deleteThreadAndSwitch} handleChatNew={newThreadAndSwitch} bind:threads bind:open/>
+        {#key selectedThreadId}
+        <Sidebar handleChatSelect={switchActiveThread} handleChatDelete={deleteThreadAndSwitch} handleChatNew={newThreadAndSwitch} bind:threads bind:open bind:selectedThreadId/>
         {/key}
       <div id="chat-container">
         <!-- demo/textInput are examples of passing an object directly into a property -->

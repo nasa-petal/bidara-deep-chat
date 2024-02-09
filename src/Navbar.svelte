@@ -60,9 +60,6 @@
   header {
     z-index: 10;
     border-bottom: 1px solid rgb(229, 229, 234);
-  }
-
-  button {
     padding: 0.5em;
   }
 
