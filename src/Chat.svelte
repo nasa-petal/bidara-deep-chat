@@ -19,11 +19,15 @@
     let touching = false;
 
     let wasDragged = false
+    let width;
+    let position;
+    
     function onMouseDown () { 
         wasDragged = false; 
     }
 
     function onDragStart (event) { 
+        width = event.target.offsetWidth;
         touching = true;
         wasDragged = true;
     }
@@ -31,17 +35,26 @@
     function onDrag(event) {
         if (!touching || !wasDragged) return;
 
-        const position = event.detail.position.left;
-        deltaX = position - initialLeft;
+        position = event.detail.position.left;
+        deltaX = (-1) * (position - initialLeft);
 
-        if (deltaX >= 0) {
+        if (deltaX <= 0) {
             event.detail.position.left = 0;
+            console.log("clicked under thresh");
         }
     }
 
     function onMouseUp (event) {
         if (! wasDragged) {
-          console.log('button was clicked')
+            console.log("clicked");
+            handleClick(thread);
+        }
+
+        const deltaX = (-1) * (position - initialLeft);
+
+        const delete_thresh = width  * (1/2);
+        if (deltaX >= delete_thresh) {
+            handleDelete(thread);
         }
 
         touching = false;
@@ -83,6 +96,7 @@
 
     .container {
         position: relative;
+        border-bottom: 2px solid black;
     }
 
 
@@ -90,6 +104,7 @@
         padding: 1em;
         background-color: rgb(229, 229, 234);
         transition: background-color 0.1s ease;
+        cursor: pointer;
     }
 
     .trash-image {
@@ -120,8 +135,8 @@
         left: 0;
         top: 0;
         position: absolute;
-        border-bottom: 1px solid rgb(209, 209, 214);
     }
+
     .inner-container:hover,
     .inner-container:focus,
     .touching {
