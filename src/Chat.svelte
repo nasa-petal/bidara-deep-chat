@@ -71,11 +71,17 @@
             handleClick(thread);
         }
 
+        if (! touching) {
+            return;
+        }
+
         deltaX = (-1) * (position - initialLeft);
 
         if (deltaX >= deleteThresh) {
             handleDelete(thread);
         }
+
+        deltaX = 0;
 
         const trashImage = document.getElementById(trashId);
         trashImage.style.transition = 'margin-right 0.3s ease';
