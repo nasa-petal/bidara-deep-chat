@@ -1,5 +1,4 @@
 <script>
-    export let open = false;
     export let thread;
     export let handleClick = null;
     export let handleDelete = null;

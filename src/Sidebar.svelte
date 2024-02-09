@@ -37,12 +37,11 @@
   aside {
     z-index: 20;
     width: 20%;
-    height: calc(100dvh - 3em);
+    height: calc(100dvh - 3.1em);
     left: -20%;
-    margin-top: -1px;
     transition: ease 0.3s;
     background-color: rgb(229, 229, 234);
-    border-right: 1px solid rgb(209, 209, 214);
+    border-right: 1px solid rgb(199, 199, 204);
   }
 
 

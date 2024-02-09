@@ -58,9 +58,13 @@
 
 <style>
   header {
+    background-color: rgb(229, 229, 234);
     z-index: 10;
-    border-bottom: 1px solid rgb(229, 229, 234);
+    border-bottom: 1px solid rgb(199, 199, 204);
     padding: 0.5em;
+  }
+  button:focus {
+    outline: none;
   }
 
 </style>
