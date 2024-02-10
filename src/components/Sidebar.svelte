@@ -1,5 +1,5 @@
 <script>
-	export let open = false
+  export let open = false
   export let threads = null;
   export let handleChatSelect = null;
   export let handleChatDelete = null
@@ -19,14 +19,13 @@
     }, 200);
   }
 
-  console.log("end script");
 </script>
 
   <aside class="absolute full shadow-lg flex flex-col justify-between" class:open>
     <nav class="w-full">
       {#if threads !== null}
         {#each threads as thread}
-          <Chat handleClick={handleChatSelect} handleDelete={handleChatDelete} bind:thread selected={thread.id === selectedThreadId}/>
+          <Chat handleSelect={handleChatSelect} handleDelete={handleChatDelete} selected={thread.id === selectedThreadId} bind:thread/>
         {/each}
       {/if}
     </nav>
@@ -40,7 +39,7 @@
     width: 20%;
     height: calc(100dvh - 3.1em);
     left: -20%;
-    transition: width ease 0.3s;
+    transition: ease 0.3s;
     background-color: rgb(229, 229, 234);
     border-right: 1px solid rgb(199, 199, 204);
   }
