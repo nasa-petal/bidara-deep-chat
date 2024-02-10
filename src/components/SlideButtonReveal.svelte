@@ -85,7 +85,6 @@
     }
 
     function onMouseUp () {
-        console.log("mouse up. clicked: " + clicked + ". wasDragged: " + wasDragged);
         if (! wasDragged && ! clicked) {
             handleClick();
             clicked = true;

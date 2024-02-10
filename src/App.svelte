@@ -28,7 +28,7 @@
     let sidebarRef;
     let deepChatRef;
     let deepChatWidth = "100dvw"
-    export let open = false;
+    let open = false;
 
     let threads = getThreads();
     let selectedThreadId;
@@ -81,7 +81,6 @@
       }
 
       if (message.message.role === 'user' && emptyChat && emptyChat.id === selectedThreadId) {
-        console.log("nullifying empty thread");
         emptyChat = null;
       }
     }
@@ -112,8 +111,11 @@
       else {
         welcomeRef.style.display = "none";
         navbarRef.style.display = "block";
-        open = true;
-        deepChatWidth = "100%";
+
+        if (deepChatWidth === "100dvw") {
+          deepChatWidth = "100%";
+          await initKeyAsstAndThreads();
+        }
       }
     }
 
@@ -126,8 +128,8 @@
       const currrent_messages = deepChatRef.getMessages();
 
       if (currrent_messages.length <= initialMessages.length) {
+        return;
       } 
-
 
       const newThread = await getNewThread();
 
@@ -427,22 +429,26 @@
     }
     
     .open #chat-container {
+      width: 80%;
       margin-left: 20%;
     }
 
     @media only screen and (max-width: 1000px) {
       .open #chat-container {
+        width: 70%;
         margin-left: 30%;
       }
     }
 
     @media only screen and (max-width: 900px) {
       .open #chat-container {
+        width: 60%;
         margin-left: 40%;
       }
  
     @media only screen and (max-width: 700px) {
       .open #chat-container {
+        width: 100%;
         margin-left: 0;
       }
     }
