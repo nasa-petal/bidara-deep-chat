@@ -4,8 +4,7 @@
   <script>
     import { DeepChat } from "deep-chat-dev";
     import { onMount } from 'svelte';
-    import Sidebar from './Sidebar.svelte';
-    import Navbar from './Navbar.svelte';
+    import { Navbar, Sidebar } from './components';
     import { BIDARA_CONFIG } from './bidara';
     import { funcCalling } from './bidaraFunctions';
     import { setOpenAIKey, setAsst, getKeyAsstAndThread, getBidaraAssistant } from './openaiUtils';
@@ -29,16 +28,20 @@
     let sidebarRef;
     let deepChatRef;
     let deepChatWidth = "100dvw"
-    let contentRef;
     export let open = false;
 
     let threads = getThreads();
     let selectedThreadId;
     let selectedThreadName = "";
+    let emptyChat;
     
     function onError(error) {
       console.log(error);
     }
+
+    onMount(async () => {
+      await initKeyAsstAndThreads();
+    });
 
     async function initKeyAsstAndThreads() {
       keyAsstAndThread = await getKeyAsstAndThread();
@@ -76,6 +79,11 @@
         setThread(newThread);
         openAIThreadIdSet = true;
       }
+
+      if (message.message.role === 'user' && emptyChat && emptyChat.id === selectedThreadId) {
+        console.log("nullifying empty thread");
+        emptyChat = null;
+      }
     }
 
     async function onComponentRender() {
@@ -104,15 +112,20 @@
       else {
         welcomeRef.style.display = "none";
         navbarRef.style.display = "block";
+        open = true;
         deepChatWidth = "100%";
       }
     }
 
     async function newThreadAndSwitch() {
+      if (emptyChat) {
+        switchActiveThread(emptyChat);
+        return true;
+      }
+
       const currrent_messages = deepChatRef.getMessages();
 
       if (currrent_messages.length <= initialMessages.length) {
-        return;
       } 
 
 
@@ -121,17 +134,22 @@
       // force new object so Siderbar rerenders
       threads = [ newThread ].concat(threads);
       switchActiveThread(newThread);
+      emptyChat = newThread;
 
       setThreads(threads);
+      return true;
     }
 
     async function deleteThreadAndSwitch(thread) {
       const currrent_messages = deepChatRef.getMessages();
 
-
       if (threads.length <= 1 && currrent_messages.length <= initialMessages.length) {
-        return;
+        return false;
       } 
+
+      if (emptyChat && emptyChat.id === thread.id) {
+        emptyChat = null;
+      }
 
 
       threads = deleteThreadFromThreads(thread.id);
@@ -146,6 +164,8 @@
       } else {
         newThreadAndSwitch();
       }
+
+      return true;
     }
     
     async function switchActiveThread(thread) {
@@ -155,12 +175,13 @@
       selectedThreadId = keyAsstAndThread[2].id;
       selectedThreadName = thread.name;
 
-      // reload messages
-      deepChatRef.initialMessages = initialMessages;
+      return true;
     }
 
     async function renameActiveThread(name) {
       threads = await setActiveThreadName(name);
+
+      return true;
     }
 
   </script>
@@ -218,6 +239,7 @@
       </ul>
     </div>
     <div>
+    {#key deepChatWidth}
     <div id="content-container" class:open>
       <div bind:this={navbarRef}>
       <Navbar bind:this={navbarRef} bind:chat_name={selectedThreadName} bind:sidebar={open} handleRename={renameActiveThread}/>   
@@ -227,12 +249,11 @@
         <Sidebar bind:this={sidebarRef} handleChatSelect={switchActiveThread} handleChatDelete={deleteThreadAndSwitch} handleChatNew={newThreadAndSwitch} bind:threads bind:open bind:selectedThreadId/>
         {/key}
       </div>
-      {#key deepChatWidth}
       <div id="chat-container">
         <!-- demo/textInput are examples of passing an object directly into a property -->
         <!-- initialMessages is an example of passing a state object into a property -->
+        {#if keyAsstAndThread !== null}
         {#key keyAsstAndThread}
-        {#await initKeyAsstAndThreads()}
         <deep-chat
           id="chat-element"
           bind:this={deepChatRef}
@@ -384,11 +405,11 @@
             }
           }}
         />
-        {/await}
         {/key}
+        {/if}
       </div>
-      {/key}
     </div>
+    {/key}
     </div>
     
   </main>
@@ -406,20 +427,17 @@
     }
     
     .open #chat-container {
-      width: 80%;
       margin-left: 20%;
     }
 
     @media only screen and (max-width: 1000px) {
       .open #chat-container {
-        width: 70%;
         margin-left: 30%;
       }
     }
 
     @media only screen and (max-width: 900px) {
       .open #chat-container {
-        width: 30;
         margin-left: 40%;
       }
  
