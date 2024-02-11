@@ -74,13 +74,15 @@
             revealImage.style.transition = 'margin-right 0.3s ease';
             revealImage.style.marginRight = slideThreshWidth + 'px';
 
-        } else if (deltaX >= clickTolerance) {
-            wasDragged = true;
-
         } else {
             const revealImage = document.getElementById(revealId);
             revealImage.style.transition = 'margin-right 0.3s ease';
             revealImage.style.marginRight = '1em';
+        }
+
+        if (deltaX >= clickTolerance) {
+            wasDragged = true;
+
         }
     }
 

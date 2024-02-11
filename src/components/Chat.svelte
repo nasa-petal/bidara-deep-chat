@@ -44,6 +44,6 @@
 
 <style>
     .chat-slider-button {
-        height: 4em;
+        height: 5em;
     }
 </style>

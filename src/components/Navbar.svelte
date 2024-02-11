@@ -19,7 +19,7 @@
 
     async function handleButtonKeyDown(event) {
       if (event.key === 'Enter') {
-        const new_chat_name = event.target.textContent;
+        const new_chat_name = event.target.innerText;
 
         if (new_chat_name) {
           chat_name = new_chat_name;
@@ -27,6 +27,9 @@
         }
 
         editing_name = false;
+      } else if (event.key === 'Escape') { 
+        console.log('escape');
+        editing_button.blur()
 
       } else if (event.key === ' '){
         event.preventDefault();
@@ -49,7 +52,7 @@
   </nav>
 
   {#if editing_name}
-    <button bind:this={editing_button} class="focus:no-outline" on:blur={handleButtonLeave} on:keydown={handleButtonKeyDown} contenteditable></button>
+    <button bind:this={editing_button} class="" on:blur={handleButtonLeave} on:keydown={handleButtonKeyDown} contenteditable></button>
   {:else}
     <button class="focus:no-outline" on:click={handleButtonClick}>{chat_name}</button>
   {/if}
@@ -63,8 +66,18 @@
     border-bottom: 1px solid rgb(199, 199, 204);
     padding: 0.5em;
   }
+  button {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 0.5em;
+    background-color: rgb(229, 229, 234);
+    border: 2px solid rgb(229,229,234);
+  }
   button:focus {
-    outline: none;
+    border-radius: 1em;
+    border: 2px solid rgb(199, 199, 204);
+    outline: rgb(199, 199, 204);
   }
 
 </style>

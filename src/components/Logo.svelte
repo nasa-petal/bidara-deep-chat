@@ -1,4 +1,4 @@
-<div class="flex justify-center space-x-4">
+<div class="flex mx-2 justify-center space-x-4">
 	<img src="bidara.png" alt="" />
 	<p>Bidara</p>
 </div>
