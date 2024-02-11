@@ -37,7 +37,7 @@
   aside {
     z-index: 20;
     width: 20%;
-    height: calc(100dvh - 3.1em);
+    height: calc(100dvh - 3.9em);
     left: -20%;
     transition: ease 0.3s;
     background-color: rgb(229, 229, 234);

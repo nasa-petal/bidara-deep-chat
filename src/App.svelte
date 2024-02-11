@@ -364,7 +364,7 @@
           initialMessages={initialMessages}
           chatStyle={{
             width: deepChatWidth,
-            height: "calc(100dvh - 3em)",
+            height: "calc(100dvh - 3.9em)",
             backgroundColor: "white",
             border: "none",
             fontSize: "17px",
