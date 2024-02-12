@@ -1,4 +1,4 @@
-import * as bidara from "./bidara";
+import * as bidara from "../bidara";
 
 import { getStoredAPIKey, getStoredAsstId, setStoredAPIKey, setStoredAsstId } from "./storageUtils";
 import { getThread } from "./threadUtils";

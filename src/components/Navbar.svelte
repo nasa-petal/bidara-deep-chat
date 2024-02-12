@@ -28,7 +28,6 @@
 
         editing_name = false;
       } else if (event.key === 'Escape') { 
-        console.log('escape');
         editing_button.blur()
 
       } else if (event.key === ' '){

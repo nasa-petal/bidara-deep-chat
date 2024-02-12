@@ -7,9 +7,9 @@
     import { Navbar, Sidebar } from './components';
     import { BIDARA_CONFIG } from './bidara';
     import { funcCalling } from './bidaraFunctions';
-    import { setOpenAIKey, setAsst, getKeyAsstAndThread, getBidaraAssistant } from './openaiUtils';
-    import { setThread, getThread, deleteThreadFromThreads, getNewThread, getThreads, setThreads, setActiveThreadName } from './threadUtils';
-    import { filterStoredThreads, getStoredActiveThread } from './storageUtils';
+    import { setOpenAIKey, setAsst, getKeyAsstAndThread, getBidaraAssistant } from './utils/openaiUtils';
+    import { setThread, getThread, deleteThreadFromThreads, getNewThread, getThreads, setThreads, setActiveThreadName } from './utils/threadUtils';
+    import { getStoredActiveThread } from './utils/storageUtils';
     import hljs from "highlight.js";
     window.hljs = hljs;
   
