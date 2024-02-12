@@ -5,8 +5,8 @@
     import { DeepChat } from "deep-chat-dev";
     import { onMount } from 'svelte';
     import { Navbar, Sidebar } from './components';
-    import { BIDARA_CONFIG } from './bidara';
-    import { funcCalling } from './bidaraFunctions';
+    import { BIDARA_CONFIG } from './assistant/bidara';
+    import { funcCalling } from './assistant/bidaraFunctions';
     import { setOpenAIKey, setAsst, getKeyAsstAndThread, getBidaraAssistant } from './utils/openaiUtils';
     import { setThread, getThread, deleteThreadFromThreads, getNewThread, getThreads, setThreads, setActiveThreadName } from './utils/threadUtils';
     import { getStoredActiveThread } from './utils/storageUtils';
