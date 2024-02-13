@@ -225,19 +225,19 @@
       </div>-->
       <div id="welcome" style={" display: none "}; bind:this={welcomeRef}>
       <div id="header"><img src="bidara.png" alt="girl with dark hair" height="57" width="57" /><h2>BIDARA</h2><br/><span class="small">Bio-Inspired Design and Research Assistant</span></div>
-      <h3>How to access</h3>
-      <ol>
-        <li><a href="https://platform.openai.com/signup">Create an OpenAI account</a></li>
-        <li><a href="https://platform.openai.com/login">Login to OpenAI Platform</a></li>
-        <li>In the left sidebar, navigate to <a href="https://platform.openai.com/account/billing/overview">Settings -&gt; Billing</a></li> <li>Click the 'Add payment details' button</li>
-        <li>Add a minimum of $5 in credits. It is required to spend a minimum of $5 to <a href="https://platform.openai.com/docs/guides/rate-limits/usage-tiers?context=tier-free">access GPT-4</a>.</li>
-        <li>In the left sidebar, navigate to <a href="https://platform.openai.com/api-keys">API Keys</a></li>
+      <h3 class="text-lg font-bold mt-5 mb-5">How to access</h3>
+      <ol class="list-decimal">
+        <li><a href="https://platform.openai.com/signup" class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600">Create an OpenAI account</a></li>
+        <li><a href="https://platform.openai.com/login" class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600">Login to OpenAI Platform</a></li>
+        <li>In the left sidebar, navigate to <a href="https://platform.openai.com/account/billing/overview" class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600">Settings -&gt; Billing</a></li> <li>Click the 'Add payment details' button</li>
+        <li>Add a minimum of $5 in credits. It is required to spend a minimum of $5 to <a href="https://platform.openai.com/docs/guides/rate-limits/usage-tiers?context=tier-free" class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600">access GPT-4</a>.</li>
+        <li>In the left sidebar, navigate to <a href="https://platform.openai.com/api-keys" class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600">API Keys</a></li>
         <li>Verify your phone number, then click the 'Create new secret key' button.</li> <li>Copy your secret key.</li>
         <li>Paste your key into the input field below. Your browser will save the key, so you only have to enter it once.</li>
       </ol>
-      <ul>
-        <li>With OpenAI API you only pay for what you use. Track your usage and costs on the <a href="https://platform.openai.com/usage">Usage page</a>.</li>
-        <li>After you send your first message to BIDARA, it will also be available to interact with through the <a href="https://platform.openai.com/assistants">OpenAI Assistants Playground</a>. This interface is more complex, but also provides more customizability. Just select BIDARA, then click the 'Test' button.</li>
+      <ul class="list-disc mt-4">
+        <li>With OpenAI API you only pay for what you use. Track your usage and costs on the <a href="https://platform.openai.com/usage" class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600">Usage page</a>.</li>
+        <li>After you send your first message to BIDARA, it will also be available to interact with through the <a href="https://platform.openai.com/assistants" class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600">OpenAI Assistants Playground</a>. This interface is more complex, but also provides more customizability. Just select BIDARA, then click the 'Test' button.</li>
       </ul>
     </div>
     <div>
@@ -445,6 +445,7 @@
         width: 60%;
         margin-left: 40%;
       }
+    }
  
     @media only screen and (max-width: 700px) {
       .open #chat-container {
@@ -476,10 +477,6 @@
       font-size: 2em;
       line-height: 1em;
       display: inline;
-    }
-
-    #welcome h3 {
-      margin-inline-start: .25em;
     }
 
     #header {
