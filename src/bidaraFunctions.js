@@ -1,4 +1,4 @@
-import { getDalleImageGeneration } from "../utils/openaiUtils";
+import { getDalleImageGeneration } from "./openaiUtils";
 
 export function getCurrentWeather(location) {
   location = location.toLowerCase();
