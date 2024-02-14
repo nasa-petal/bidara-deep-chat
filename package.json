@@ -14,10 +14,8 @@
     "svelte": "^4.0.0"
   },
   "dependencies": {
-    "deep-chat-dev": "^9.0.131",
-    "sirv-cli": "^2.0.0",
-    "svelte-agnostic-draggable": "^0.2.0",
-    "svelte-touch-to-mouse": "^1.0.0"
+    "deep-chat-dev": "^9.0.124",
+    "sirv-cli": "^2.0.0"
   },
   "scripts": {
     "build": "rollup -c --bundleConfigAsCjs",
