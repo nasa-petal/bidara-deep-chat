@@ -57,7 +57,10 @@
   .new-thread {
     line-height: 1em;
     border-radius: 1em;
-    background-color: rgb(242, 242, 247);
+    background-color: white;
+    border: 1px solid rgb(180, 180, 180);
+    color: rgb(0, 122, 255);
+    font-weight: bold;
   }
 
   @media only screen and (max-width: 1000px) {
