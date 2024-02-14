@@ -1,7 +1,4 @@
-import * as bidara from "../assistant/bidara";
-
-import { getStoredAPIKey, getStoredAsstId, setStoredAPIKey, setStoredAsstId } from "./storageUtils";
-import { getThread } from "./threadUtils";
+import * as bidara from "./bidara";
 
 let openaiKey = null;
 let openaiAsst = null;
@@ -118,7 +115,7 @@ export async function getOpenAIKey() {
   let localOpenAiKey = urlParams.get('key');
 
   if (localOpenAiKey === null) {
-    localOpenAiKey = getStoredAPIKey();
+    localOpenAiKey = localStorage.getItem('openai-key');
   }
   if (localOpenAiKey !== null) {
     // validate key. if invalid set openai_key to null
@@ -139,7 +136,7 @@ export async function getOpenAIKey() {
 export function setOpenAIKey(key) {
   // key must have already been validated
   openaiKey = key;
-  setStoredAPIKey(openaiKey);
+  localStorage.setItem('openai-key', openaiKey);
 }
 
 export async function getAsst() {
@@ -150,7 +147,7 @@ export async function getAsst() {
     return openaiAsst;
   }
 
-  openaiAsst = getStoredAsstId();
+  openaiAsst = localStorage.getItem('openai-asst-id');
 
   let isValidAsstId = false;
   if (openaiAsst !== null) {
@@ -168,77 +165,18 @@ export function setAsst(id) {
   // assistant id must have already been validated
   if(id) {
     openaiAsst = id;
-    setStoredAsstId(openaiAsst);
+    localStorage.setItem('openai-asst-id', openaiAsst);
   }
 }
 
-export async function validThread(thread_id) {
-  if(!openaiKey) {
-    throw new Error('openai key not set. cannot validate thread.');
-  }
-  try {
-    const response = await fetch(`https://api.openai.com/v1/threads/${thread_id}`, {
-      method: "GET",
-      headers: {
-        Authorization: 'Bearer ' + openaiKey,
-        'Content-Type': 'application/json',
-        'OpenAI-Beta': 'assistants=v1'
-      },
-      body: null
-    });
-
-    const r = await response.json();
-    if (r.hasOwnProperty('error') && r.error.type === 'invalid_request_error') {
-      return false;
-    }
-
-    if (r.hasOwnProperty('id')) {
-      return true;
-    }
-    return false;
-  } catch (e) {
-    console.error("ERROR: " + e);
-    return false;
-  }
-}
-
-export async function getNewThreadId() {
-  if (!openaiKey) {
-    throw new Error('openai key not set. cannot get new thread.');
-  }
-  const response = await fetch("https://api.openai.com/v1/threads", {
-    method: "POST",
-    headers: {
-      Authorization: 'Bearer ' + openaiKey,
-      'Content-Type': 'application/json',
-      'OpenAI-Beta': 'assistants=v1'
-    },
-    body: null
-  });
-  
-  const r = await response.json();
-  if (r.hasOwnProperty('error') && r.error.type === 'invalid_request_error') {
-    return null;
-  }
-
-  if (r.hasOwnProperty('id')) {
-    return r.id;
-  }
-  return null;
-}
-
-
-export async function getKeyAsstAndThread() {
+export async function getKeyAndAsst() {
   let key = await getOpenAIKey();
   if (key === null) {
-    return [null, null, null]
+    return [null, null]
   }
 
   let asst = await getAsst();
-
-  let thread = await getThread();
-
-  return [key, asst, thread]
+  return [key, asst]
 }
 
 export async function getDalleImageGeneration(prompt, image_size = null, image_quality = null, num_images = null) {
