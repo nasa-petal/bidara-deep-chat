@@ -45,15 +45,15 @@
 
 </script>
 
-<header class="flex justify-between items-center text-gray-600">
+<header class="flex py-2 justify-between items-center text-gray-600">
   <nav class="flex mx-2">
     <Hamburger bind:open={sidebar}/>
   </nav>
 
   {#if editing_name}
-    <button bind:this={editing_button} class="" on:blur={handleButtonLeave} on:keydown={handleButtonKeyDown} contenteditable></button>
+    <button bind:this={editing_button} class="px-3 py-1 rounded-full" on:blur={handleButtonLeave} on:keydown={handleButtonKeyDown} contenteditable></button>
   {:else}
-    <button class="focus:no-outline" on:click={handleButtonClick}>{chat_name}</button>
+    <button class="focus:no-outline px-3 py-1 rounded-full" on:click={handleButtonClick}>{chat_name}</button>
   {/if}
   <Logo/>	
 </header>
@@ -68,12 +68,10 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    padding: 0.5em;
     background-color: rgb(229, 229, 234);
     border: 2px solid rgb(229,229,234);
   }
   button:focus {
-    border-radius: 1em;
     border: 2px solid rgb(199, 199, 204);
     outline: rgb(199, 199, 204);
   }

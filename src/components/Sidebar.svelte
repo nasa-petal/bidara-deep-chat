@@ -22,7 +22,7 @@
 </script>
 
   <aside class="absolute full shadow-lg flex flex-col" class:open>
-    <button class="new-thread m-2 text-base font-sans p-2 focus:outline-none" on:click={handleButtonClick}>New Thread</button>
+    <button class="new-thread rounded-full m-2 text-base font-sans p-2 focus:outline-none" on:click={handleButtonClick}>New Thread</button>
     <nav class="w-full">
       {#if threads !== null}
         {#each threads as thread}
@@ -37,7 +37,7 @@
   aside {
     z-index: 20;
     width: 20%;
-    height: calc(100dvh - 3rem);
+    height: calc(100dvh - 3.4rem);
     left: -20%;
     transition: ease 0.3s;
     background-color: rgb(229, 229, 234);
@@ -56,7 +56,6 @@
 
   .new-thread {
     line-height: 1em;
-    border-radius: 1em;
     background-color: white;
     border: 1px solid rgb(180, 180, 180);
     color: rgb(0, 122, 255);
