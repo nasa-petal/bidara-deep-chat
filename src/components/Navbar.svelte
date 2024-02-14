@@ -45,8 +45,8 @@
 
 </script>
 
-<header class="flex justify-between p-2 items-center text-gray-600">
-  <nav class="flex">
+<header class="flex justify-between items-center text-gray-600">
+  <nav class="flex mx-2">
     <Hamburger bind:open={sidebar}/>
   </nav>
 
@@ -63,7 +63,6 @@
     background-color: rgb(229, 229, 234);
     z-index: 10;
     border-bottom: 1px solid rgb(199, 199, 204);
-    padding: 0.5em;
   }
   button {
     overflow: hidden;
