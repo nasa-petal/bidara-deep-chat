@@ -113,9 +113,11 @@
     }
 </script>
 
-<a class="slider-button-reveal-container">
-    <a 
+<div class="slider-button-reveal-container">
+    <div 
         id={sliderId} 
+        role="button"
+        tabindex="-1"
         class="slider-button draggable flex justify-between items-center py-0" 
         class:selected class:touching 
         use:draggable={{axis:'x', revert: 'true', revertDuration:'200'}} 
@@ -126,17 +128,17 @@
         style="background-color: {slideBgColor};"
         >
         <p class="slider-button-text draggable my-0 font-sans block w-full focus:outline-none" >{sliderText}</p>
-        <img class="slider-image draggable" src={sliderImage} alt="Dragger image" />
-    </a>
+        <img class="slider-image draggable" src={sliderImage} alt="Dragger" />
+    </div>
     {#if rendered}
     <div 
         class="reveal flex justify-end items-center"
         style="background-color: {revealBgColor};"
         >
-        <img id={revealId} class="reveal-image" src={revealImage} alt="Revealed image"/>
+        <img id={revealId} class="reveal-image" src={revealImage} alt="Revealed"/>
     </div>
     {/if}
-</a>
+</div>
 
 <style>
     .slider-button-reveal-container {

@@ -21,7 +21,8 @@
 
 </script>
 
-  <aside class="absolute full shadow-lg flex flex-col justify-between" class:open>
+  <aside class="absolute full shadow-lg flex flex-col" class:open>
+    <button class="new-thread m-2 text-base font-sans p-2 focus:outline-none" on:click={handleButtonClick}>New Thread</button>
     <nav class="w-full">
       {#if threads !== null}
         {#each threads as thread}
@@ -29,7 +30,6 @@
         {/each}
       {/if}
     </nav>
-    <button class="new-thread mx-2 text-base font-sans p-2 focus:outline-none" on:click={handleButtonClick}>New Thread</button>
   </aside>
 
 <style>
@@ -37,11 +37,12 @@
   aside {
     z-index: 20;
     width: 20%;
-    height: calc(100dvh - 3.9em);
+    height: calc(100dvh - 3rem);
     left: -20%;
     transition: ease 0.3s;
     background-color: rgb(229, 229, 234);
     border-right: 1px solid rgb(199, 199, 204);
+    overflow-y: auto;
   }
 
 
@@ -57,7 +58,6 @@
     line-height: 1em;
     border-radius: 1em;
     background-color: rgb(242, 242, 247);
-    margin-bottom: 1em;
   }
 
   @media only screen and (max-width: 1000px) {
@@ -79,5 +79,19 @@
     aside {
       border-right: none;
     }
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: #d0d0d0;
+    border-radius: 5px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background-color: #f2f2f2;
   }
 </style>
