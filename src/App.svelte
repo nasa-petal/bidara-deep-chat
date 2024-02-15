@@ -8,7 +8,7 @@
     import { BIDARA_CONFIG } from './assistant/bidara';
     import { funcCalling } from './assistant/bidaraFunctions';
     import { setOpenAIKey, setAsst, getKeyAsstAndThread, getBidaraAssistant } from './utils/openaiUtils';
-    import { setThread, getThread, deleteThreadFromThreads, getNewThread, getThreads, setThreads, setActiveThreadName } from './utils/threadUtils';
+    import { setThread, getThread, deleteThreadFromThreads, getNewThread, getThreads, setThreads, setActiveThreadName, updateThreadAndThreads, getEmptyThreads, floatThreadInThreads } from './utils/threadUtils';
     import { getStoredActiveThread } from './utils/storageUtils';
     import hljs from "highlight.js";
     window.hljs = hljs;
@@ -30,10 +30,8 @@
     let deepChatWidth = "100dvw"
     let open = false;
 
-    let threads = getThreads();
-    let selectedThreadId;
-    let selectedThreadName = "";
-    let emptyChat;
+    let threads;
+    let activeThread;
     
     function onError(error) {
       console.log(error);
@@ -49,15 +47,10 @@
       if (keyAsstAndThread && keyAsstAndThread[0]) {
 
         threads = getThreads();
-        selectedThreadName = keyAsstAndThread[2]?.name ? keyAsstAndThread[2].name : "";
-        selectedThreadId = keyAsstAndThread[2]?.id ? keyAsstAndThread[2].id : "";
+        activeThread = keyAsstAndThread[2];
 
-        if (selectedThreadId) {
-          setThread({name: selectedThreadName, id: selectedThreadId});
-        }
-
-        if (threads.length <= 0 && selectedThreadName) {
-          threads = [keyAsstAndThread[2]];
+        if (!threads || (threads.length <= 0 && activeThread)) {
+          threads = [activeThread];
           setThreads(threads);
         }
       }
@@ -74,15 +67,9 @@
         openAIAsstIdSet = true;
       }
 
-      if (!openAIThreadIdSet && message.message._sessionId && message.message._sessionId != await getThread()) {
-        const newThread = {name: "New Chat", id: message.message._sessionId}
-        setThread(newThread);
-        openAIThreadIdSet = true;
-      }
-
-      if (message.message.role === 'user' && emptyChat && emptyChat.id === selectedThreadId) {
-        emptyChat = null;
-      }
+      activeThread.length = deepChatRef.getMessages().length;
+      console.log("here");
+      updateThreads();
     }
 
     async function onComponentRender() {
@@ -120,70 +107,67 @@
     }
 
     async function newThreadAndSwitch() {
-      if (emptyChat) {
-        switchActiveThread(emptyChat);
+      // If the thread is already "new", stay on it
+      if (activeThread.length <= 0) {
+        if (activeThread.name != "New Chat") {
+          await renameActiveThread("New Chat");
+        }
+        return true;
+      } 
+
+      // If an empty thead is already created, prevents creating a new one
+      const emptyThreads = getEmptyThreads();
+      if (emptyThreads && emptyThreads.length >= 1) {
+
+        const emptyThread = emptyThreads[0];
+        switchActiveThread(emptyThread);
+
         return true;
       }
 
-      const currrent_messages = deepChatRef.getMessages();
-
-      if (currrent_messages.length <= initialMessages.length) {
-        return;
-      } 
-
-      const newThread = await getNewThread();
-
-      // force new object so Siderbar rerenders
-      threads = [ newThread ].concat(threads);
-      switchActiveThread(newThread);
-      emptyChat = newThread;
+      activeThread = await getNewThread();
+      threads.unshift(activeThread);
 
       setThreads(threads);
+
+      switchActiveThread(activeThread);
+      
       return true;
     }
 
     async function deleteThreadAndSwitch(thread) {
-      const currrent_messages = deepChatRef.getMessages();
-
-      if (threads.length <= 1 && currrent_messages.length <= initialMessages.length) {
-        return false;
-      } 
-
-      if (emptyChat && emptyChat.id === thread.id) {
-        emptyChat = null;
-      }
-
 
       threads = deleteThreadFromThreads(thread.id);
       if (threads && threads.length > 0) {
-        const current_thread = getStoredActiveThread();
-        const candidateThread = threads[0];
-
-        if (candidateThread && candidateThread !== current_thread) {
-          switchActiveThread(candidateThread);
-        }
-
+        switchActiveThread(threads[0]);
       } else {
         newThreadAndSwitch();
       }
 
       return true;
     }
+
     
     async function switchActiveThread(thread) {
 
       await setThread(thread);
       keyAsstAndThread = await getKeyAsstAndThread();
-      selectedThreadId = keyAsstAndThread[2].id;
-      selectedThreadName = thread.name;
+      activeThread = keyAsstAndThread[2];
 
       return true;
     }
 
     async function renameActiveThread(name) {
-      threads = await setActiveThreadName(name);
+      await setActiveThreadName(name);
+
+      threads = getThreads();
+      activeThread = await getThread();
 
       return true;
+    }
+
+    function updateThreads() {
+      updateThreadAndThreads(activeThread, threads);
     }
 
   </script>
@@ -235,21 +219,20 @@
         <li>After you send your first message to BIDARA, it will also be available to interact with through the <a href="https://platform.openai.com/assistants" class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600">OpenAI Assistants Playground</a>. This interface is more complex, but also provides more customizability. Just select BIDARA, then click the 'Test' button.</li>
       </ul>
     </div>
-    <div>
+    {#if keyAsstAndThread !== null}
     {#key deepChatWidth}
     <div id="content-container" class:open>
       <div bind:this={navbarRef}>
-      <Navbar bind:this={navbarRef} bind:chat_name={selectedThreadName} bind:sidebar={open} handleRename={renameActiveThread}/>   
+      <Navbar bind:this={navbarRef} bind:chat_name={activeThread.name} bind:sidebar={open} handleRename={renameActiveThread}/>   
       </div>
       <div bind:this={sidebarRef}>
-        {#key selectedThreadId}
-        <Sidebar bind:this={sidebarRef} handleChatSelect={switchActiveThread} handleChatDelete={deleteThreadAndSwitch} handleChatNew={newThreadAndSwitch} bind:threads bind:open bind:selectedThreadId/>
+        {#key activeThread}
+        <Sidebar bind:this={sidebarRef} handleChatSelect={switchActiveThread} handleChatDelete={deleteThreadAndSwitch} handleChatNew={newThreadAndSwitch} bind:threads bind:open bind:selectedThreadId={activeThread.id}/>
         {/key}
       </div>
       <div id="chat-container">
         <!-- demo/textInput are examples of passing an object directly into a property -->
         <!-- initialMessages is an example of passing a state object into a property -->
-        {#if keyAsstAndThread !== null}
         {#key keyAsstAndThread}
         <deep-chat
           id="chat-element"
@@ -403,12 +386,10 @@
           }}
         />
         {/key}
-        {/if}
       </div>
     </div>
     {/key}
-    </div>
-    
+    {/if}
   </main>
 
 

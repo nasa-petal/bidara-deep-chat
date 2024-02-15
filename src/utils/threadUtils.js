@@ -1,18 +1,19 @@
 import { validThread, getNewThreadId } from "./openaiUtils";
-import { getStoredActiveThread, getStoredThreads, setStoredActiveThread, setStoredThreads, filterStoredThreads } from "./storageUtils";
+import { getStoredActiveThread, getStoredThreads, setStoredActiveThread, setStoredThreads, getFilteredThreads } from "./storageUtils";
 
 export async function getNewThread() {
   const new_id = await getNewThreadId();
 
   if (new_id) {
     const new_name = "New Chat";
-    return {name: new_name, id: new_id};
+    return {name: new_name, id: new_id, length:0};
   }
 
   return null;
 }
 
 export async function getThread() {
+  console.log("getttingthread");
   const thread = getStoredActiveThread();
 
   let isValidThreadId = false;
@@ -46,11 +47,6 @@ export async function setThread(thread) {
 export function getThreads() {
   var threads = getStoredThreads();
 
-  if (threads === null) {
-    threads = []
-    setThreads(threads);
-  }
-
   return threads;
 }
 
@@ -59,7 +55,7 @@ export function setThreads(threads) {
 }
 
 export function deleteThreadFromThreads(thread_id) {
-  return filterStoredThreads((thread) => thread.id !== thread_id);
+  return getFilteredThreads((thread) => thread.id !== thread_id);
 }
 
 export async function setActiveThreadName(name) {
@@ -79,6 +75,37 @@ export async function setActiveThreadName(name) {
 
   setThread(active_thread);
   setThreads(new_threads);
+}
 
-  return new_threads;
+export function getEmptyThreads() {
+  return getFilteredThreads((thread) => thread.length === 0);
+}
+
+export function floatThreadInThreads(floatThread) {
+  const filteredWithoutThread = getFilteredThreads((thread) => thread.id !== floatThread);
+  filteredWithoutThread.unshift(floatThread);
+  return filteredWithoutThread;
+}
+
+export function updateThreadAndThreads(activeThread, threads) {
+  const storedThread = getStoredActiveThread();
+  const storedThreads = getStoredThreads();
+
+
+  if (activeThread != storedThread) {
+    threads = threads.map((thread) => { 
+      if (thread.id === activeThread.id) {
+        return activeThread;
+      }
+      return thread;
+    });
+
+
+    setStoredActiveThread(activeThread);
+  }
+
+
+  if (threads != storedThreads) {
+    setStoredThreads(threads);
+  }
 }
