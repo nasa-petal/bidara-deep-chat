@@ -4,9 +4,12 @@
   <script>
     import { DeepChat } from "deep-chat-dev";
     import { onMount } from 'svelte';
-    import { BIDARA_CONFIG } from './bidara';
-    import { funcCalling } from './bidaraFunctions';
-    import { setOpenAIKey, setAsst, getKeyAndAsst, getBidaraAssistant } from './openaiUtils';
+    import { Navbar, Sidebar } from './components';
+    import { BIDARA_CONFIG } from './assistant/bidara';
+    import { funcCalling } from './assistant/bidaraFunctions';
+    import { setOpenAIKey, setAsst, getKeyAsstAndThread, getBidaraAssistant } from './utils/openaiUtils';
+    import { setThread, getThread, deleteThreadFromThreads, getNewThread, getThreads, setThreads, setActiveThreadName } from './utils/threadUtils';
+    import { getStoredActiveThread } from './utils/storageUtils';
     import hljs from "highlight.js";
     window.hljs = hljs;
   
@@ -18,19 +21,67 @@
 
     let openAIKeySet = false;
     let openAIAsstIdSet = false;
+    let openAIThreadIdSet = false;
+    let changedToLoggedInView = false;
+    let keyAsstAndThread = null;
     let welcomeRef;
+    let navbarRef;
+    let sidebarRef;
+    let deepChatRef;
+    let open = false;
 
+    let threads = getThreads();
+    let selectedThreadId;
+    let selectedThreadName = "";
+    let emptyChat;
+    
     function onError(error) {
       console.log(error);
     }
 
-    function onNewMessage(message) { 
+    onMount(async () => {
+      await initKeyAsstAndThreads();
+    });
+
+    async function initKeyAsstAndThreads() {
+      keyAsstAndThread = await getKeyAsstAndThread();
+
+      if (keyAsstAndThread && keyAsstAndThread[0]) {
+
+        threads = getThreads();
+        selectedThreadName = keyAsstAndThread[2]?.name ? keyAsstAndThread[2].name : "";
+        selectedThreadId = keyAsstAndThread[2]?.id ? keyAsstAndThread[2].id : "";
+
+        if (selectedThreadId) {
+          setThread({name: selectedThreadName, id: selectedThreadId});
+        }
+
+        if (threads.length <= 0 && selectedThreadName) {
+          threads = [keyAsstAndThread[2]];
+          setThreads(threads);
+        }
+      }
+
+      return keyAsstAndThread;
+    }
+
+    async function onNewMessage(message) { 
       // this function is called once for each message including initialMessages, ai messages, and user messages.
 
       // save asst id to localStorage when new Assistant is made.
       if (!openAIAsstIdSet && this._activeService && this._activeService.rawBody.assistant_id) {
         setAsst(this._activeService.rawBody.assistant_id)
         openAIAsstIdSet = true;
+      }
+
+      if (!openAIThreadIdSet && message.message._sessionId && message.message._sessionId != await getThread()) {
+        const newThread = {name: "New Chat", id: message.message._sessionId}
+        setThread(newThread);
+        openAIThreadIdSet = true;
+      }
+
+      if (message.message.role === 'user' && emptyChat && emptyChat.id === selectedThreadId) {
+        emptyChat = null;
       }
     }
 
@@ -53,17 +104,93 @@
         }
       }
 
-      if(!openAIKeySet) {
+      if(!openAIKeySet) { // Show login instructions.
         welcomeRef.style.display = "block";
+        navbarRef.style.display = "none";
+        deepChatRef.style.width = "calc(100vw - 1rem)";
+        deepChatRef.style.height = "100px";
       }
-      else {
+      else if (!changedToLoggedInView) { // Hide login instructions after login. 
         welcomeRef.style.display = "none";
+        navbarRef.style.display = "block";
+        deepChatRef.style.height = "calc(100dvh - 3.1rem)";
+        await initKeyAsstAndThreads();
+        changedToLoggedInView = true;
       }
+      else { // Using cached login
+        deepChatRef.style.width = "100%";
+      }
+    }
+
+    async function newThreadAndSwitch() {
+      if (emptyChat) {
+        switchActiveThread(emptyChat);
+        return true;
+      }
+
+      const currrent_messages = deepChatRef.getMessages();
+
+      if (currrent_messages.length <= initialMessages.length) {
+        return;
+      } 
+
+      const newThread = await getNewThread();
+
+      // force new object so Siderbar rerenders
+      threads = [ newThread ].concat(threads);
+      switchActiveThread(newThread);
+      emptyChat = newThread;
+
+      setThreads(threads);
+      return true;
+    }
+
+    async function deleteThreadAndSwitch(thread) {
+      const currrent_messages = deepChatRef.getMessages();
+
+      if (threads.length <= 1 && currrent_messages.length <= initialMessages.length) {
+        return false;
+      } 
+
+      if (emptyChat && emptyChat.id === thread.id) {
+        emptyChat = null;
+      }
+
+
+      threads = deleteThreadFromThreads(thread.id);
+      if (threads && threads.length > 0) {
+        const current_thread = getStoredActiveThread();
+        const candidateThread = threads[0];
+
+        if (candidateThread && candidateThread !== current_thread) {
+          switchActiveThread(candidateThread);
+        }
+
+      } else {
+        newThreadAndSwitch();
+      }
+
+      return true;
+    }
+    
+    async function switchActiveThread(thread) {
+
+      await setThread(thread);
+      keyAsstAndThread = await getKeyAsstAndThread();
+      selectedThreadId = keyAsstAndThread[2].id;
+      selectedThreadName = thread.name;
+
+      return true;
+    }
+
+    async function renameActiveThread(name) {
+      threads = await setActiveThreadName(name);
+
+      return true;
     }
 
   </script>
 
-  
   <main>
     <!--
       <h1>BIDARA</h1>
@@ -94,187 +221,235 @@
           </div>
         </div>
       </div>-->
-    <div id="welcome" bind:this={welcomeRef}>
+      <div id="welcome" style={" display: none "}; bind:this={welcomeRef}>
       <div id="header"><img src="bidara.png" alt="girl with dark hair" height="57" width="57" /><h2>BIDARA</h2><br/><span class="small">Bio-Inspired Design and Research Assistant</span></div>
-      <h3>How to access</h3>
-      <ol>
-        <li><a href="https://platform.openai.com/signup">Create an OpenAI account</a></li>
-        <li><a href="https://platform.openai.com/login">Login to OpenAI Platform</a></li>
-        <li>In the left sidebar, navigate to <a href="https://platform.openai.com/account/billing/overview">Settings -&gt; Billing</a></li> <li>Click the 'Add payment details' button</li>
-        <li>Add a minimum of $5 in credits. It is required to spend a minimum of $5 to <a href="https://platform.openai.com/docs/guides/rate-limits/usage-tiers?context=tier-free">access GPT-4</a>.</li>
-        <li>In the left sidebar, navigate to <a href="https://platform.openai.com/api-keys">API Keys</a></li>
+      <h3 class="text-lg font-bold mt-5 mb-5">How to access</h3>
+      <ol class="list-decimal">
+        <li><a href="https://platform.openai.com/signup" class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600">Create an OpenAI account</a></li>
+        <li><a href="https://platform.openai.com/login" class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600">Login to OpenAI Platform</a></li>
+        <li>In the left sidebar, navigate to <a href="https://platform.openai.com/account/billing/overview" class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600">Settings -&gt; Billing</a></li> <li>Click the 'Add payment details' button</li>
+        <li>Add a minimum of $5 in credits. It is required to spend a minimum of $5 to <a href="https://platform.openai.com/docs/guides/rate-limits/usage-tiers?context=tier-free" class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600">access GPT-4</a>.</li>
+        <li>In the left sidebar, navigate to <a href="https://platform.openai.com/api-keys" class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600">API Keys</a></li>
         <li>Verify your phone number, then click the 'Create new secret key' button.</li> <li>Copy your secret key.</li>
         <li>Paste your key into the input field below. Your browser will save the key, so you only have to enter it once.</li>
       </ol>
-      <ul>
-        <li>With OpenAI API you only pay for what you use. Track your usage and costs on the <a href="https://platform.openai.com/usage">Usage page</a>.</li>
-        <li>After you send your first message to BIDARA, it will also be available to interact with through the <a href="https://platform.openai.com/assistants">OpenAI Assistants Playground</a>. This interface is more complex, but also provides more customizability. Just select BIDARA, then click the 'Test' button.</li>
+      <ul class="list-disc mt-4">
+        <li>With OpenAI API you only pay for what you use. Track your usage and costs on the <a href="https://platform.openai.com/usage" class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600">Usage page</a>.</li>
+        <li>After you send your first message to BIDARA, it will also be available to interact with through the <a href="https://platform.openai.com/assistants" class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600">OpenAI Assistants Playground</a>. This interface is more complex, but also provides more customizability. Just select BIDARA, then click the 'Test' button.</li>
       </ul>
     </div>
-    <!-- demo/textInput are examples of passing an object directly into a property -->
-    <!-- initialMessages is an example of passing a state object into a property -->
-    {#await getKeyAndAsst() then keyAndAsst}
-    <deep-chat
-      id="chat-element"
-      directConnection={{
-        openAI: {
-          key: keyAndAsst[0],
-          validateKeyProperty: keyAndAsst[0] ? false : true, // if apiKey is not null it has already been validated.
-          assistant: {
-            assistant_id: keyAndAsst[1],
-            new_assistant: BIDARA_CONFIG,
-            function_handler: funcCalling
-          }
-        }
-      }}
-      errorMessages={{
-        displayServiceErrorMessages: true
-      }}
-      onError={onError}
-      onNewMessage={onNewMessage}
-      onComponentRender={onComponentRender}
-      _insertKeyViewStyles={{displayCautionText: false}}
-      demo={false}
-      speechToText={{
-        webSpeech: "true",
-        commands: {
-          submit: "dude"
-        },
-        settings: {
-          substrings: "false"
-        },
-        button: {
-          default: {
-            container: {
+    <div id="content-container" class:open>
+      <div bind:this={navbarRef}>
+      <Navbar bind:this={navbarRef} bind:chat_name={selectedThreadName} bind:sidebar={open} handleRename={renameActiveThread}/>   
+      </div>
+      <div bind:this={sidebarRef}>
+        {#key selectedThreadId}
+        <Sidebar bind:this={sidebarRef} handleChatSelect={switchActiveThread} handleChatDelete={deleteThreadAndSwitch} handleChatNew={newThreadAndSwitch} bind:threads bind:open bind:selectedThreadId/>
+        {/key}
+      </div>
+      <div id="chat-container">
+        <!-- demo/textInput are examples of passing an object directly into a property -->
+        <!-- initialMessages is an example of passing a state object into a property -->
+        {#if keyAsstAndThread !== null}
+        {#key keyAsstAndThread}
+        <deep-chat
+          id="chat-element"
+          bind:this={deepChatRef}
+          directConnection={{
+            openAI: {
+              key: keyAsstAndThread[0],
+              validateKeyProperty: keyAsstAndThread[0] ? false : true, // if apiKey is not null it has already been validated.
+              assistant: {
+                assistant_id: keyAsstAndThread[1],
+                new_assistant: BIDARA_CONFIG,
+                thread_id: keyAsstAndThread[2] ? keyAsstAndThread[2]?.id : null,
+                load_thread_history: keyAsstAndThread[2] ? true : false,
+                function_handler: funcCalling
+              }
+            }
+          }}
+          errorMessages={{
+            displayServiceErrorMessages: true
+          }}
+          onError={onError}
+          onNewMessage={onNewMessage}
+          onComponentRender={onComponentRender}
+          _insertKeyViewStyles={{displayCautionText: false}}
+          demo={false}
+          speechToText={{
+            webSpeech: "true",
+            commands: {
+              submit: "dude"
+            },
+            settings: {
+              substrings: "false"
+            },
+            button: {
               default: {
-                width: "1em",
-                height: "1em",
-                bottom: ".7em",
-                borderRadius: "100vmax",
-                padding: "0.5em",
-                backgroundColor: "rgba(0, 0, 0, 0.1)",
-                left: "calc(11px - 0.25em)"
+                container: {
+                  default: {
+                    width: "1em",
+                    height: "1em",
+                    bottom: ".7em",
+                    borderRadius: "100vmax",
+                    padding: "0.5em",
+                    backgroundColor: "rgba(0, 0, 0, 0.1)",
+                    left: "calc(11px - 0.25em)"
+                  }
+                },
+                svg: {
+                  styles: {
+                    default: {
+                      bottom: "0.35em",
+                      left: "0.4em"
+                    }
+                  }
+                }
+              },
+              position: "outside-right"
+            }
+          }}
+          mixedFiles={{
+            button: {
+              styles: {
+                container: {
+                  default: {
+                    width: "1em",
+                    height: "1em",
+                    right: "calc(10% + 0.4em)",
+                    bottom: ".7em",
+                    borderRadius: "100vmax",
+                    padding: "0.5em",
+                    backgroundColor: "rgba(0, 0, 0, 0.1)"
+                  }
+                },
+                svg: {
+                  styles: {
+                    default: {
+                      bottom: "0.35em",
+                      left: "0.4em"
+                    }
+                  }
+                }
+              },
+              position: "outside-left"
+            }
+          }}
+          attachmentContainerStyle={{
+            backgroundColor: "rgba(255, 255, 255, 0.6)",
+            borderRadius: "5px 5px 0 0",
+            border: "1px solid rgba(0,0,0,0.2)",
+            top: "-2.55em",
+            height: "4em",
+            width: "calc(100% - 6.2em)",
+          }}
+          textInput={{
+            styles: {
+              container: {
+                width: "calc(100% - 6em)",
+                boxShadow: "none",
+                borderRadius: "1em",
+                border: "1px solid rgba(0,0,0,0.2)"
+              },
+              text: {
+                padding: "0.4em 2.5em 0.4em 0.8em",
               }
             },
-            svg: {
-              styles: {
-                default: {
-                  bottom: "0.35em",
-                  left: "0.4em"
-                }
-              }
-            }
-          },
-          position: "outside-right"
-        }
-      }}
-      mixedFiles={{
-        button: {
-          styles: {
-            container: {
-              default: {
-                width: "1em",
-                height: "1em",
-                right: "calc(10% + 0.4em)",
-                bottom: ".7em",
-                borderRadius: "100vmax",
-                padding: "0.5em",
-                backgroundColor: "rgba(0, 0, 0, 0.1)"
-              }
-            },
-            svg: {
-              styles: {
-                default: {
-                  bottom: "0.35em",
-                  left: "0.4em"
-                }
-              }
-            }
-          },
-          position: "outside-left"
-        }
-      }}
-      attachmentContainerStyle={{
-        backgroundColor: "rgba(255, 255, 255, 0.6)",
-        borderRadius: "5px 5px 0 0",
-        border: "1px solid rgba(0,0,0,0.2)",
-        top: "-2.55em",
-        height: "4em",
-        width: "calc(100% - 6.2em)",
-      }}
-      textInput={{
-        styles: {
-          container: {
-            width: "calc(100% - 6em)",
-            boxShadow: "none",
-            borderRadius: "1em",
-            border: "1px solid rgba(0,0,0,0.2)"
-          },
-          text: {
-            padding: "0.4em 2.5em 0.4em 0.8em",
-          }
-        },
-        placeholder:{text: "How might we..."}
-      }}
-      initialMessages={initialMessages}
-      chatStyle={{
-        width: "100%",
-        height: "100dvh",
-        backgroundColor: "white",
-        border: "none",
-        fontSize: "17px",
-        fontFamily: 'system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"'
-      }}
-      messageStyles={{
-        default: {
-          shared: {
-            bubble: {
-              maxWidth: "75%",
-              borderRadius: "1em",
-              padding: ".42em .7em"
-            }
-          }
-        },
-        loading: {
-          shared: {
-            bubble: {
-              padding: "0.6em 0.75em 0.6em 1.3em"
-            }
-          }
-        }
-      }}
-      submitButtonStyles={{
-        submit: {
-          container: {
+            placeholder:{text: "How might we..."}
+          }}
+          initialMessages={initialMessages}
+          chatStyle={{
+            width: "100vw",
+            height: "calc(100dvh - 3.1rem)",
+            backgroundColor: "white",
+            border: "none",
+            fontSize: "17px",
+            fontFamily: 'system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"'
+          }}
+          messageStyles={{
             default: {
-              width: "1em",
-              height: "1em",
-              right: "calc(10% + 0.3em)",
-              bottom: ".87em",
-              borderRadius: "100vmax",
-              padding: "0.3em",
-              backgroundColor: "rgb(0, 132, 255)"
+              shared: {
+                bubble: {
+                  maxWidth: "75%",
+                  borderRadius: "1em",
+                  padding: ".42em .7em"
+                }
+              }
+            },
+            loading: {
+              shared: {
+                bubble: {
+                  padding: "0.6em 0.75em 0.6em 1.3em"
+                }
+              }
             }
-          },
-          svg: {
-            content: '<svg viewBox="2 2 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3C12.2652 3 12.5196 3.10536 12.7071 3.29289L19.7071 10.2929C20.0976 10.6834 20.0976 11.3166 19.7071 11.7071C19.3166 12.0976 18.6834 12.0976 18.2929 11.7071L13 6.41421V20C13 20.5523 12.5523 21 12 21C11.4477 21 11 20.5523 11 20V6.41421L5.70711 11.7071C5.31658 12.0976 4.68342 12.0976 4.29289 11.7071C3.90237 11.3166 3.90237 10.6834 4.29289 10.2929L11.2929 3.29289C11.4804 3.10536 11.7348 3 12 3Z" fill="#ffffff" stroke="white" stroke-width="1"/></svg>'
-          }
-        }
-      }}
-    />
-    {/await}
+          }}
+          submitButtonStyles={{
+            submit: {
+              container: {
+                default: {
+                  width: "1em",
+                  height: "1em",
+                  right: "calc(10% + 0.3em)",
+                  bottom: ".87em",
+                  borderRadius: "100vmax",
+                  padding: "0.3em",
+                  backgroundColor: "rgb(0, 132, 255)"
+                }
+              },
+              svg: {
+                content: '<svg viewBox="2 2 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3C12.2652 3 12.5196 3.10536 12.7071 3.29289L19.7071 10.2929C20.0976 10.6834 20.0976 11.3166 19.7071 11.7071C19.3166 12.0976 18.6834 12.0976 18.2929 11.7071L13 6.41421V20C13 20.5523 12.5523 21 12 21C11.4477 21 11 20.5523 11 20V6.41421L5.70711 11.7071C5.31658 12.0976 4.68342 12.0976 4.29289 11.7071C3.90237 11.3166 3.90237 10.6834 4.29289 10.2929L11.2929 3.29289C11.4804 3.10536 11.7348 3 12 3Z" fill="#ffffff" stroke="white" stroke-width="1"/></svg>'
+              }
+            }
+          }}
+        />
+        {/key}
+        {/if}
+      </div>
+    </div>
     
   </main>
 
 
   <style>
+    #chat-container {
+      width: 100%;
+      margin-left: 0;
+      transition: ease 0.3s;
+    }
+    
+    .open #chat-container {
+      width: 80%;
+      margin-left: 20%;
+    }
+
+    @media only screen and (max-width: 1000px) {
+      .open #chat-container {
+        width: 70%;
+        margin-left: 30%;
+      }
+    }
+
+    @media only screen and (max-width: 900px) {
+      .open #chat-container {
+        width: 60%;
+        margin-left: 40%;
+      }
+    }
+ 
+    @media only screen and (max-width: 700px) {
+      .open #chat-container {
+        width: 100%;
+        margin-left: 0;
+      }
+    }
+
     main {
       font-family: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
       display: grid;
     }
 
     #welcome {
-      margin-bottom: -30dvh;
       z-index: 1;
       line-height: 1.5em;
       padding-left: 1em;
@@ -291,10 +466,6 @@
       font-size: 2em;
       line-height: 1em;
       display: inline;
-    }
-
-    #welcome h3 {
-      margin-inline-start: .25em;
     }
 
     #header {
