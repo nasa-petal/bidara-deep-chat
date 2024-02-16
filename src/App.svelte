@@ -8,8 +8,7 @@
     import { BIDARA_CONFIG } from './assistant/bidara';
     import { funcCalling } from './assistant/bidaraFunctions';
     import { setOpenAIKey, setAsst, getKeyAsstAndThread, getBidaraAssistant } from './utils/openaiUtils';
-    import { setThread, getThread, deleteThreadFromThreads, getNewThread, getThreads, setThreads, setActiveThreadName, updateThreadAndThreads, getEmptyThreads, floatThreadInThreads } from './utils/threadUtils';
-    import { getStoredActiveThread } from './utils/storageUtils';
+    import { setThread, getThread, deleteThreadFromThreads, getNewThread, getThreads, setThreads, setActiveThreadName, updateThreadAndThreads, getEmptyThreads } from './utils/threadUtils';
     import hljs from "highlight.js";
     window.hljs = hljs;
   
@@ -21,7 +20,6 @@
 
     let openAIKeySet = false;
     let openAIAsstIdSet = false;
-    let openAIThreadIdSet = false;
     let changedToLoggedInView = false;
     let keyAsstAndThread = null;
     let welcomeRef;
@@ -32,6 +30,8 @@
 
     let threads;
     let activeThread;
+    let activeThreadName = "";
+    let activeThreadId = "";
     
     function onError(error) {
       console.log(error);
@@ -72,6 +72,7 @@
     }
 
     async function onComponentRender() {
+      console.log("render");
       // save key to localStorage.
       // The event occurs before key is set, and again, after key is set.
       if (!openAIKeySet && this._activeService.key) {
@@ -95,6 +96,8 @@
         navbarRef.style.display = "none";
         deepChatRef.style.width = "calc(100vw - 1rem)";
         deepChatRef.style.height = "100px";
+        activeThread = {name: "", id: ""};
+        console.log("not set");
       }
       else if (!changedToLoggedInView) { // Hide login instructions after login. 
         welcomeRef.style.display = "none";
@@ -102,8 +105,10 @@
         deepChatRef.style.height = "calc(100dvh - 3.1rem)";
         await initKeyAsstAndThreads();
         changedToLoggedInView = true;
+        console.log("not set");
       }
       else { // Using cached login
+        console.log("cached");
         deepChatRef.style.width = "100%";
       }
     }
@@ -225,15 +230,16 @@
         <li>After you send your first message to BIDARA, it will also be available to interact with through the <a href="https://platform.openai.com/assistants" class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600">OpenAI Assistants Playground</a>. This interface is more complex, but also provides more customizability. Just select BIDARA, then click the 'Test' button.</li>
       </ul>
     </div>
-    <div id="content-container" class:open>
-      <div bind:this={navbarRef}>
-      <Navbar bind:this={navbarRef} bind:chat_name={selectedThreadName} bind:sidebar={open} handleRename={renameActiveThread}/>   
-      </div>
+    {#if keyAsstAndThread !== null}
+    <div bind:this={navbarRef}>
+      <Navbar bind:chat_name={activeThreadName} bind:sidebar={open} handleRename={renameActiveThread}/>   
+    </div>
+    <div id="content-container" class="flex justify-between" class:open>
+      {#key activeThread}
       <div bind:this={sidebarRef}>
-        {#key activeThread}
-        <Sidebar bind:this={sidebarRef} handleChatSelect={switchActiveThread} handleChatDelete={deleteThreadAndSwitch} handleChatNew={newThreadAndSwitch} bind:threads bind:open bind:selectedThreadId={activeThread.id}/>
-        {/key}
+        <Sidebar handleChatSelect={switchActiveThread} handleChatDelete={deleteThreadAndSwitch} handleChatNew={newThreadAndSwitch} bind:threads bind:open bind:selectedThreadId={activeThreadId}/>
       </div>
+      {/key}
       <div id="chat-container">
         <!-- demo/textInput are examples of passing an object directly into a property -->
         <!-- initialMessages is an example of passing a state object into a property -->
@@ -391,6 +397,7 @@
         {/key}
       </div>
     </div>
+    {/if}
   </main>
 
 

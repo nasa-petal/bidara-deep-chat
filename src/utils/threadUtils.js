@@ -92,15 +92,15 @@ export function updateThreadAndThreads(activeThread, threads) {
   const storedThread = getStoredActiveThread();
   const storedThreads = getStoredThreads();
 
-
   if (activeThread != storedThread) {
-    threads = threads.map((thread) => { 
-      if (thread.id === activeThread.id) {
-        return activeThread;
-      }
-      return thread;
-    });
-
+    if (threads) {
+      threads = threads.map((thread) => { 
+        if (thread.id === activeThread.id) {
+          return activeThread;
+        }
+        return thread;
+      });
+    }
 
     setStoredActiveThread(activeThread);
   }
