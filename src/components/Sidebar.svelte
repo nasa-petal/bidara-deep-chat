@@ -41,7 +41,7 @@
     left: -20%;
     transition: ease 0.3s;
     background-color: rgb(229, 229, 234);
-    border-right: 1px solid rgb(199, 199, 204);
+    border-right: 1px solid rgb(180, 180, 180);
     overflow-y: auto;
   }
 

@@ -62,9 +62,10 @@
   header {
     background-color: rgb(229, 229, 234);
     z-index: 10;
-    border-bottom: 1px solid rgb(199, 199, 204);
+    border-bottom: 1px solid rgb(180, 180, 180);
   }
   button {
+    width: 50%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
