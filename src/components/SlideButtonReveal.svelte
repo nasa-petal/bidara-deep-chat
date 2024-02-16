@@ -128,7 +128,9 @@
         style="background-color: {slideBgColor};"
         >
         <p class="slider-button-text draggable my-0 font-sans block w-full focus:outline-none" >{sliderText}</p>
-        <img class="slider-image draggable" src={sliderImage} alt="Dragger" />
+        <a class="slider-grabber draggable">
+            <img class="slider-image draggable" src={sliderImage} alt="Dragger" />
+        </a>
     </div>
     {#if rendered}
     <div 
@@ -182,14 +184,18 @@
     }
 
     .reveal-image {
-        width: 15px;
-        height: 15px;
+        width: 1em;
+        height: 1em;
         margin-right: 1em;
     }
 
+    .slider-grabber {
+        padding: 0.5em;
+    }
+
     .slider-image {
-        width: 15px;
-        height: 15px;
+        width: 1em;
+        height: 1em;
         color: red;
         transform: rotate(180deg);
         cursor: grab;

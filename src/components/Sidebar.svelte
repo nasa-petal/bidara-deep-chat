@@ -54,6 +54,10 @@
     left: 0;
   }
 
+  nav {
+    border-top: 1px solid rgb(199, 199, 204);
+  }
+
   .new-thread {
     line-height: 1em;
     background-color: white;

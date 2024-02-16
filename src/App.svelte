@@ -21,7 +21,6 @@
 
     let openAIKeySet = false;
     let openAIAsstIdSet = false;
-    let openAIThreadIdSet = false;
     let keyAsstAndThread = null;
     let welcomeRef;
     let navbarRef;
@@ -68,7 +67,6 @@
       }
 
       activeThread.length = deepChatRef.getMessages().length;
-      console.log("here");
       updateThreads();
     }
 
@@ -108,7 +106,7 @@
 
     async function newThreadAndSwitch() {
       // If the thread is already "new", stay on it
-      if (activeThread.length <= 0) {
+      if (activeThread && activeThread.length <= 0) {
         if (activeThread.name != "New Chat") {
           await renameActiveThread("New Chat");
         }
@@ -130,7 +128,7 @@
 
       setThreads(threads);
 
-      switchActiveThread(activeThread);
+      await switchActiveThread(activeThread);
       
       return true;
     }
@@ -138,10 +136,11 @@
     async function deleteThreadAndSwitch(thread) {
 
       threads = deleteThreadFromThreads(thread.id);
+      activeThread = {};
       if (threads && threads.length > 0) {
         switchActiveThread(threads[0]);
       } else {
-        newThreadAndSwitch();
+        await newThreadAndSwitch();
       }
 
       return true;
