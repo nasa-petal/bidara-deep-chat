@@ -123,12 +123,12 @@
         return true;
       }
 
-      activeThread = await getNewThread();
-      threads.unshift(activeThread);
+      const thread = await getNewThread();
+      threads.unshift(thread);
 
       setThreads(threads);
 
-      await switchActiveThread(activeThread);
+      await switchActiveThread(thread);
       
       return true;
     }
@@ -148,6 +148,9 @@
 
     
     async function switchActiveThread(thread) {
+      if (thread.id === activeThread.id) {
+        return;
+      }
 
       await setThread(thread);
       keyAsstAndThread = await getKeyAsstAndThread();
@@ -214,16 +217,16 @@
         <li>Paste your key into the input field below. Your browser will save the key, so you only have to enter it once.</li>
       </ol>
       <ul class="list-disc mt-4">
-        <li>With OpenAI API you only pay for what you use. Track your usage and costs on the <a href="https://platform.openai.com/usage" class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600">Usage page</a>.</li>
+        <li>With OpenAI API you only pay for what you use. Track your usage and costs on the <a href="https://platform.openai.com/usage" class="underline text-blue-600 hover:text-elue-800 visited:text-purple-600">Usage page</a>.</li>
         <li>After you send your first message to BIDARA, it will also be available to interact with through the <a href="https://platform.openai.com/assistants" class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600">OpenAI Assistants Playground</a>. This interface is more complex, but also provides more customizability. Just select BIDARA, then click the 'Test' button.</li>
       </ul>
     </div>
     {#if keyAsstAndThread !== null}
     {#key deepChatWidth}
-    <div id="content-container" class:open>
-      <div bind:this={navbarRef}>
+    <div style="width: 100vw;" bind:this={navbarRef}>
       <Navbar bind:this={navbarRef} bind:chat_name={activeThread.name} bind:sidebar={open} handleRename={renameActiveThread}/>   
-      </div>
+    </div>
+    <div id="content-container" class="flex justify-between" class:open>
       <div bind:this={sidebarRef}>
         {#key activeThread}
         <Sidebar bind:this={sidebarRef} handleChatSelect={switchActiveThread} handleChatDelete={deleteThreadAndSwitch} handleChatNew={newThreadAndSwitch} bind:threads bind:open bind:selectedThreadId={activeThread.id}/>
@@ -400,32 +403,28 @@
     #chat-container {
       width: 100%;
       margin-left: 0;
-      transition: ease 0.3s;
+      transition: width 0.3s ease, filter 0.2s ease-out;
     }
     
     .open #chat-container {
       width: 80%;
-      margin-left: 20%;
     }
 
     @media only screen and (max-width: 1000px) {
       .open #chat-container {
         width: 70%;
-        margin-left: 30%;
       }
     }
 
     @media only screen and (max-width: 900px) {
       .open #chat-container {
         width: 60%;
-        margin-left: 40%;
       }
     }
  
     @media only screen and (max-width: 700px) {
       .open #chat-container {
         width: 100%;
-        margin-left: 0;
       }
     }
 
