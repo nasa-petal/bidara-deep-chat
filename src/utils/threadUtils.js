@@ -13,7 +13,6 @@ export async function getNewThread() {
 }
 
 export async function getThread() {
-  console.log("getttingthread");
   const thread = getStoredActiveThread();
 
   let isValidThreadId = false;
@@ -55,7 +54,9 @@ export function setThreads(threads) {
 }
 
 export function deleteThreadFromThreads(thread_id) {
-  return getFilteredThreads((thread) => thread.id !== thread_id);
+  const filteredThreads = getFilteredThreads((thread) => thread.id !== thread_id);
+  setThreads(filteredThreads);
+  return filteredThreads;
 }
 
 export async function setActiveThreadName(name) {
