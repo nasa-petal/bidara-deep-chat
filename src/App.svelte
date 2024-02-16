@@ -21,12 +21,13 @@
 
     let openAIKeySet = false;
     let openAIAsstIdSet = false;
+    let openAIThreadIdSet = false;
+    let changedToLoggedInView = false;
     let keyAsstAndThread = null;
     let welcomeRef;
     let navbarRef;
     let sidebarRef;
     let deepChatRef;
-    let deepChatWidth = "100dvw"
     let open = false;
 
     let threads;
@@ -89,18 +90,21 @@
         }
       }
 
-      if(!openAIKeySet) {
+      if(!openAIKeySet) { // Show login instructions.
         welcomeRef.style.display = "block";
         navbarRef.style.display = "none";
+        deepChatRef.style.width = "calc(100vw - 1rem)";
+        deepChatRef.style.height = "100px";
       }
-      else {
+      else if (!changedToLoggedInView) { // Hide login instructions after login. 
         welcomeRef.style.display = "none";
         navbarRef.style.display = "block";
-
-        if (deepChatWidth === "100dvw") {
-          deepChatWidth = "100%";
-          await initKeyAsstAndThreads();
-        }
+        deepChatRef.style.height = "calc(100dvh - 3.1rem)";
+        await initKeyAsstAndThreads();
+        changedToLoggedInView = true;
+      }
+      else { // Using cached login
+        deepChatRef.style.width = "100%";
       }
     }
 
@@ -221,12 +225,10 @@
         <li>After you send your first message to BIDARA, it will also be available to interact with through the <a href="https://platform.openai.com/assistants" class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600">OpenAI Assistants Playground</a>. This interface is more complex, but also provides more customizability. Just select BIDARA, then click the 'Test' button.</li>
       </ul>
     </div>
-    {#if keyAsstAndThread !== null}
-    {#key deepChatWidth}
-    <div style="width: 100vw;" bind:this={navbarRef}>
-      <Navbar bind:this={navbarRef} bind:chat_name={activeThread.name} bind:sidebar={open} handleRename={renameActiveThread}/>   
-    </div>
-    <div id="content-container" class="flex justify-between" class:open>
+    <div id="content-container" class:open>
+      <div bind:this={navbarRef}>
+      <Navbar bind:this={navbarRef} bind:chat_name={selectedThreadName} bind:sidebar={open} handleRename={renameActiveThread}/>   
+      </div>
       <div bind:this={sidebarRef}>
         {#key activeThread}
         <Sidebar bind:this={sidebarRef} handleChatSelect={switchActiveThread} handleChatDelete={deleteThreadAndSwitch} handleChatNew={newThreadAndSwitch} bind:threads bind:open bind:selectedThreadId={activeThread.id}/>
@@ -325,7 +327,6 @@
             border: "1px solid rgba(0,0,0,0.2)",
             top: "-2.55em",
             height: "4em",
-            width: "calc(100% - 6.2em)",
           }}
           textInput={{
             styles: {
@@ -343,8 +344,8 @@
           }}
           initialMessages={initialMessages}
           chatStyle={{
-            width: deepChatWidth,
-            height: "calc(100dvh - 3.4rem)",
+            width: "100vw",
+            height: "calc(100dvh - 3.1rem)",
             backgroundColor: "white",
             border: "none",
             fontSize: "17px",
@@ -390,16 +391,10 @@
         {/key}
       </div>
     </div>
-    {/key}
-    {/if}
   </main>
 
 
   <style>
-    #content-container {
-      width: 100dvw;
-    }
-
     #chat-container {
       width: 100%;
       margin-left: 0;
@@ -434,7 +429,6 @@
     }
 
     #welcome {
-      margin-bottom: -30dvh;
       z-index: 1;
       line-height: 1.5em;
       padding-left: 1em;
