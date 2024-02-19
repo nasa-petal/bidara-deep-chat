@@ -14,7 +14,7 @@
     "svelte": "^4.0.0"
   },
   "dependencies": {
-    "deep-chat-dev": "^9.0.131",
+    "deep-chat-dev": "^9.0.135",
     "sirv-cli": "^2.0.0",
     "svelte-agnostic-draggable": "^0.2.0",
     "svelte-touch-to-mouse": "^1.0.0"
