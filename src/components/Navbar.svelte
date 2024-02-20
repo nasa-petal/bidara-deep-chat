@@ -9,6 +9,10 @@
     let editing_name = false;
     let editing_input;
 
+    if (!chat_name) {
+      chat_name = "";
+    }
+
     function handleButtonClick() {
       editing_name = true;
     }
@@ -42,7 +46,6 @@
         editing_input.focus();
       }
     }
-
 </script>
 
 <header class="flex py-2 justify-between items-center text-gray-600">
