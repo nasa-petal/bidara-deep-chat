@@ -29,12 +29,16 @@ npm run dev
 ```
 
 ### Known issues
+
+- add a loading icon, while thread is loading. so user doesn't just see the navbar and blank screen.
 - deep-chat speechToText: submit command word is sent in message on safari and chrome on iOS.
 
 - deep-chat textToSpeech: doesn't read messages aloud on safari or chrome on iOS.
 
 ### Nice to haves
 
+- after you select a chat on mobile, close the sidebar.
+- have sidebar opened by default on larger screen sizes.
 - save chat logs.
 - ability rate responses and add feedback.
 - ability to send ratings, feedback and chat log to us.
