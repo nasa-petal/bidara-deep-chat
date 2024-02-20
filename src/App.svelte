@@ -22,6 +22,7 @@
     let openAIAsstIdSet = false;
     let changedToLoggedInView = false;
     let keyAsstAndThread = null;
+    let activeThread = null;
     let welcomeRef;
     let navbarRef;
     let sidebarRef;
@@ -29,9 +30,6 @@
     let open = false;
 
     let threads;
-    let activeThread;
-    let activeThreadName = "";
-    let activeThreadId = "";
     
     function onError(error) {
       console.log(error);
@@ -43,8 +41,11 @@
 
     async function initKeyAsstAndThreads() {
       keyAsstAndThread = await getKeyAsstAndThread();
+      activeThread = null;
 
       if (keyAsstAndThread && keyAsstAndThread[0]) {
+        openAIKeySet = true;
+        changedToLoggedInView = true;
 
         threads = getThreads();
         activeThread = keyAsstAndThread[2];
@@ -67,12 +68,13 @@
         openAIAsstIdSet = true;
       }
 
-      activeThread.length = deepChatRef.getMessages().length;
-      updateThreads();
+      if (activeThread) {
+        activeThread.length = deepChatRef.getMessages().length;
+        updateThreads();
+      }
     }
 
     async function onComponentRender() {
-      console.log("render");
       // save key to localStorage.
       // The event occurs before key is set, and again, after key is set.
       if (!openAIKeySet && this._activeService.key) {
@@ -93,22 +95,16 @@
 
       if(!openAIKeySet) { // Show login instructions.
         welcomeRef.style.display = "block";
-        navbarRef.style.display = "none";
         deepChatRef.style.width = "calc(100vw - 1rem)";
         deepChatRef.style.height = "100px";
-        activeThread = {name: "", id: ""};
-        console.log("not set");
       }
       else if (!changedToLoggedInView) { // Hide login instructions after login. 
         welcomeRef.style.display = "none";
-        navbarRef.style.display = "block";
         deepChatRef.style.height = "calc(100dvh - 3.1rem)";
         await initKeyAsstAndThreads();
         changedToLoggedInView = true;
-        console.log("not set");
       }
       else { // Using cached login
-        console.log("cached");
         deepChatRef.style.width = "100%";
       }
     }
@@ -231,15 +227,21 @@
       </ul>
     </div>
     {#if keyAsstAndThread !== null}
-    <div bind:this={navbarRef}>
-      <Navbar bind:chat_name={activeThreadName} bind:sidebar={open} handleRename={renameActiveThread}/>   
-    </div>
+    {#if activeThread !== null}
+    {#key activeThread}
+      <div bind:this={navbarRef}>
+        <Navbar bind:chat_name={activeThread.name} bind:sidebar={open} handleRename={renameActiveThread}/>   
+      </div>
+    {/key}
+    {/if}
     <div id="content-container" class="flex justify-between" class:open>
+      {#if activeThread !== null}
       {#key activeThread}
       <div bind:this={sidebarRef}>
-        <Sidebar handleChatSelect={switchActiveThread} handleChatDelete={deleteThreadAndSwitch} handleChatNew={newThreadAndSwitch} bind:threads bind:open bind:selectedThreadId={activeThreadId}/>
+        <Sidebar handleChatSelect={switchActiveThread} handleChatDelete={deleteThreadAndSwitch} handleChatNew={newThreadAndSwitch} bind:threads bind:open bind:selectedThreadId={activeThread.id}/>
       </div>
       {/key}
+      {/if}
       <div id="chat-container">
         <!-- demo/textInput are examples of passing an object directly into a property -->
         <!-- initialMessages is an example of passing a state object into a property -->

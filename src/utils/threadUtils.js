@@ -13,27 +13,22 @@ export async function getNewThread() {
 }
 
 export async function getThread() {
-  const thread = getStoredActiveThread();
+  var thread = getStoredActiveThread();
 
-  let isValidThreadId = false;
+  var isValidThreadId = false;
   if (thread !== null) {
     isValidThreadId = await validThread(thread.id);
   }
 
-  if (isValidThreadId) {
-    return thread;
+  while (!isValidThreadId) {
+    thread = await getNewThread();
+
+    if (thread !== null) {
+      isValidThreadId = await validThread(thread.id);
+    }
   }
 
-  if (thread === null) {
-    const new_thread = await getNewThread();
-
-    setThreads([new_thread]);
-    setThread(new_thread);
-
-    return new_thread;
-  }
-
-  return null;
+  return thread;
 }
 
 export async function setThread(thread) {
