@@ -53,7 +53,7 @@
   {#if editing_name}
     <input type="text" bind:this={editing_input} class="px-3 py-1 rounded-full" on:blur={handleInputLeave} on:keydown={handleInputKeyDown}/>
   {:else}
-    <button class="focus:no-outline px-3 py-1 rounded-full" on:click={handleButtonClick}>{chat_name}</button>
+    <button tabindex="0" class="focus:no-outline px-3 py-1 rounded-full" on:click={handleButtonClick}>{chat_name}</button>
   {/if}
   <Logo/>	
 </header>

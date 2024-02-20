@@ -2,7 +2,7 @@
   https://codesandbox.io/p/sandbox/deep-chat-sveltekit-fn8h6x -->
 
   <script>
-    import { DeepChat } from "deep-chat-dev";
+    import { DeepChat } from "deep-chat";
     import { onMount } from 'svelte';
     import { Navbar, Sidebar } from './components';
     import { BIDARA_CONFIG } from './assistant/bidara';
@@ -113,12 +113,10 @@
       else if (!changedToLoggedInView) { // Hide login instructions after login. 
         welcomeRef.style.display = "none";
         navbarRef.style.display = "block";
+        deepChatRef.style.width = "100%";
         deepChatRef.style.height = "calc(100dvh - 3.1rem)";
         await initKeyAsstAndThreads();
         changedToLoggedInView = true;
-      }
-      else { // Using cached login
-        deepChatRef.style.width = "100%";
       }
     }
 
@@ -359,7 +357,8 @@
           }}
           initialMessages={initialMessages}
           chatStyle={{
-            width: "100vw",
+            display: "block",
+            width: "100%",
             height: "calc(100dvh - 3.1rem)",
             backgroundColor: "white",
             border: "none",
