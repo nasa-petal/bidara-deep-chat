@@ -22,7 +22,7 @@
 </script>
 
   <aside class="absolute full shadow-lg flex flex-col" class:open>
-    <button class="new-thread rounded-full m-2 text-base font-sans p-2 focus:outline-none" on:click={handleButtonClick}>New Thread</button>
+    <button tabindex="0" class="new-thread rounded-full m-2 text-base font-sans p-2" disabled={!open} on:click={handleButtonClick}>New Thread</button>
     <nav class="w-full">
       {#if threads !== null}
         {#each threads as thread}
