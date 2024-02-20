@@ -4,16 +4,18 @@
 
     export let selected = false;
 
-		export let revealedButtonFocusImage;
-		export let revealedButtonUnfocusImage;
-		export let revealedButtonFocusBgColor;
-		export let revealedButtonUnfocusBgColor;
-		export let buttonBgColor;
-		export let buttonText;
+    export let revealedButtonFocusImage;
+    export let revealedButtonUnfocusImage;
+    export let revealedButtonFocusBgColor;
+    export let revealedButtonUnfocusBgColor;
+    export let buttonBgColor;
+    export let buttonText;
 
 </script>
 <div class="button-reveal-container">
     <div 
+        role="button"
+        tabindex="-1"
         class="button-box flex justify-between items-center py-0" 
         class:selected
         style="background-color: {buttonBgColor};"
@@ -21,10 +23,10 @@
         >
 
         <p class="button-text my-0 font-sans block focus:outline-none" >{buttonText}</p>
-        <a class="revealed-button flex-shrink-0" on:click={handleClickRevealed}>
-            <img class="revealed-image unfocused" src={revealedButtonUnfocusImage}  alt="revealed unfocused select"/>
-            <img class="revealed-image focused" src={revealedButtonFocusImage}  alt="revealed focused select"/>
-        </a>
+        <button class="revealed-button flex-shrink-0 focus:outline-none" on:click={handleClickRevealed}>
+            <img draggable="false" class="revealed-image unfocused" src={revealedButtonUnfocusImage}  alt="revealed unfocused select"/>
+            <img draggable="false" class="revealed-image focused" src={revealedButtonFocusImage}  alt="revealed focused select"/>
+        </button>
     </div>
 </div>
 
