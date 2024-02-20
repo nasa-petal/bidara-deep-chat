@@ -3,12 +3,20 @@
 </script>
 
 <div class="container flex items-center">
-    <a class="menu" class:open on:click={() => open = !open}>
+    <button tabindex="0" class="focus:outline-none menu" class:open on:click={() => open = !open}>
         <img class="menu-image" src="chevron-right-blue.svg" alt="menu"/>
-    </a>
+    </button>
 </div>
 
 <style>
+    button {
+        padding: 3px;
+    }
+
+    button:focus-visible {
+        outline: 5px auto -webkit-focus-ring-color;
+    }
+    
     .container {
         width: 2em;
         height: 2em;
