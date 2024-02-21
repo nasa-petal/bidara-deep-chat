@@ -28,6 +28,7 @@
     let sidebarRef;
     let deepChatRef;
     let open = false;
+    let blurred = true;
 
     let threads;
     
@@ -105,6 +106,9 @@
         await initKeyAsstAndThreads();
         changedToLoggedInView = true;
       }
+
+      console.log("rendered");
+      setTimeout(()=> blurred = false, 200);
     }
 
     async function newThreadAndSwitch() {
@@ -154,6 +158,8 @@
       if (thread.id === activeThread.id) {
         return;
       }
+
+      blurred = true;
 
       await setThread(thread);
       keyAsstAndThread = await getKeyAsstAndThread();
@@ -247,6 +253,7 @@
         <deep-chat
           id="chat-element"
           bind:this={deepChatRef}
+          class:blurred
           directConnection={{
             openAI: {
               key: keyAsstAndThread[0],
@@ -406,7 +413,7 @@
     #chat-container {
       width: 100%;
       margin-left: 0;
-      transition: width 0.3s ease, filter 0.2s ease-out;
+      transition: width 0.3s ease, filter 0.5s ease-out;
     }
     
     .open #chat-container {
@@ -429,6 +436,10 @@
       .open #chat-container {
         width: 100%;
       }
+    }
+
+    .blurred {
+      filter: blur(2px);
     }
 
     main {

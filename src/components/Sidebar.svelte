@@ -8,6 +8,10 @@
 
   import Chat from './Chat.svelte'
 
+  function isMobile() {
+    return window.innerWidth < 700;
+  }
+
   async function handleButtonClick(event) {
     event.target.style.transition = 'background-color 0.2s ease color 0.2s ease';
     event.target.style.backgroundColor = 'rgb(209,209,214)';
@@ -17,6 +21,24 @@
     setTimeout(() => {
       event.target.style.backgroundColor = 'rgb(242, 242, 247)';
     }, 200);
+
+    if (isMobile()) {
+      open = false;
+    }
+  }
+
+  async function handleChatClick(thread) {
+    handleChatSelect(thread);
+
+    console.log("click");
+    if (isMobile()) {
+      console.log("open false");
+      open = false;
+    }
+  }
+
+  async function handleChatSwipe(thread) {
+    handleChatDelete(thread);
   }
 
 </script>
@@ -26,7 +48,7 @@
     <nav class="w-full">
       {#if threads !== null}
         {#each threads as thread}
-          <Chat handleSelect={handleChatSelect} handleDelete={handleChatDelete} selected={thread.id === selectedThreadId} bind:thread/>
+          <Chat handleSelect={() => handleChatClick(thread)} handleDelete={() => handleChatSwipe(thread)} selected={thread.id === selectedThreadId} bind:thread/>
         {/each}
       {/if}
     </nav>
