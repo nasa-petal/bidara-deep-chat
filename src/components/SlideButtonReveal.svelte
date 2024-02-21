@@ -22,7 +22,7 @@
 
     let touching = false;
     let wasDragged = false
-    let clicked = selected;
+    let clicked = false;
     let clickTolerance = 5;
 
     let deltaX = 0;

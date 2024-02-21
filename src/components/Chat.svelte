@@ -17,11 +17,11 @@
     const trashBgColor = 'rgb(255, 59, 48)';
 
     async function handleSelectThread() {
-        handleSelect(thread);
+        handleSelect();
     }
 
     async function handleDeleteThread() {
-        const success = handleDelete(thread);
+        const success = handleDelete();
 
         // Make visual cue that weren't allowed to delete thread;
     }
