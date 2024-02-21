@@ -13,24 +13,27 @@
 
 </script>
 <div class="button-reveal-container">
-    <div 
-        role="button"
-        tabindex="-1"
-        class="button-box flex justify-between items-center py-0" 
+    <button 
+        tabindex="0"
+        class="button-box flex justify-between items-center py-0 focus:outline-none" 
         class:selected
         style="background-color: {buttonBgColor};"
         on:click={handleClick}
         >
 
-        <p class="button-text my-0 font-sans block focus:outline-none" >{buttonText}</p>
-        <button class="revealed-button flex-shrink-0 focus:outline-none" on:click={handleClickRevealed}>
+        <p class="button-text my-0 font-sans block" >{buttonText}</p>
+        <button tabindex="0" class="revealed-button flex-shrink-0 focus:outline-none" on:click={handleClickRevealed}>
             <img draggable="false" class="revealed-image unfocused" src={revealedButtonUnfocusImage}  alt="revealed unfocused select"/>
             <img draggable="false" class="revealed-image focused" src={revealedButtonFocusImage}  alt="revealed focused select"/>
         </button>
-    </div>
+    </button>
 </div>
 
 <style>
+    button:focus-visible {
+        outline: 5px auto -webkit-focus-ring-color;
+    }
+
     .button-reveal-container {
         width: 100%;
         height: 100%;

@@ -128,9 +128,9 @@
         style="background-color: {slideBgColor};"
         >
         <p class="slider-button-text draggable my-0 font-sans block w-full focus:outline-none" >{sliderText}</p>
-        <a class="slider-grabber draggable">
+        <div class="slider-grabber draggable">
             <img class="slider-image draggable" src={sliderImage} alt="Dragger" />
-        </a>
+        </div>
     </div>
     {#if rendered}
     <div 
