@@ -74,7 +74,8 @@ export async function setActiveThreadName(name) {
 }
 
 export function getEmptyThreads() {
-  return getFilteredThreads((thread) => thread.length === 0);
+  const emptyThreads = getFilteredThreads((thread) => thread.length === 0);
+  return emptyThreads;
 }
 
 export function floatThreadInThreads(floatThread) {

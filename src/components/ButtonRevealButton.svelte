@@ -6,8 +6,6 @@
 
     export let revealedButtonFocusImage;
     export let revealedButtonUnfocusImage;
-    export let revealedButtonFocusBgColor;
-    export let revealedButtonUnfocusBgColor;
     export let buttonBgColor;
     export let buttonText;
 
