@@ -37,8 +37,6 @@ npm run dev
 
 ### Nice to haves
 
-- after you select a chat on mobile, close the sidebar.
-- have sidebar opened by default on larger screen sizes.
 - save chat logs.
 - ability rate responses and add feedback.
 - ability to send ratings, feedback and chat log to us.
