@@ -43,13 +43,13 @@ export async function ssSearch(params) {
 
 async function genImage(params) {
 
-  var imageParams = JSON.parse(params);
+  let imageParams = JSON.parse(params);
 
   if ("parameters" in imageParams) {
     imageParams = imageParams.parameters;
   }
 
-  var imageDescription = JSON.stringify(imageParams.description) + " Realistic depiction of the object and its environment. Stay true to science, engineering, and biology. DO NOT INCLUDE ANY WORDS OR BRANDING."
+  let imageDescription = JSON.stringify(imageParams.description) + " Realistic depiction of the object and its environment. Stay true to science, engineering, and biology. DO NOT INCLUDE ANY WORDS OR BRANDING."
 
   const res = await getDalleImageGeneration(imageDescription);
 

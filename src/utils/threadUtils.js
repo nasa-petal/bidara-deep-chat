@@ -13,9 +13,9 @@ export async function getNewThread() {
 }
 
 export async function getThread() {
-  var thread = getStoredActiveThread();
+  let thread = getStoredActiveThread();
 
-  var isValidThreadId = false;
+  let isValidThreadId = false;
   if (thread !== null) {
     isValidThreadId = await validThread(thread.id);
   }
@@ -26,15 +26,18 @@ export async function getThread() {
     setThread(thread);
   }
 
-  var threads = getStoredThreads();
+  let threads = getStoredThreads();
 
-  const threadInThreads = threads.filter((t) => t.id == thread.id).length > 0;
 
-  if (threads && !threadInThreads) {
-    threads.unshift(thread);
-    setThreads(threads);
+  if (threads) {
+    const threadInThreads = threads.filter((t) => t.id == thread.id).length > 0;
 
-  } else if (!threads){
+    if (!threadInThreads) {
+      threads.unshift(thread);
+      setThreads(threads);
+    }
+
+  } else {
     threads = [thread];
     setThreads(threads);
   }
@@ -50,7 +53,7 @@ export async function setThread(thread) {
 }
 
 export function getThreads() {
-  var threads = getStoredThreads();
+  let threads = getStoredThreads();
 
   return threads;
 }
