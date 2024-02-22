@@ -9,6 +9,10 @@
     let editing_name = false;
     let editing_input;
 
+    if (!chat_name) {
+      chat_name = "";
+    }
+
     function handleButtonClick() {
       editing_name = true;
     }
@@ -42,7 +46,6 @@
         editing_input.focus();
       }
     }
-
 </script>
 
 <header class="flex py-2 justify-between items-center text-gray-600">
@@ -62,10 +65,10 @@
   header {
     background-color: rgb(229, 229, 234);
     z-index: 10;
-    border-bottom: 1px solid rgb(199, 199, 204);
-    max-width: 100vw;
+    border-bottom: 1px solid rgb(180, 180, 180);
   }
   button {
+    width: 50%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

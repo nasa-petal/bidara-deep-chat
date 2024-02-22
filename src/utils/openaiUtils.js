@@ -176,6 +176,11 @@ export async function validThread(thread_id) {
   if(!openaiKey) {
     throw new Error('openai key not set. cannot validate thread.');
   }
+
+  if (!thread_id) {
+    return false;
+  }
+
   try {
     const response = await fetch(`https://api.openai.com/v1/threads/${thread_id}`, {
       method: "GET",
@@ -187,9 +192,16 @@ export async function validThread(thread_id) {
       body: null
     });
 
-    const r = await response.json();
-    if (r.hasOwnProperty('error') && r.error.type === 'invalid_request_error') {
+    if (response.status === 404) {
+      console.error("Thread not found.");
       return false;
+    }
+
+    const r = await response.json();
+    if (r.hasOwnProperty('error')) {
+      if (r.error.type === 'invalid_request_error') {
+        return false;
+      }
     }
 
     if (r.hasOwnProperty('id')) {

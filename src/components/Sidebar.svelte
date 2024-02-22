@@ -1,4 +1,6 @@
 <script>
+  import {onMount} from 'svelte';
+
   export let open = false
   export let threads = null;
   export let handleChatSelect = null;
@@ -7,6 +9,16 @@
   export let selectedThreadId = true;
 
   import Chat from './Chat.svelte'
+
+  function isSmallScreen() {
+    return window.innerWidth < 700;
+  }
+
+  onMount(() => {
+    if (!isSmallScreen()) {
+      open = true;
+    }
+  });
 
   async function handleButtonClick(event) {
     event.target.style.transition = 'background-color 0.2s ease color 0.2s ease';
@@ -17,16 +29,32 @@
     setTimeout(() => {
       event.target.style.backgroundColor = 'rgb(242, 242, 247)';
     }, 200);
+
+    if (isSmallScreen()) {
+      open = false;
+    }
+  }
+
+  async function handleChatClick(thread) {
+    handleChatSelect(thread);
+
+    if (isSmallScreen()) {
+      open = false;
+    }
+  }
+
+  async function handleChatSwipe(thread) {
+    handleChatDelete(thread);
   }
 
 </script>
 
-  <aside class="absolute full shadow-lg flex flex-col" class:open>
+<aside class="absolute full shadow-lg flex flex-col" class:open>
     <button tabindex="0" class="focus:outline-none new-thread rounded-full m-2 text-base font-sans p-2" disabled={!open} on:click={handleButtonClick}>New Thread</button>
     <nav class="w-full">
       {#if threads !== null}
         {#each threads as thread}
-          <Chat handleSelect={handleChatSelect} handleDelete={handleChatDelete} selected={thread.id === selectedThreadId} bind:thread/>
+          <Chat handleSelect={() => handleChatClick(thread)} handleDelete={() => handleChatSwipe(thread)} selected={thread.id === selectedThreadId} bind:thread/>
         {/each}
       {/if}
     </nav>
@@ -42,10 +70,11 @@
     width: 20%;
     height: calc(100dvh - 3.1rem);
     left: -20%;
-    transition: ease 0.3s;
     background-color: rgb(229, 229, 234);
-    border-right: 1px solid rgb(199, 199, 204);
+    border-right: 1px solid rgb(180, 180, 180);
+    transition: left ease 0.3s, width ease 0.3s, visibility 0.3s 0s;
     overflow-y: auto;
+    visibility: hidden;
   }
 
 
@@ -55,6 +84,11 @@
 	
   .open {
     left: 0;
+    visibility: visible
+  }
+
+  nav {
+    border-top: 1px solid rgb(199, 199, 204);
   }
 
   .new-thread {
@@ -65,13 +99,13 @@
     font-weight: bold;
   }
 
-  @media only screen and (max-width: 1000px) {
+  @media only screen and (max-width: 1400px) {
     .open {
       width: 30%;
     }
   }
 
-  @media only screen and (max-width: 900px) {
+  @media only screen and (max-width: 1000px) {
     .open {
       width: 40%;
     }

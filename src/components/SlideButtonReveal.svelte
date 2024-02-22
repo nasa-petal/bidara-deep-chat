@@ -22,7 +22,7 @@
 
     let touching = false;
     let wasDragged = false
-    let clicked = selected;
+    let clicked = false;
     let clickTolerance = 5;
 
     let deltaX = 0;
@@ -128,7 +128,9 @@
         style="background-color: {slideBgColor};"
         >
         <p class="slider-button-text draggable my-0 font-sans block w-full focus:outline-none" >{sliderText}</p>
-        <img class="slider-image draggable" src={sliderImage} alt="Dragger" />
+        <div class="slider-grabber draggable">
+            <img class="slider-image draggable" src={sliderImage} alt="Dragger" />
+        </div>
     </div>
     {#if rendered}
     <div 
@@ -151,13 +153,15 @@
     }
 
     .slider-button {
+        overflow: hidden;
+        whitespace: nowrap;
         height: 100%;
         width: 100%;
         left: 0;
         top: 0;
         padding: 1em;
         z-index: 25 !important;
-        border-bottom: 1px solid rgb(199, 199, 204);
+        border-bottom: 1px solid rgb(180, 180, 180);
         transition: background-color 0.3s ease;
     }
 
@@ -178,18 +182,22 @@
         left: 0;
         top: 0;
         transition: margin-right 0.3s ease;
-        border-bottom: 1px solid rgb(174, 174, 178);
+        border-bottom: 1px solid rgb(180, 180, 180);
     }
 
     .reveal-image {
-        width: 15px;
-        height: 15px;
+        width: 1em;
+        height: 1em;
         margin-right: 1em;
     }
 
+    .slider-grabber {
+        padding: 0.5em;
+    }
+
     .slider-image {
-        width: 15px;
-        height: 15px;
+        width: 1em;
+        height: 1em;
         color: red;
         transform: rotate(180deg);
         cursor: grab;

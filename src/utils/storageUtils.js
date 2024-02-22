@@ -35,11 +35,10 @@ export function setStoredThreads(value) {
   return setStorageJSON(OPENAI_THREADS_KEY, value);
 }
 
-export function filterStoredThreads(thread_filter) {
+export function getFilteredThreads(thread_filter) {
   const threads = getStoredThreads();
   const updated_threads = threads.filter(thread_filter);
 
-  setStoredThreads(updated_threads);
   return updated_threads;
 }
 
@@ -71,7 +70,11 @@ function getStorageJSON(key) {
   const value = getLocal(key);
 
   try {
-    return JSON.parse(value);
+    if (value) {
+      return JSON.parse(value);
+    } else {
+      return null;
+    }
   } catch (e) {
     console.error(`error: attempted to parse value '${value}' from key '${key}'. got error: ${e}`);
 
