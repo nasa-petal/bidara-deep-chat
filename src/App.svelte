@@ -44,8 +44,6 @@
       activeThread = null;
 
       if (keyAsstAndThread && keyAsstAndThread[0]) {
-        openAIKeySet = true;
-        changedToLoggedInView = true;
 
         threads = getThreads();
         activeThread = keyAsstAndThread[2];
@@ -224,7 +222,7 @@
         <li>Paste your key into the input field below. Your browser will save the key, so you only have to enter it once.</li>
       </ol>
       <ul class="list-disc mt-4">
-        <li>With OpenAI API you only pay for what you use. Track your usage and costs on the <a href="https://platform.openai.com/usage" class="underline text-blue-600 hover:text-elue-800 visited:text-purple-600">Usage page</a>.</li>
+        <li>With OpenAI API you only pay for what you use. Track your usage and costs on the <a href="https://platform.openai.com/usage" class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600">Usage page</a>.</li>
         <li>After you send your first message to BIDARA, it will also be available to interact with through the <a href="https://platform.openai.com/assistants" class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600">OpenAI Assistants Playground</a>. This interface is more complex, but also provides more customizability. Just select BIDARA, then click the 'Test' button.</li>
       </ul>
     </div>
