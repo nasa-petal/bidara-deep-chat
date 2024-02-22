@@ -70,7 +70,11 @@ function getStorageJSON(key) {
   const value = getLocal(key);
 
   try {
-    return JSON.parse(value);
+    if (value) {
+      return JSON.parse(value);
+    } else {
+      return null;
+    }
   } catch (e) {
     console.error(`error: attempted to parse value '${value}' from key '${key}'. got error: ${e}`);
 
