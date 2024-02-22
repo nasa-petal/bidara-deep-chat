@@ -6,7 +6,7 @@ export async function getNewThread() {
 
   if (new_id) {
     const new_name = "New Chat";
-    return {name: new_name, id: new_id, length:0};
+    return {name: new_name, id: new_id, length: 0};
   }
 
   return null;
@@ -20,12 +20,23 @@ export async function getThread() {
     isValidThreadId = await validThread(thread.id);
   }
 
-  while (!isValidThreadId) {
+  if (thread === null || !isValidThreadId) {
     thread = await getNewThread();
 
-    if (thread !== null) {
-      isValidThreadId = await validThread(thread.id);
-    }
+    setThread(thread);
+  }
+
+  var threads = getStoredThreads();
+
+  const threadInThreads = threads.filter((t) => t.id == thread.id).length > 0;
+
+  if (threads && !threadInThreads) {
+    threads.unshift(thread);
+    setThreads(threads);
+
+  } else if (!threads){
+    threads = [thread];
+    setThreads(threads);
   }
 
   return thread;
