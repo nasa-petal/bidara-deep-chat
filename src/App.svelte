@@ -1,5 +1,4 @@
-<!-- This is an example for a Svelte browser app, if you are using SvelteKit, please see the following example:
-  https://codesandbox.io/p/sandbox/deep-chat-sveltekit-fn8h6x -->
+<!-- This is an example for a Svelte browser app, if you are using SvelteKit, please see the following example: https://codesandbox.io/p/sandbox/deep-chat-sveltekit-fn8h6x -->
 
   <script>
     import { DeepChat } from "deep-chat";
@@ -8,8 +7,7 @@
     import { BIDARA_CONFIG } from './assistant/bidara';
     import { funcCalling } from './assistant/bidaraFunctions';
     import { setOpenAIKey, setAsst, getKeyAsstAndThread, getBidaraAssistant } from './utils/openaiUtils';
-    import { setThread, getThread, deleteThreadFromThreads, getNewThread, getThreads, setThreads, setActiveThreadName } from './utils/threadUtils';
-    import { getStoredActiveThread } from './utils/storageUtils';
+    import { setThread, getThread, deleteThreadFromThreads, getNewThread, getThreads, setThreads, setActiveThreadName, updateThreadAndThreads, getEmptyThreads } from './utils/threadUtils';
     import hljs from "highlight.js";
     window.hljs = hljs;
   
@@ -21,19 +19,17 @@
 
     let openAIKeySet = false;
     let openAIAsstIdSet = false;
-    let openAIThreadIdSet = false;
     let changedToLoggedInView = false;
     let keyAsstAndThread = null;
+    let activeThread = null;
     let welcomeRef;
     let navbarRef;
     let sidebarRef;
     let deepChatRef;
     let open = false;
+    let blurred = true;
 
-    let threads = getThreads();
-    let selectedThreadId;
-    let selectedThreadName = "";
-    let emptyChat;
+    let threads;
     
     function onError(error) {
       console.log(error);
@@ -45,19 +41,16 @@
 
     async function initKeyAsstAndThreads() {
       keyAsstAndThread = await getKeyAsstAndThread();
+      activeThread = null;
 
       if (keyAsstAndThread && keyAsstAndThread[0]) {
+        changedToLoggedInView = true;
 
         threads = getThreads();
-        selectedThreadName = keyAsstAndThread[2]?.name ? keyAsstAndThread[2].name : "";
-        selectedThreadId = keyAsstAndThread[2]?.id ? keyAsstAndThread[2].id : "";
+        activeThread = keyAsstAndThread[2];
 
-        if (selectedThreadId) {
-          setThread({name: selectedThreadName, id: selectedThreadId});
-        }
-
-        if (threads.length <= 0 && selectedThreadName) {
-          threads = [keyAsstAndThread[2]];
+        if (!threads || (threads.length <= 0 && activeThread)) {
+          threads = [activeThread];
           setThreads(threads);
         }
       }
@@ -74,14 +67,9 @@
         openAIAsstIdSet = true;
       }
 
-      if (!openAIThreadIdSet && message.message._sessionId && message.message._sessionId != await getThread()) {
-        const newThread = {name: "New Chat", id: message.message._sessionId}
-        setThread(newThread);
-        openAIThreadIdSet = true;
-      }
-
-      if (message.message.role === 'user' && emptyChat && emptyChat.id === selectedThreadId) {
-        emptyChat = null;
+      if (activeThread) {
+        activeThread.length = deepChatRef.getMessages().length;
+        updateThreads();
       }
     }
 
@@ -89,7 +77,7 @@
       // save key to localStorage.
       // The event occurs before key is set, and again, after key is set.
       if (!openAIKeySet && this._activeService.key) {
-        // if key set through UI, save it to localStorage.
+        // if key set through UI or in URL variable, save it to localStorage.
         setOpenAIKey(this._activeService.key);
         openAIKeySet = true;
       }
@@ -106,85 +94,88 @@
 
       if(!openAIKeySet) { // Show login instructions.
         welcomeRef.style.display = "block";
-        navbarRef.style.display = "none";
         deepChatRef.style.width = "calc(100vw - 1rem)";
         deepChatRef.style.height = "100px";
       }
       else if (!changedToLoggedInView) { // Hide login instructions after login. 
         welcomeRef.style.display = "none";
-        navbarRef.style.display = "block";
         deepChatRef.style.width = "100%";
         deepChatRef.style.height = "calc(100dvh - 3.1rem)";
         await initKeyAsstAndThreads();
         changedToLoggedInView = true;
       }
+
+      setTimeout(()=> blurred = false, 200);
     }
 
     async function newThreadAndSwitch() {
-      if (emptyChat) {
-        switchActiveThread(emptyChat);
+      // If the thread is already "new", stay on it
+      if (activeThread && activeThread.length <= 0) {
+        if (activeThread.name != "New Chat") {
+          await renameActiveThread("New Chat");
+        }
+        return true;
+      } 
+
+      // If an empty thead is already created, prevents creating a new one
+      const emptyThreads = getEmptyThreads();
+      if (emptyThreads && emptyThreads.length >= 1) {
+
+        const emptyThread = emptyThreads[0];
+        switchActiveThread(emptyThread);
+
         return true;
       }
 
-      const currrent_messages = deepChatRef.getMessages();
-
-      if (currrent_messages.length <= initialMessages.length) {
-        return;
-      } 
-
-      const newThread = await getNewThread();
-
-      // force new object so Siderbar rerenders
-      threads = [ newThread ].concat(threads);
-      switchActiveThread(newThread);
-      emptyChat = newThread;
+      const thread = await getNewThread();
+      threads.unshift(thread);
 
       setThreads(threads);
+
+      await switchActiveThread(thread);
+      
       return true;
     }
 
     async function deleteThreadAndSwitch(thread) {
-      const currrent_messages = deepChatRef.getMessages();
-
-      if (threads.length <= 1 && currrent_messages.length <= initialMessages.length) {
-        return false;
-      } 
-
-      if (emptyChat && emptyChat.id === thread.id) {
-        emptyChat = null;
-      }
-
 
       threads = deleteThreadFromThreads(thread.id);
+      activeThread = {};
       if (threads && threads.length > 0) {
-        const current_thread = getStoredActiveThread();
-        const candidateThread = threads[0];
-
-        if (candidateThread && candidateThread !== current_thread) {
-          switchActiveThread(candidateThread);
-        }
-
+        switchActiveThread(threads[0]);
       } else {
-        newThreadAndSwitch();
+        await newThreadAndSwitch();
       }
 
       return true;
     }
+
     
     async function switchActiveThread(thread) {
+      if (thread.id === activeThread.id) {
+        return;
+      }
+
+      blurred = true;
 
       await setThread(thread);
       keyAsstAndThread = await getKeyAsstAndThread();
-      selectedThreadId = keyAsstAndThread[2].id;
-      selectedThreadName = thread.name;
+      activeThread = keyAsstAndThread[2];
 
       return true;
     }
 
     async function renameActiveThread(name) {
-      threads = await setActiveThreadName(name);
+      await setActiveThreadName(name);
+
+      threads = getThreads();
+      activeThread = await getThread();
 
       return true;
+    }
+
+    function updateThreads() {
+      updateThreadAndThreads(activeThread, threads);
     }
 
   </script>
@@ -236,23 +227,30 @@
         <li>After you send your first message to BIDARA, it will also be available to interact with through the <a href="https://platform.openai.com/assistants" class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600">OpenAI Assistants Playground</a>. This interface is more complex, but also provides more customizability. Just select BIDARA, then click the 'Test' button.</li>
       </ul>
     </div>
-    <div id="content-container" class:open>
+    {#if keyAsstAndThread !== null}
+    {#if activeThread !== null}
+    {#key activeThread}
       <div bind:this={navbarRef}>
-      <Navbar bind:this={navbarRef} bind:chat_name={selectedThreadName} bind:sidebar={open} handleRename={renameActiveThread}/>   
+        <Navbar bind:chat_name={activeThread.name} bind:sidebar={open} handleRename={renameActiveThread}/>   
       </div>
+    {/key}
+    {/if}
+    <div id="content-container" class="flex justify-between" class:open>
+      {#if activeThread !== null}
+      {#key activeThread}
       <div bind:this={sidebarRef}>
-        {#key selectedThreadId}
-        <Sidebar bind:this={sidebarRef} handleChatSelect={switchActiveThread} handleChatDelete={deleteThreadAndSwitch} handleChatNew={newThreadAndSwitch} bind:threads bind:open bind:selectedThreadId/>
-        {/key}
+        <Sidebar handleChatSelect={switchActiveThread} handleChatDelete={deleteThreadAndSwitch} handleChatNew={newThreadAndSwitch} bind:threads bind:open bind:selectedThreadId={activeThread.id}/>
       </div>
+      {/key}
+      {/if}
       <div id="chat-container">
         <!-- demo/textInput are examples of passing an object directly into a property -->
         <!-- initialMessages is an example of passing a state object into a property -->
-        {#if keyAsstAndThread !== null}
         {#key keyAsstAndThread}
         <deep-chat
           id="chat-element"
           bind:this={deepChatRef}
+          class:blurred
           directConnection={{
             openAI: {
               key: keyAsstAndThread[0],
@@ -339,7 +337,6 @@
             border: "1px solid rgba(0,0,0,0.2)",
             top: "-2.55em",
             height: "4em",
-            width: "calc(100% - 6.2em)",
           }}
           textInput={{
             styles: {
@@ -403,10 +400,9 @@
           }}
         />
         {/key}
-        {/if}
       </div>
     </div>
-    
+    {/if}
   </main>
 
 
@@ -414,33 +410,33 @@
     #chat-container {
       width: 100%;
       margin-left: 0;
-      transition: ease 0.3s;
+      transition: width 0.3s ease, filter 0.5s ease-out;
     }
     
     .open #chat-container {
       width: 80%;
-      margin-left: 20%;
+    }
+
+    @media only screen and (max-width: 1400px) {
+      .open #chat-container {
+        width: 70%;
+      }
     }
 
     @media only screen and (max-width: 1000px) {
       .open #chat-container {
-        width: 70%;
-        margin-left: 30%;
-      }
-    }
-
-    @media only screen and (max-width: 900px) {
-      .open #chat-container {
         width: 60%;
-        margin-left: 40%;
       }
     }
  
     @media only screen and (max-width: 700px) {
       .open #chat-container {
         width: 100%;
-        margin-left: 0;
       }
+    }
+
+    .blurred {
+      filter: blur(2px);
     }
 
     main {
