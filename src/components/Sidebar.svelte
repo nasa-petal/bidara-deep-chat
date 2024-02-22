@@ -1,4 +1,6 @@
 <script>
+  import {onMount} from 'svelte';
+
   export let open = false
   export let threads = null;
   export let handleChatSelect = null;
@@ -11,6 +13,12 @@
   function isSmallScreen() {
     return window.innerWidth < 700;
   }
+
+  onMount(() => {
+    if (!isSmallScreen()) {
+      open = true;
+    }
+  });
 
   async function handleButtonClick(event) {
     event.target.style.transition = 'background-color 0.2s ease color 0.2s ease';
@@ -39,17 +47,9 @@
     handleChatDelete(thread);
   }
 
-  function handleTransitionEnd() {
-    if (!open) {
-      document.getElementById("sidebar").classList.add(".display-none");
-    } else {
-      document.getElementById("sidebar").classList.remove(".display-none");
-    }
-  }
-
 </script>
 
-<aside id="sidebar" class="absolute full shadow-lg flex flex-col" on:transitionend={handleTransitionEnd} class:open>
+<aside class="absolute full shadow-lg flex flex-col" class:open>
     <button tabindex="0" class="focus:outline-none new-thread rounded-full m-2 text-base font-sans p-2" disabled={!open} on:click={handleButtonClick}>New Thread</button>
     <nav class="w-full">
       {#if threads !== null}
@@ -69,24 +69,22 @@
     z-index: 20;
     width: 20%;
     height: calc(100dvh - 3.1rem);
-    left: -10%;
-    transition: ease 0.3s;
+    left: -20%;
     background-color: rgb(229, 229, 234);
     border-right: 1px solid rgb(180, 180, 180);
+    transition: left ease 0.3s, width ease 0.3s, visibility 0.3s 0s;
     overflow-y: auto;
+    visibility: hidden;
   }
 
 
   button {
     transition: background-color 0.3s ease;
   }
-
-  .display-none {
-    display: none;
-  }
 	
   .open {
     left: 0;
+    visibility: visible
   }
 
   nav {
