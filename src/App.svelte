@@ -44,7 +44,6 @@
       activeThread = null;
 
       if (keyAsstAndThread && keyAsstAndThread[0]) {
-        openAIKeySet = true;
         changedToLoggedInView = true;
 
         threads = getThreads();
@@ -78,7 +77,7 @@
       // save key to localStorage.
       // The event occurs before key is set, and again, after key is set.
       if (!openAIKeySet && this._activeService.key) {
-        // if key set through UI, save it to localStorage.
+        // if key set through UI or in URL variable, save it to localStorage.
         setOpenAIKey(this._activeService.key);
         openAIKeySet = true;
       }
