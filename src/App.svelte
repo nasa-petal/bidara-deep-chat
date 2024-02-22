@@ -44,6 +44,8 @@
       activeThread = null;
 
       if (keyAsstAndThread && keyAsstAndThread[0]) {
+        openAIKeySet = true;
+        changedToLoggedInView = true;
 
         threads = getThreads();
         activeThread = keyAsstAndThread[2];
