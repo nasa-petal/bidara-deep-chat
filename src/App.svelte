@@ -1,5 +1,4 @@
-<!-- This is an example for a Svelte browser app, if you are using SvelteKit, please see the following example:
-  https://codesandbox.io/p/sandbox/deep-chat-sveltekit-fn8h6x -->
+<!-- This is an example for a Svelte browser app, if you are using SvelteKit, please see the following example: https://codesandbox.io/p/sandbox/deep-chat-sveltekit-fn8h6x -->
 
   <script>
     import { DeepChat } from "deep-chat";
@@ -107,7 +106,6 @@
         changedToLoggedInView = true;
       }
 
-      console.log("rendered");
       setTimeout(()=> blurred = false, 200);
     }
 
@@ -420,13 +418,13 @@
       width: 80%;
     }
 
-    @media only screen and (max-width: 1000px) {
+    @media only screen and (max-width: 1400px) {
       .open #chat-container {
         width: 70%;
       }
     }
 
-    @media only screen and (max-width: 900px) {
+    @media only screen and (max-width: 1000px) {
       .open #chat-container {
         width: 60%;
       }

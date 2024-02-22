@@ -8,7 +8,7 @@
 
   import Chat from './Chat.svelte'
 
-  function isMobile() {
+  function isSmallScreen() {
     return window.innerWidth < 700;
   }
 
@@ -22,7 +22,7 @@
       event.target.style.backgroundColor = 'rgb(242, 242, 247)';
     }, 200);
 
-    if (isMobile()) {
+    if (isSmallScreen()) {
       open = false;
     }
   }
@@ -30,9 +30,7 @@
   async function handleChatClick(thread) {
     handleChatSelect(thread);
 
-    console.log("click");
-    if (isMobile()) {
-      console.log("open false");
+    if (isSmallScreen()) {
       open = false;
     }
   }
@@ -41,9 +39,17 @@
     handleChatDelete(thread);
   }
 
+  function handleTransitionEnd() {
+    if (!open) {
+      document.getElementById("sidebar").classList.add(".display-none");
+    } else {
+      document.getElementById("sidebar").classList.remove(".display-none");
+    }
+  }
+
 </script>
 
-  <aside class="absolute full shadow-lg flex flex-col" class:open>
+<aside id="sidebar" class="absolute full shadow-lg flex flex-col" on:transitionend={handleTransitionEnd} class:open>
     <button tabindex="0" class="focus:outline-none new-thread rounded-full m-2 text-base font-sans p-2" disabled={!open} on:click={handleButtonClick}>New Thread</button>
     <nav class="w-full">
       {#if threads !== null}
@@ -63,7 +69,7 @@
     z-index: 20;
     width: 20%;
     height: calc(100dvh - 3.1rem);
-    left: -20%;
+    left: -10%;
     transition: ease 0.3s;
     background-color: rgb(229, 229, 234);
     border-right: 1px solid rgb(180, 180, 180);
@@ -73,6 +79,10 @@
 
   button {
     transition: background-color 0.3s ease;
+  }
+
+  .display-none {
+    display: none;
   }
 	
   .open {
@@ -91,13 +101,13 @@
     font-weight: bold;
   }
 
-  @media only screen and (max-width: 1000px) {
+  @media only screen and (max-width: 1400px) {
     .open {
       width: 30%;
     }
   }
 
-  @media only screen and (max-width: 900px) {
+  @media only screen and (max-width: 1000px) {
     .open {
       width: 40%;
     }

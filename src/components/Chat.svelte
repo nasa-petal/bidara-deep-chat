@@ -25,9 +25,20 @@
 
         // Make visual cue that weren't allowed to delete thread;
     }
+
+    function isMobile() {
+        const userAgent = navigator.userAgent.toLowerCase();
+        if (/mobile|android|iphone|ipad/.test(userAgent)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 </script>
 
 <div class="chat-button-container">
+        {#if isMobile()}
         <div class="chat-slider"> 
             <SlideButtonReveal 
                 handleClick={handleSelectThread} 
@@ -42,6 +53,7 @@
                 bind:selected
             />
         </div>
+        {:else}
         <div class="chat-button">
             <ButtonRevealButton
                 buttonText={thread.name}
@@ -50,11 +62,10 @@
                 revealedButtonFocusImage={trashImageWhite}
                 revealedButtonUnfocusImage={trashImageRed}
                 buttonBgColor={chatBgColor}
-                revealedButtonFocusBgColor={trashBgColor}
-                revealedButtonUnfocusBgColor="white"
                 bind:selected
             />
         </div>
+        {/if}
 </div>
 
 <style>
@@ -65,32 +76,10 @@
     .chat-button {
         height: 100%;
         width: 100%;
-        display: block;
     }
 
     .chat-slider {
         height: 100%;
         width: 100%;
-        display: none;
-    }
-
-    @media only screen and (min-width: 701px) {
-        .chat-button {
-             display: block;
-        }
-
-        .chat-slider {
-             display: none;
-        }
-    }
-
-    @media only screen and (max-width: 700px) {
-        .chat-button {
-             display: none;
-        }
-
-        .chat-slider {
-             display: block;
-        }
     }
 </style>
