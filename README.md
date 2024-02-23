@@ -30,7 +30,6 @@ npm run dev
 
 ### Known issues
 
-- add a loading icon, while thread is loading. so user doesn't just see the navbar and blank screen.
 - deep-chat speechToText: submit command word is sent in message on safari and chrome on iOS.
 
 - deep-chat textToSpeech: doesn't read messages aloud on safari or chrome on iOS.
