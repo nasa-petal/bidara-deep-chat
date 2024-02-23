@@ -49,7 +49,8 @@
 
 </script>
 
-<aside class="absolute full shadow-lg flex flex-col" class:open>
+<div>
+  <aside class="absolute shadow-lg flex flex-col" class:open>
     <button tabindex="0" class="focus:outline-none new-thread rounded-full m-2 text-base font-sans p-2" disabled={!open} on:click={handleButtonClick}>New Thread</button>
     <nav class="w-full">
       {#if threads !== null}
@@ -59,6 +60,7 @@
       {/if}
     </nav>
   </aside>
+</div>
 
 <style>
   button:focus-visible {
@@ -68,7 +70,7 @@
   aside {
     z-index: 20;
     width: 20%;
-    height: calc(100dvh - 3.1rem);
+    height: calc(100% - 3rem);
     left: -20%;
     background-color: rgb(229, 229, 234);
     border-right: 1px solid rgb(180, 180, 180);
