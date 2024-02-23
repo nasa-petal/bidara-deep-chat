@@ -23,8 +23,6 @@
     let keyAsstAndThread = null;
     let activeThread = null;
     let welcomeRef;
-    let navbarRef;
-    let sidebarRef;
     let deepChatRef;
     let open = false;
     let blurred = true;
@@ -94,13 +92,12 @@
 
       if(!openAIKeySet) { // Show login instructions.
         welcomeRef.style.display = "block";
-        deepChatRef.style.width = "calc(100vw - 1rem)";
+        deepChatRef.style.width = "calc(100vw)";
         deepChatRef.style.height = "100px";
       }
       else if (!changedToLoggedInView) { // Hide login instructions after login. 
         welcomeRef.style.display = "none";
         deepChatRef.style.width = "100%";
-        deepChatRef.style.height = "calc(100dvh - 3.1rem)";
         await initKeyAsstAndThreads();
         changedToLoggedInView = true;
       }
@@ -180,7 +177,8 @@
 
   </script>
 
-  <main>
+  <main class="flex">
+    <div>
     <!--
       <h1>BIDARA</h1>
       <div
@@ -230,17 +228,13 @@
     {#if keyAsstAndThread !== null}
     {#if activeThread !== null}
     {#key activeThread}
-      <div bind:this={navbarRef}>
         <Navbar bind:chat_name={activeThread.name} bind:sidebar={open} handleRename={renameActiveThread}/>   
-      </div>
     {/key}
     {/if}
     <div id="content-container" class="flex justify-between" class:open>
       {#if activeThread !== null}
       {#key activeThread}
-      <div bind:this={sidebarRef}>
         <Sidebar handleChatSelect={switchActiveThread} handleChatDelete={deleteThreadAndSwitch} handleChatNew={newThreadAndSwitch} bind:threads bind:open bind:selectedThreadId={activeThread.id}/>
-      </div>
       {/key}
       {/if}
       <div id="chat-container">
@@ -343,6 +337,7 @@
             styles: {
               container: {
                 width: "calc(100% - 6em)",
+                height: "2em",
                 boxShadow: "none",
                 borderRadius: "1em",
                 border: "1px solid rgba(0,0,0,0.2)"
@@ -357,7 +352,7 @@
           chatStyle={{
             display: "block",
             width: "100%",
-            height: "calc(100dvh - 3.1rem)",
+            height: "100%",
             backgroundColor: "white",
             border: "none",
             fontSize: "17px",
@@ -369,7 +364,7 @@
                 bubble: {
                   maxWidth: "75%",
                   borderRadius: "1em",
-                  padding: ".42em .7em"
+                  padding: ".42em .7em",
                 }
               }
             },
@@ -404,12 +399,18 @@
       </div>
     </div>
     {/if}
+    </div>
   </main>
 
 
-  <style>
+<style>
+    #content-container {
+      height: calc(100% - 3rem);
+    }
+
     #chat-container {
       width: 100%;
+      height: 100%;
       margin-left: 0;
       transition: width 0.3s ease, filter 0.5s ease-out;
     }
@@ -442,7 +443,10 @@
 
     main {
       font-family: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-      display: grid;
+      width: 100%;
+      height: calc(100% + env(safe-area-inset-top));
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
     }
 
     #welcome {
