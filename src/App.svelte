@@ -179,7 +179,7 @@
   </script>
 
   <main class="flex">
-    <div>
+    <div class="w-full h-full flex flex-col justify-between">
     <!--
       <h1>BIDARA</h1>
       <div
@@ -232,13 +232,13 @@
         <Navbar bind:chat_name={activeThread.name} bind:sidebar={open} handleRename={renameActiveThread}/>   
     {/key}
     {/if}
-    <div id="content-container" class="flex justify-between" class:open>
+    <div id="content-container" class="flex justify-between w-full h-full flex-1" class:open>
       {#if activeThread !== null}
       {#key activeThread}
         <Sidebar handleChatSelect={switchActiveThread} handleChatDelete={deleteThreadAndSwitch} handleChatNew={newThreadAndSwitch} bind:threads bind:open bind:selectedThreadId={activeThread.id}/>
       {/key}
       {/if}
-      <div id="chat-container">
+      <div id="chat-container" class="w-full">
         <!-- demo/textInput are examples of passing an object directly into a property -->
         <!-- initialMessages is an example of passing a state object into a property -->
         {#key keyAsstAndThread}
@@ -410,9 +410,6 @@
     }
 
     #chat-container {
-      width: 100%;
-      height: 100%;
-      margin-left: 0;
       transition: width 0.3s ease, filter 0.5s ease-out;
     }
     
