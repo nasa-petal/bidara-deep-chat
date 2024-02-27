@@ -253,10 +253,11 @@ export async function getKeyAsstAndThread() {
   return [key, asst, thread]
 }
 
-export async function getDalleImageGeneration(prompt, image_size = null, image_quality = null, num_images = null) {
+export async function getDalleImageGeneration(prompt, image_size = null, image_quality = null, num_images = null, response_format = null) {
   if (!image_size) image_size = "1024x1024";
   if (!image_quality) image_quality = "standard";
   if (!num_images) num_images = 1;
+  if (!response_format) response_format = "b64_json";
 
   try {
     if (!openaiKey) {
@@ -276,7 +277,8 @@ export async function getDalleImageGeneration(prompt, image_size = null, image_q
         prompt: prompt,
         n: num_images,
         size: image_size,
-        quality: image_quality
+        quality: image_quality,
+        response_format: response_format
       })
     }
 
