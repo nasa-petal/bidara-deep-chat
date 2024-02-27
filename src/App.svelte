@@ -92,12 +92,13 @@
 
       if(!openAIKeySet) { // Show login instructions.
         welcomeRef.style.display = "block";
-        deepChatRef.style.width = "calc(100vw)";
+        document.getElementById("content-container").style.height = "inherit";
         deepChatRef.style.height = "100px";
       }
       else if (!changedToLoggedInView) { // Hide login instructions after login. 
         welcomeRef.style.display = "none";
         deepChatRef.style.width = "100%";
+        document.getElementById("content-container").style.height = "calc(100% - 3rem)";
         await initKeyAsstAndThreads();
         changedToLoggedInView = true;
       }
