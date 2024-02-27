@@ -58,6 +58,18 @@
       return keyAsstAndThread;
     }
 
+    function loadMessages(thread) {
+      if (!thread || !thread?.messages) {
+        return;
+      }
+
+      const messages = thread.messages.slice(initialMessages.length);
+      
+      messages.forEach((message) => {
+        deepChatRef._addMessage(message);
+      });
+    }
+
     async function onNewMessage(message) { 
       // this function is called once for each message including initialMessages, ai messages, and user messages.
 
@@ -68,8 +80,12 @@
       }
 
       if (activeThread) {
-        activeThread.length = deepChatRef.getMessages().length;
-        updateThreads();
+        const messages = deepChatRef.getMessages();
+        if (messages.length > 0) {
+          activeThread.length = messages.length;
+          activeThread.messages = messages;
+          updateThreads();
+        }
       }
     }
 
@@ -102,9 +118,11 @@
         deepChatRef.style.width = "100%";
         deepChatRef.style.height = "calc(100dvh - 3.1rem)";
         await initKeyAsstAndThreads();
+
         changedToLoggedInView = true;
       }
 
+      loadMessages(activeThread);
       setTimeout(()=> blurred = false, 200);
     }
 
@@ -259,7 +277,7 @@
                 assistant_id: keyAsstAndThread[1],
                 new_assistant: BIDARA_CONFIG,
                 thread_id: keyAsstAndThread[2] ? keyAsstAndThread[2]?.id : null,
-                load_thread_history: keyAsstAndThread[2] ? true : false,
+                load_thread_history: false,
                 function_handler: funcCalling
               }
             }

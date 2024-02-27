@@ -6,7 +6,7 @@ export async function getNewThread() {
 
   if (new_id) {
     const new_name = "New Chat";
-    return {name: new_name, id: new_id, length: 0};
+    return {name: new_name, id: new_id, length: 0, messages: []};
   }
 
   return null;
