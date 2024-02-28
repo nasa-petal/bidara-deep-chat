@@ -69,7 +69,7 @@ async function genImage(params) {
   const deepChatRef = document.getElementById('chat-element');
   deepChatRef._addMessage(message);
 
-  return "The image has been inserted into the chat, respond by tieing this image back into the Biomimicry Design Process with a short question or response. DO NOT RESPOND WITH AN IMAGE, URL, OR MARKDOWN.";
+  return "The image has been inserted into the chat. Respond with a very short question bring this back into this process. DO NOT REPLY WITH AN IMAGE, MARKDOWN, OR ANYTHING OTHER THAN A SHORT QUESTION.";
 }
 
 export async function callFunc(functionDetails) {

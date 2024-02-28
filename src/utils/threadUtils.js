@@ -119,4 +119,6 @@ export function updateThreadAndThreads(activeThread, threads) {
   if (threads != storedThreads) {
     setStoredThreads(threads);
   }
+
+  return [activeThread, threads];
 }
