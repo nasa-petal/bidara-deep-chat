@@ -1,7 +1,9 @@
 html {
   text-size-adjust: 100%; /* Prevent font scaling in landscape while allowing user zoom */
+  height: 100%;
 }
 
 body {
   margin: 0;
+  height: 100%;
 }

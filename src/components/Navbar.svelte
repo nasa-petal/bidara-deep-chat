@@ -66,6 +66,8 @@
     background-color: rgb(229, 229, 234);
     z-index: 10;
     border-bottom: 1px solid rgb(180, 180, 180);
+    width: 100%;
+    height: 3rem;
   }
   button {
     width: 50%;
