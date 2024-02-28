@@ -49,6 +49,7 @@
 
 </script>
 
+<div>
   <aside class="absolute shadow-lg flex flex-col" class:open>
     <button tabindex="0" class="focus:outline-none new-thread rounded-full m-2 text-base font-sans p-2" disabled={!open} on:click={handleButtonClick}>New Thread</button>
     <nav class="w-full divide-y">
@@ -59,6 +60,7 @@
       {/if}
     </nav>
   </aside>
+</div>
 
 <style>
   button:focus-visible {

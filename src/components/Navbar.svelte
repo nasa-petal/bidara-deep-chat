@@ -67,7 +67,9 @@
     z-index: 10;
     border-bottom: 1px solid rgb(180, 180, 180);
     width: 100%;
-    height: 3rem;
+    height: 10em;
+    margin-top: -7em;
+    padding-top: 7.5em;
   }
   button {
     width: 50%;
