@@ -49,9 +49,9 @@
 
 </script>
 
-<aside class="absolute full shadow-lg flex flex-col" class:open>
+  <aside class="absolute shadow-lg flex flex-col" class:open>
     <button tabindex="0" class="focus:outline-none new-thread rounded-full m-2 text-base font-sans p-2" disabled={!open} on:click={handleButtonClick}>New Thread</button>
-    <nav class="w-full">
+    <nav class="w-full divide-y">
       {#if threads !== null}
         {#each threads as thread}
           <Chat handleSelect={() => handleChatClick(thread)} handleDelete={() => handleChatSwipe(thread)} selected={thread.id === selectedThreadId} bind:thread/>
@@ -68,7 +68,7 @@
   aside {
     z-index: 20;
     width: 20%;
-    height: calc(100dvh - 3.1rem);
+    height: calc(100% - 3em);
     left: -20%;
     background-color: rgb(229, 229, 234);
     border-right: 1px solid rgb(180, 180, 180);
@@ -77,7 +77,6 @@
     visibility: hidden;
   }
 
-
   button {
     transition: background-color 0.3s ease;
   }
@@ -85,10 +84,6 @@
   .open {
     left: 0;
     visibility: visible
-  }
-
-  nav {
-    border-top: 1px solid rgb(199, 199, 204);
   }
 
   .new-thread {
@@ -100,22 +95,23 @@
   }
 
   @media only screen and (max-width: 1400px) {
-    .open {
+    aside {
       width: 30%;
+      left: -30%;
     }
   }
 
   @media only screen and (max-width: 1000px) {
-    .open {
+    aside {
       width: 40%;
+      left: -40%;
     }
   }
 
   @media only screen and (max-width: 700px) {
-    .open {
-      width: 100%;
-    }
     aside {
+      width: 100%;
+      left: -100%;
       border-right: none;
     }
   }

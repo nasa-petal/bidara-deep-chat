@@ -25,7 +25,7 @@ export async function validAssistant(id) {
     return false;
   }
 
-  if (r.hasOwnProperty('name') && r.name == "BIDARAv"+bidara.BIDARA_VERSION) {
+  if (r.hasOwnProperty('name') && r.name == bidara.BIDARA_NAME+"v"+bidara.BIDARA_VERSION) {
     return true;
   }
   return false;
@@ -73,7 +73,8 @@ export async function getBidaraAssistant() {
   if (r.hasOwnProperty('data')) {
     // find assistant with name == BIDARAvX.X
     
-    let bidaraAsst = r.data.find(item => /^BIDARAv[0-9]+\.[0-9]+$/.test(item.name));
+    const bidaraRegex = new RegExp(`^${bidara.BIDARA_NAME}v[0-9]+\.[0-9]+$`)
+    let bidaraAsst = r.data.find(item => bidaraRegex.test(item.name));
     if(bidaraAsst && bidaraAsst.hasOwnProperty('id')) {
       // get version of assistant.
       let bidaraVersion = bidaraAsst.name.substring(7);
