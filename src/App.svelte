@@ -79,12 +79,12 @@
         openAIAsstIdSet = true;
       }
 
-      if (activeThread) {
+      if (activeThread.id === message.message._sessionId) {
         const messages = deepChatRef.getMessages();
         if (messages.length > 0) {
           activeThread.length = messages.length;
           activeThread.messages = messages;
-          updateThreads();
+          updateThreads(activeThread);
         }
       }
     }
@@ -192,8 +192,10 @@
       return true;
     }
 
-    function updateThreads() {
-      updateThreadAndThreads(activeThread, threads);
+    function updateThreads(thread) {
+      const updated = updateThreadAndThreads(thread, threads);
+      activeThread = updated[0];
+      threads = updated[1];
     }
 
   </script>
