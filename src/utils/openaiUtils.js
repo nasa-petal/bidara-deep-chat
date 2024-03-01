@@ -1,7 +1,7 @@
 import * as bidara from "../assistant/bidara";
 
 import { getStoredAPIKey, getStoredAsstId, setStoredAPIKey, setStoredAsstId } from "./storageUtils";
-import { getThread } from "./threadUtils";
+import { getActiveThread } from "./threadUtils";
 
 let openaiKey = null;
 let openaiAsst = null;
@@ -248,7 +248,7 @@ export async function getKeyAsstAndThread() {
 
   let asst = await getAsst();
 
-  let thread = await getThread();
+  let thread = await getActiveThread();
 
   return [key, asst, thread]
 }
