@@ -7,7 +7,8 @@
     import { BIDARA_CONFIG } from './assistant/bidara';
     import { funcCalling } from './assistant/bidaraFunctions';
     import { setOpenAIKey, setAsst, getKeyAsstAndThread, getBidaraAssistant } from './utils/openaiUtils';
-    import { setThread, getThread, deleteThreadFromThreads, getNewThread, getThreads, setThreads, setActiveThreadName, updateThreadAndThreads, getEmptyThreads } from './utils/threadUtils';
+    import * as threadUtils from './utils/threadUtils';
+    import { createBidaraDB } from "./utils/bidaraDB";
     import hljs from "highlight.js";
     window.hljs = hljs;
   
@@ -36,6 +37,7 @@
     }
 
     onMount(async () => {
+      await createBidaraDB();
       await initKeyAsstAndThreads();
     });
 
@@ -46,13 +48,8 @@
       if (keyAsstAndThread && keyAsstAndThread[0]) {
         changedToLoggedInView = true;
 
-        threads = getThreads();
         activeThread = keyAsstAndThread[2];
-
-        if (!threads || (threads.length <= 0 && activeThread)) {
-          threads = [activeThread];
-          setThreads(threads);
-        }
+        threads = await threadUtils.getThreads();
       }
 
       return keyAsstAndThread;
@@ -79,12 +76,12 @@
         openAIAsstIdSet = true;
       }
 
-      if (activeThread.id === message.message._sessionId) {
+      if (activeThread && activeThread.id === message.message._sessionId) {
         const messages = deepChatRef.getMessages();
         if (messages.length > 0) {
-          activeThread.length = messages.length;
           activeThread.messages = messages;
-          updateThreads(activeThread);
+          activeThread.length = messages.length;
+          await threadUtils.setThreadMessages(activeThread.id, messages);
         }
       }
     }
@@ -127,77 +124,75 @@
     }
 
     async function newThreadAndSwitch() {
+      console.log("switch");
       // If the thread is already "new", stay on it
       if (activeThread && activeThread.length <= 0) {
-        if (activeThread.name != "New Chat") {
-          await renameActiveThread("New Chat");
-        }
-        return true;
+       console.log("not switching, just renaming");
+       console.log("thread");
+       console.log(activeThread);
+       if (activeThread.name != "New Chat") {
+         await threadUtils.setThreadName(activeThread.id, "New Chat");
+       }
+       return;
       } 
 
       // If an empty thead is already created, prevents creating a new one
-      const emptyThreads = getEmptyThreads();
-      if (emptyThreads && emptyThreads.length >= 1) {
+      const emptyThread = await threadUtils.getEmptyThread();
+      if (emptyThread) {
+        console.log("switching to empty");
+        await switchActiveThread(emptyThread);
 
-        const emptyThread = emptyThreads[0];
-        switchActiveThread(emptyThread);
-
-        return true;
+        return;
       }
 
-      const thread = await getNewThread();
-      threads.unshift(thread);
-
-      setThreads(threads);
-
+      console.log("switching")
+      const thread = await threadUtils.getNewThread();
       await switchActiveThread(thread);
-      
-      return true;
+      threads = await threadUtils.getThreads();
     }
 
     async function deleteThreadAndSwitch(thread) {
+      console.log("deleting thread id: " + thread.id);
 
-      threads = deleteThreadFromThreads(thread.id);
-      activeThread = {};
+      await threadUtils.deleteThread(thread.id);
+      threads = await threadUtils.getThreads();
+
+      if (thread.id !== activeThread.id) {
+        return;
+      }
+
       if (threads && threads.length > 0) {
-        switchActiveThread(threads[0]);
+        const thread = await threadUtils.getRecentThread();
+        console.log("switching to thread: " + activeThread.id);
+        await switchActiveThread(thread);
+
       } else {
         await newThreadAndSwitch();
       }
-
-      return true;
     }
 
     
     async function switchActiveThread(thread) {
+      console.log("try switch active thread");
       if (thread.id === activeThread.id) {
         return;
       }
 
+      console.log("switch active thread");
       blurred = true;
 
-      await setThread(thread);
+      await threadUtils.setActiveThread(thread.id);
+
       keyAsstAndThread = await getKeyAsstAndThread();
       activeThread = keyAsstAndThread[2];
-
-      return true;
     }
 
     async function renameActiveThread(name) {
-      await setActiveThreadName(name);
+      await threadUtils.setThreadName(activeThread.id, name);
 
-      threads = getThreads();
-      activeThread = await getThread();
-
-      return true;
+      threads = await threadUtils.getThreads();
+      activeThread = await threadUtils.getActiveThread();
     }
-
-    function updateThreads(thread) {
-      const updated = updateThreadAndThreads(thread, threads);
-      activeThread = updated[0];
-      threads = updated[1];
-    }
-
   </script>
 
   <main>
