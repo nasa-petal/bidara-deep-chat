@@ -172,6 +172,8 @@
         text-overflow: ellipsis;
         white-space: nowrap;
         cursor: pointer;
+        padding-right: env(safe-area-inset-right);
+        padding-left: env(safe-area-inset-left);
     }
 
     .reveal {
