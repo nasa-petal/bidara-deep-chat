@@ -407,6 +407,8 @@
 <style>
     #content-container {
       height: calc(100% - 3rem);
+      padding-right: env(safe-area-inset-right);
+      padding-left: env(safe-area-inset-left);
     }
 
     #chat-container {
