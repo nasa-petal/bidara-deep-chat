@@ -55,6 +55,10 @@ export async function createBidaraDB() {
 	BIDARA_DB = await dbUtils.openDB(BIDARA_DB_CONFIG.name, BIDARA_DB_CONFIG.stores, BIDARA_DB_CONFIG.version);
 }
 
+export async function closeBidaraDB() {
+	await dbUtils.closeDB(BIDARA_DB);
+}
+
 export async function getAllThreads() {
 	const threads = await dbUtils.readAll(BIDARA_DB, CHAT_STORE_NAME, "created_time", true);
 	return threads;

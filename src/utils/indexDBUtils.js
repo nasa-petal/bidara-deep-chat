@@ -23,6 +23,18 @@ export async function openDB(name, stores, version) {
   });
 }
 
+export async function closeDB(db) {
+	if (!db) {
+		throw new Error("Attempting to close DB when DB is null.");
+	}
+
+	if (db.closed) {
+		throw new Error("Attempting to close DB when DB is already closed.");
+	}
+
+	await db.close();
+}
+
 function createStore(event, db, name, primaryKey, indices) {
 	if (db.objectStoreNames.contains(name)) {
 		const existingStore = event.currentTarget.transaction.objectStore(name);

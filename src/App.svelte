@@ -2,13 +2,13 @@
 
   <script>
     import { DeepChat } from "deep-chat";
-    import { onMount } from 'svelte';
+    import { onMount, onDestroy } from 'svelte';
     import { Navbar, Sidebar } from './components';
     import { BIDARA_CONFIG } from './assistant/bidara';
     import { funcCalling } from './assistant/bidaraFunctions';
     import { setOpenAIKey, setAsst, getKeyAsstAndThread, getBidaraAssistant } from './utils/openaiUtils';
     import * as threadUtils from './utils/threadUtils';
-    import { createBidaraDB } from "./utils/bidaraDB";
+    import { createBidaraDB, closeBidaraDB } from "./utils/bidaraDB";
     import hljs from "highlight.js";
     window.hljs = hljs;
   
@@ -38,6 +38,10 @@
       await createBidaraDB();
       await initKeyAsstAndThreads();
     });
+
+    onDestroy(async () => {
+      await closeBidaraDB();
+    })
 
     async function initKeyAsstAndThreads() {
       keyAsstAndThread = await getKeyAsstAndThread();
