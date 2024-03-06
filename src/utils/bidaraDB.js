@@ -84,8 +84,6 @@ export async function getMostRecentlyUpdatedThread() {
 export async function getEmptyThread() {
 	const emptyThread = await dbUtils.readFirstByIndex(BIDARA_DB, CHAT_STORE_NAME, "length", false);
 	if (emptyThread && emptyThread.length === 0) {
-		console.log("empty thread");
-		console.log(emptyThread);
 		return emptyThread;
 	}
 
