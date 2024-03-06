@@ -36,9 +36,22 @@ export async function ssSearch(params) {
   fields = [...new Set(fields)]; //remove duplicates
   searchParams.fields = fields.join();
   searchParams = new URLSearchParams(searchParams);
-  const response = await fetch("https://api.semanticscholar.org/graph/v1/paper/search?" + searchParams);
-  const papers = await response.json();
-  return JSON.stringify(papers);
+
+  try {
+    const response = await fetch("https://api.semanticscholar.org/graph/v1/paper/search?" + searchParams);
+
+    if (response.status === 429) {
+      return "Semantic Scholar is currently having issues with their servers. So, for now, searching for academic papers will not work."
+    }
+    const papers = await response.json();
+    return JSON.stringify(papers);
+  } catch (e) {
+    if (e instanceof TypeError && e.message === 'Failed to fetch') {
+      return "Semantic Scholar is currently having issues with their servers. So, for now, searching for academic papers will not work."
+    }
+
+    throw e;
+  }
 }
 
 async function genImage(params) {
