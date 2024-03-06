@@ -6,7 +6,7 @@
     import { Navbar, Sidebar } from './components';
     import { BIDARA_CONFIG } from './assistant/bidara';
     import { funcCalling } from './assistant/bidaraFunctions';
-    import { setOpenAIKey, setAsst, getKeyAsstAndThread, getBidaraAssistant } from './utils/openaiUtils';
+    import { setOpenAIKey, setAsst, getKeyAsstAndThread, getBidaraAssistant, syncMessagesWithThread } from './utils/openaiUtils';
     import * as threadUtils from './utils/threadUtils';
     import { createBidaraDB, closeBidaraDB } from "./utils/bidaraDB";
     import hljs from "highlight.js";
@@ -57,12 +57,16 @@
       return keyAsstAndThread;
     }
 
-    function loadMessages(thread) {
+    async function loadMessages(thread) {
       if (!thread || !thread?.messages) {
         return;
       }
 
-      const messages = thread.messages.slice(initialMessages.length);
+      let messages = thread.messages.slice(initialMessages.length);
+
+      if (messages?.length > 0 && messages[messages.length - 1].role === "user") {
+        messages = await syncMessagesWithThread(messages, thread.id);
+      }
       
       messages.forEach((message) => {
         deepChatRef._addMessage(message);
@@ -126,12 +130,8 @@
     }
 
     async function newThreadAndSwitch() {
-      console.log("switch");
       // If the thread is already "new", stay on it
       if (activeThread && activeThread.length <= 0) {
-       console.log("not switching, just renaming");
-       console.log("thread");
-       console.log(activeThread);
        if (activeThread.name != "New Chat") {
          await threadUtils.setThreadName(activeThread.id, "New Chat");
        }
@@ -141,20 +141,17 @@
       // If an empty thead is already created, prevents creating a new one
       const emptyThread = await threadUtils.getEmptyThread();
       if (emptyThread) {
-        console.log("switching to empty");
         await switchActiveThread(emptyThread);
 
         return;
       }
 
-      console.log("switching")
       const thread = await threadUtils.getNewThread();
       await switchActiveThread(thread);
       threads = await threadUtils.getThreads();
     }
 
     async function deleteThreadAndSwitch(thread) {
-      console.log("deleting thread id: " + thread.id);
 
       await threadUtils.deleteThread(thread.id);
       threads = await threadUtils.getThreads();
@@ -165,7 +162,6 @@
 
       if (threads && threads.length > 0) {
         const thread = await threadUtils.getRecentThread();
-        console.log("switching to thread: " + activeThread.id);
         await switchActiveThread(thread);
 
       } else {
@@ -175,12 +171,10 @@
 
     
     async function switchActiveThread(thread) {
-      console.log("try switch active thread");
       if (thread.id === activeThread.id) {
         return;
       }
 
-      console.log("switch active thread");
       blurred = true;
 
       await threadUtils.setActiveThread(thread.id);

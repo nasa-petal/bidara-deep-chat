@@ -51,13 +51,9 @@ export async function getEmptyThread() {
 
 export async function setActiveThread(threadId) {
   const currentActiveThread = await bidaraDB.getActiveThread();
-  console.log("current active");
-  console.log(currentActiveThread);
   if (currentActiveThread) {
     await bidaraDB.setActiveStatusById(currentActiveThread.id, false);
   }
-  console.log("switch to");
-  console.log(threadId);
   await bidaraDB.setActiveStatusById(threadId, true);
 }
 
