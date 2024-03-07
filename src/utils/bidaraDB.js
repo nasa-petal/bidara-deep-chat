@@ -91,17 +91,17 @@ export async function getEmptyThread() {
 }
 
 export async function getNameById(id) {
-	const thread = await dbUtils.getThreadById(id);
+	const thread = await getThreadById(id);
 	return thread.name;
 }
 
 export async function getLengthById(id) {
-	const thread = await dbUtils.getThreadById(id);
+	const thread = await getThreadById(id);
 	return thread.length;
 }
 
 export async function getFilteredThreads(thread_filter) {
-	return await dbUtils.getAllThreads().filter(thread_filter);
+	return await getAllThreads().filter(thread_filter);
 }
 
 export async function pushMessageToId(id, message) {
