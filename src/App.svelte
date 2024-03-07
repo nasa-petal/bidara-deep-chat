@@ -27,6 +27,7 @@
     let deepChatRef;
     let open = false;
     let blurred = true;
+    let loaded = false;
 
     let threads;
     
@@ -61,6 +62,7 @@
       if (!thread || !thread?.messages) {
         return;
       }
+      loaded = true;
 
       let messages = thread.messages.slice(initialMessages.length);
 
@@ -71,6 +73,7 @@
       messages.forEach((message) => {
         deepChatRef._addMessage(message);
       });
+
     }
 
     async function onNewMessage(message) { 
@@ -125,7 +128,9 @@
         changedToLoggedInView = true;
       }
 
-      loadMessages(activeThread);
+      if (!loaded) {
+        await loadMessages(activeThread);
+      }
       setTimeout(()=> blurred = false, 200);
     }
 
@@ -165,16 +170,20 @@
         await switchActiveThread(thread);
 
       } else {
+        // temporary fix stops newThreadAndSwitch from not giving new thread on empty delete
+        // this won't be written to storage
+        activeThread.length = 1; 
         await newThreadAndSwitch();
       }
     }
 
     
     async function switchActiveThread(thread) {
-      if (thread.id === activeThread.id) {
+      if (activeThread && thread.id === activeThread.id) {
         return;
       }
 
+      loaded = false;
       blurred = true;
 
       await threadUtils.setActiveThread(thread.id);
