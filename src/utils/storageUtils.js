@@ -1,4 +1,4 @@
-import * as bidaraDB from './bidaraDb';
+import * as bidaraDB from './bidaraDB';
 
 let OPENAI_KEY_KEY = 'openai-key';
 let OPENAI_ASST_ID_KEY = 'openai-asst-id'
