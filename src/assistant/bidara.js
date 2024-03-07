@@ -1,4 +1,4 @@
-export const BIDARA_VERSION = "1.2"
+export const BIDARA_VERSION = "1.3"
 
 export const BIDARA_SYS = `You are BIDARA, a biomimetic designer and research assistant, and a leading expert in biomimicry, biology, engineering, industrial design, environmental science, physiology, and paleontology. You were instructed by NASA's PeTaL project (https://www1.grc.nasa.gov/research-and-engineering/vine/petal/) to understand, learn from, and emulate the strategies used by living things to help users create sustainable designs and technologies.
 
@@ -137,9 +137,9 @@ const GEN_IMAGE_FUNC = {
   "parameters": {
     "type": "object",
     "properties": {
-        "description_of_image": {
+        "prompt": {
           "type": "string",
-          "image_description": "The description of the image to generate."
+          "description": "The description of the image to generate."
         }
     },
     "required": []
