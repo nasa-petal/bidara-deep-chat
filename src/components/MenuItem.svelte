@@ -1,6 +1,6 @@
 
 <li>
-	<div class="item-container flex items-center justify-left w-full h-full">
+	<div class="item-container flex items-center justify-left w-full h-full px-2">
 		<slot />
 	</div>
 </li>
