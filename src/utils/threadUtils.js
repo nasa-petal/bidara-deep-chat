@@ -1,19 +1,19 @@
 import { validThread, getNewThreadId } from "./openaiUtils";
-import { getStoredActiveThread, getStoredThreads, setStoredActiveThread, setStoredThreads, getFilteredThreads } from "./storageUtils";
+import * as bidaraDB from "./bidaraDB";
 
-export async function getNewThread() {
+async function createNewThread() {
   const new_id = await getNewThreadId();
 
   if (new_id) {
     const new_name = "New Chat";
-    return {name: new_name, id: new_id, length: 0};
+    return {name: new_name, id: new_id, length: 0, messages: [], active: true};
   }
 
   return null;
 }
 
-export async function getThread() {
-  let thread = getStoredActiveThread();
+export async function getActiveThread() {
+  let thread = await bidaraDB.getActiveThread();
 
   let isValidThreadId = false;
   if (thread !== null) {
@@ -22,101 +22,55 @@ export async function getThread() {
 
   if (thread === null || !isValidThreadId) {
     thread = await getNewThread();
-
-    setThread(thread);
-  }
-
-  let threads = getStoredThreads();
-
-
-  if (threads) {
-    const threadInThreads = threads.filter((t) => t.id == thread.id).length > 0;
-
-    if (!threadInThreads) {
-      threads.unshift(thread);
-      setThreads(threads);
-    }
-
-  } else {
-    threads = [thread];
-    setThreads(threads);
+    await setActiveThread(thread.id);
   }
 
   return thread;
 }
 
-export async function setThread(thread) {
-  const current_thread = getStoredActiveThread();
-  if (!current_thread || thread != current_thread ) {
-    setStoredActiveThread(thread);
-  }
+export async function getNewThread() {
+  const thread = await createNewThread();
+  await bidaraDB.setThread(thread);
+
+  return thread;
 }
 
-export function getThreads() {
-  let threads = getStoredThreads();
+export async function getRecentThread() {
+  return await bidaraDB.getMostRecentlyUpdatedThread();
+}
+
+export async function getThreads() {
+  const threads = await bidaraDB.getAllThreads();
 
   return threads;
 }
 
-export function setThreads(threads) {
-  setStoredThreads(threads);
+export async function getEmptyThread() {
+  return await bidaraDB.getEmptyThread();
 }
 
-export function deleteThreadFromThreads(thread_id) {
-  const filteredThreads = getFilteredThreads((thread) => thread.id !== thread_id);
-  setThreads(filteredThreads);
-  return filteredThreads;
-}
-
-export async function setActiveThreadName(name) {
-  const active_thread = await getThread();
-
-  const threads = getThreads();
-
-  const new_threads = threads.map(thread => {
-    if (thread.id == active_thread.id) {
-      thread.name = name;
-    }
-
-    return thread;
-  })
-
-  active_thread.name = name;
-
-  setThread(active_thread);
-  setThreads(new_threads);
-}
-
-export function getEmptyThreads() {
-  const emptyThreads = getFilteredThreads((thread) => thread.length === 0);
-  return emptyThreads;
-}
-
-export function floatThreadInThreads(floatThread) {
-  const filteredWithoutThread = getFilteredThreads((thread) => thread.id !== floatThread);
-  filteredWithoutThread.unshift(floatThread);
-  return filteredWithoutThread;
-}
-
-export function updateThreadAndThreads(activeThread, threads) {
-  const storedThread = getStoredActiveThread();
-  const storedThreads = getStoredThreads();
-
-  if (activeThread != storedThread) {
-    if (threads) {
-      threads = threads.map((thread) => { 
-        if (thread.id === activeThread.id) {
-          return activeThread;
-        }
-        return thread;
-      });
-    }
-
-    setStoredActiveThread(activeThread);
+export async function setActiveThread(threadId) {
+  const currentActiveThread = await bidaraDB.getActiveThread();
+  if (currentActiveThread) {
+    await bidaraDB.setActiveStatusById(currentActiveThread.id, false);
   }
-
-
-  if (threads != storedThreads) {
-    setStoredThreads(threads);
-  }
+  await bidaraDB.setActiveStatusById(threadId, true);
 }
+
+export async function setThreadName(id, name) {
+  await bidaraDB.setNameById(id, name);
+}
+
+export async function setThreadMessages(threadId, messages) {
+  await bidaraDB.setMessagesById(threadId, messages);
+  await bidaraDB.setLengthById(threadId, messages.length);
+}
+
+export async function updateThread(thread) {
+  await bidaraDB.setThread(thread);
+}
+
+export async function deleteThread(threadId) {
+  await bidaraDB.deleteThreadById(threadId);
+}
+
