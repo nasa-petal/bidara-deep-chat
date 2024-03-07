@@ -11,7 +11,7 @@
 		<button tabindex="0" class="focus:outline-none menu-button" class:open on:click={() => {openMenu = !openMenu;}}>
 			<img class="menu-image" src="ellipsis-vertical-blue.svg" alt="menu"/>
     </button>
-		<div class="menu-container bg-gray-700 backdrop-blur-sm focus:no-outline" class:openMenu>
+		<div class="menu-container bg-gray-600 focus:no-outline" class:openMenu>
 			<menu class="p-1"><slot /></menu>
 		</div>
 		<div tabindex="0" class="clickoff" class:openMenu on:click={handleClose}>
@@ -46,10 +46,12 @@
 	.menu-container {
 		border: 0.5px solid black;
 		border-radius: 0.5em;
+		color: white;
 		width: 15em;
+		box-shadow: 0 0 1rem 0 rgba(0, 0, 0, 0.3);
+
 		position: absolute;
 		display: none;
-		color: white;
 		visibility: hidden;
 		right: 1%;
 		overflow: hidden;
