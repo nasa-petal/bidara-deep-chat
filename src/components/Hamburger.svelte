@@ -20,7 +20,6 @@
     .container {
         width: 2em;
         height: 2em;
-        margin-right: 4.5em;
     }
 
     .menu:hover {
