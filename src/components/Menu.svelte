@@ -1,13 +1,20 @@
 <script>
 	let openMenu = false;
+
+	function handleClose(event) {
+		event.preventDefault();
+		openMenu = false;
+	}
 </script>
 
 <div class="container p-2">
-	<button tabindex="0" class="focus:outline-none menu-button" class:open on:click={() => {console.log("clicked menu"); openMenu = !openMenu;}} on:blur={() => setTimeout(() => openMenu = false, 100)}>
+		<button tabindex="0" class="focus:outline-none menu-button" class:open on:click={() => {openMenu = !openMenu;}}>
 			<img class="menu-image" src="ellipsis-vertical-blue.svg" alt="menu"/>
     </button>
-		<div class="menu-container bg-gray-700 backdrop-blur-sm" class:openMenu>
+		<div class="menu-container bg-gray-700 backdrop-blur-sm focus:no-outline" class:openMenu>
 			<menu class="p-1"><slot /></menu>
+		</div>
+		<div tabindex="0" class="clickoff" class:openMenu on:click={handleClose}>
 		</div>
 </div>
 
@@ -47,6 +54,27 @@
 		right: 1%;
 		overflow: hidden;
 
+		z-index: 39;
+	}
+
+	.clickoff {
+		outline: none !important;
+		background-color: transparent !important;
+		display: none;
+		visibility: hidden;
+		position: fixed;
+		left: 0;
+		top: 0;
+		width: 100%;
+		height: 100%;
+
+		z-index: 38;
+	}
+
+	.clickoff:active {
+		outline: none !important;
+		box-shadow: none !important;
+		background-color: transparent !important;
 	}
 
 	menu {
