@@ -232,7 +232,7 @@
         </div>
       </div>-->
       <div id="welcome" style={" display: none "}; bind:this={welcomeRef}>
-      <div id="header"><img src="bidara.png" alt="girl with dark hair" height="57" width="57" /><h2>BIDARA</h2><br/><span class="small">Bio-Inspired Design and Research Assistant</span></div>
+      <div id="header"><img src="bidara128x128.png" alt="girl with dark hair" height="57" width="57" /><h2>BIDARA</h2><br/><span class="small">Bio-Inspired Design and Research Assistant</span></div>
       <h3 class="text-lg font-bold mt-5 mb-5">How to access</h3>
       <ol class="list-decimal">
         <li><a href="https://platform.openai.com/signup" class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600">Create an OpenAI account</a></li>

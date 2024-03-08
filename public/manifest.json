@@ -1,0 +1,22 @@
+{
+	"name": "BIDARA",
+	"start_url": "/",
+	"display": "standalone",
+	"icons": [
+		{
+			"src": "/bidara128x128.png",
+			"type": "image/png",
+			"sizes": "128x128"
+		},
+		{
+			"src": "/bidara192x192.png",
+			"type": "image/png",
+			"sizes": "192x192"
+		},
+		{
+			"src": "/bidara512x512.png",
+			"type": "image/png",
+			"sizes": "512x512"
+		}
+	]
+}

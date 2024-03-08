@@ -1,5 +1,5 @@
 <div class="flex mx-2 justify-center space-x-4">
-	<img src="bidara.png" alt="" />
+	<img src="bidara128x128.png" alt="" />
 </div>
 
 <style>
