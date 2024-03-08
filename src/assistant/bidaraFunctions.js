@@ -40,17 +40,14 @@ export async function ssSearch(params) {
   try {
     const response = await fetch("https://api.semanticscholar.org/graph/v1/paper/search?" + searchParams);
 
-    if (response.status === 429) {
+    if (response.status === 429 || response.code === 429 || response.statusCode === 429) {
       return "Semantic Scholar is currently having issues with their servers. So, for now, searching for academic papers will not work."
     }
     const papers = await response.json();
     return JSON.stringify(papers);
   } catch (e) {
-    if (e instanceof TypeError && e.message === 'Failed to fetch') {
-      return "Semantic Scholar is currently having issues with their servers. So, for now, searching for academic papers will not work."
-    }
-
-    throw e;
+    console.error('error: ' + e);
+    return "Semantic Scholar is currently having issues with their servers. So, for now, searching for academic papers will not work."
   }
 }
 
