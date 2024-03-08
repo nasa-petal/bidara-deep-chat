@@ -14,7 +14,7 @@
 		<div class="menu-container bg-gray-600 focus:no-outline" class:openMenu>
 			<menu class="p-1"><slot /></menu>
 		</div>
-		<div tabindex="0" class="clickoff" class:openMenu on:click={handleClose}>
+		<div tabindex="0" class="clickoff w-full h-full" class:openMenu on:click={handleClose}>
 		</div>
 </div>
 
@@ -67,16 +67,8 @@
 		position: fixed;
 		left: 0;
 		top: 0;
-		width: 100%;
-		height: 100%;
 
 		z-index: 38;
-	}
-
-	.clickoff:active {
-		outline: none !important;
-		box-shadow: none !important;
-		background-color: transparent !important;
 	}
 
 	menu {
