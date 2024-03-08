@@ -14,8 +14,8 @@
 		<div class="menu-container bg-gray-600 focus:no-outline" class:openMenu>
 			<menu class="p-1"><slot /></menu>
 		</div>
-		<div tabindex="0" class="clickoff w-full h-full" class:openMenu on:click={handleClose}>
-		</div>
+		<button tabindex="0" class="clickoff w-full h-full" class:openMenu on:click={handleClose}>
+		</button>
 </div>
 
 <style>
