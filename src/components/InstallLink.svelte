@@ -1,13 +1,19 @@
 <script>
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      console.log("beforeinstallprompt event was fired");
-    })
+  export let installEvent;
+  if (installEvent) {
+    console.log("install installevent")
+  }
+
+  function handleClick() {
+    console.log("click");
+    if (installEvent) {
+      console.log("install prompt");
+      installEvent.prompt();
+    }
+  }
 </script>
 
-<button>
+<button class="w-full h-full p-1 flex justify-left" on:click={handleClick}>
 Install BIDARA
 </button>
 

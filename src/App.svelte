@@ -198,6 +198,18 @@
       threads = await threadUtils.getThreads();
       activeThread = await threadUtils.getActiveThread();
     }
+
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      console.log("beforeinstallprompt event was fired");
+    })
+
+    window.addEventListener('appinstalled', () => {
+      deferredPrompt = null;
+      console.log("PWA installed");
+    })
   </script>
 
   <main class="flex">
@@ -251,7 +263,7 @@
     {#if keyAsstAndThread !== null}
     {#if activeThread !== null}
     {#key activeThread}
-        <Navbar bind:chat_name={activeThread.name} bind:sidebar={open} handleRename={renameActiveThread}/>   
+      <Navbar bind:chat_name={activeThread.name} bind:sidebar={open} handleRename={renameActiveThread} bind:installEvent={deferredPrompt}/>   
     {/key}
     {/if}
     <div id="content-container" class="flex justify-between w-full h-full flex-1" class:open>

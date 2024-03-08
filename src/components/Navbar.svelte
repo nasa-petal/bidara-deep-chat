@@ -2,10 +2,15 @@
     import Hamburger from './Hamburger.svelte'
     import Menu from './Menu.svelte';
     import MenuItem from './MenuItem.svelte';
+    import InstallLink from './InstallLink.svelte';
 	
     export let sidebar = false
     export let chat_name;
     export let handleRename;
+    export let installEvent;
+    if (installEvent) {
+      console.log("nav install event");
+    }
     
     let editing_name = false;
     let editing_input;
@@ -60,8 +65,15 @@
     <button tabindex="0" class="focus:no-outline px-3 py-1 rounded-full" on:click={handleButtonClick}>{chat_name}</button>
   {/if}
   <Menu>
-    <MenuItem><a class="w-full h-full p-1" tabindex="0" href="https://forms.gle/xDEixG5UJrFBwDKv5" target="_blank" rel="noopener">Send Feedback</a></MenuItem>
-    <MenuItem><a class="w-full h-full p-1" tabindex="0" href="https://www1.grc.nasa.gov/research-and-engineering/vine/petal/" target="_blank" rel="noopener">Vist PeTaL</a></MenuItem>
+    <div class="divide-y">
+      <div>
+        <MenuItem><a class="w-full h-full p-1" tabindex="0" href="https://forms.gle/xDEixG5UJrFBwDKv5" target="_blank" rel="noopener">Send Feedback</a></MenuItem>
+        <MenuItem><a class="w-full h-full p-1" tabindex="0" href="https://www1.grc.nasa.gov/research-and-engineering/vine/petal/" target="_blank" rel="noopener">Vist PeTaL</a></MenuItem>
+      </div>
+      {#if installEvent}
+        <MenuItem><InstallLink bind:installEvent/></MenuItem>
+      {/if}
+    </div>
   </Menu>
 </header>
 
