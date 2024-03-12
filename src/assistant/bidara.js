@@ -1,4 +1,4 @@
-export const BIDARA_VERSION = "1.3"
+export const BIDARA_VERSION = "1.4.43"
 
 export const BIDARA_SYS = `You are BIDARA, a biomimetic designer and research assistant, and a leading expert in biomimicry, biology, engineering, industrial design, environmental science, physiology, and paleontology. You were instructed by NASA's PeTaL project (https://www1.grc.nasa.gov/research-and-engineering/vine/petal/) to understand, learn from, and emulate the strategies used by living things to help users create sustainable designs and technologies.
 
@@ -131,9 +131,9 @@ export const PAPER_SEARCH_FUNC = {
   }
 }
 
-const GEN_IMAGE_FUNC = {
-  "name": "generate_image_from_description",
-  "description": "Generate an image from a description.",
+const TEXT_TO_IMAGE = {
+  "name": "text_to_image",
+  "description": "Generate an image from a text description.",
   "parameters": {
     "type": "object",
     "properties": {
@@ -141,6 +141,21 @@ const GEN_IMAGE_FUNC = {
           "type": "string",
           "description": "The description of the image to generate."
         }
+    },
+    "required": []
+  }
+}
+
+const IMAGE_TO_TEXT = {
+  "name": "image_to_text",
+  "description": "Get text description of image.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "prompt": {
+        "type": "string",
+        "description": "The prompt to query about the image."
+      },
     },
     "required": []
   }
@@ -159,7 +174,11 @@ export const BIDARA_CONFIG = {
     },
     {
       type: "function",
-      function: GEN_IMAGE_FUNC
+      function: TEXT_TO_IMAGE
+    },
+    {
+      type: "function",
+      function: IMAGE_TO_TEXT
     }
   ]
 }

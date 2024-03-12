@@ -1,4 +1,4 @@
-import { getDalleImageGeneration } from "../utils/openaiUtils";
+import { getDalleImageGeneration, getImageToText } from "../utils/openaiUtils";
 
 export function getCurrentWeather(location) {
   location = location.toLowerCase();
@@ -82,13 +82,31 @@ async function genImage(params) {
   return "The image has been inserted into the chat. Respond with a very short question bring this back into this process. DO NOT REPLY WITH AN IMAGE, MARKDOWN, OR ANYTHING OTHER THAN A SHORT QUESTION.";
 }
 
+async function imageToText(params) {
+  let imageParams = JSON.parse(params);
+
+
+  if ("parameters" in imageParams) {
+    imageParams = imageParams.parameters;
+  }
+
+  let prompt = imageParams.prompt
+
+  let text = await getImageToText(prompt);
+
+  return text;
+}
+
 export async function callFunc(functionDetails) {
   let tmp = '';
   if(functionDetails.name == "get_graph_paper_relevance_search") {
     tmp = await ssSearch(functionDetails.arguments);
   }
-  else if(functionDetails.name == "generate_image_from_description") {
+  else if(functionDetails.name == "text_to_image") {
     tmp = await genImage(functionDetails.arguments);
+  }
+  else if (functionDetails.name == "image_to_text") {
+    tmp = await imageToText(functionDetails.arguments);
   }
   else if(functionDetails.name == "get_weather") {
     tmp = getCurrentWeather(functionDetails.arguments);

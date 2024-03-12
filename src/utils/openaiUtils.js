@@ -5,6 +5,8 @@ import { getActiveThread } from "./threadUtils";
 
 let openaiKey = null;
 let openaiAsst = null;
+let imageDescription = null;
+let imageSource = null;
 
 export async function validAssistant(id) {
   if (!openaiKey) {
@@ -390,6 +392,7 @@ export async function syncMessagesWithThread(messages, threadId) {
 
       if (msg?.text === threadMsg?.text) {
         threadIndex++;
+      } else {
       }
 
       continue;
@@ -411,7 +414,76 @@ export async function syncMessagesWithThread(messages, threadId) {
 
   }
 
-  
   // Thread messages will only be longer by files, which we don't want to include in sync 
   return updatedMessages;
+}
+
+
+export async function getImageDescription(base64, prompt) {
+
+  if (!openaiKey) {
+    throw new Error('openai key not set. cannot validate thread.');
+  }
+
+  if (!prompt) {
+    prompt = "Give a detailed but concise description of the image. If there are any engineering, biological, or mechanical processes present, include how they're present."
+  }
+
+  const url = `https://api.openai.com/v1/chat/completions`;
+  const method = 'POST';
+  const headers = {
+    'Authorization': 'Bearer ' + openaiKey,
+    'Content-Type': 'application/json',
+  };
+  const body = JSON.stringify({
+    "model": "gpt-4-vision-preview",
+    "messages": [
+      { 
+        "role": "user",
+        "content": [
+          {
+            "type": "text",
+            "text": prompt
+          },
+          {
+            "type": "image_url",
+            "image_url": {
+              "url": base64
+            }
+          }
+        ]
+      }
+    ],
+    "max_tokens": 300
+  })
+
+  const request = {
+    method,
+    headers,
+    body
+  }
+
+  const response = await fetch(url, request);
+
+  const r = await response.json();
+  if (r.error && r.error.type === 'invalid_request_error') {
+    console.error(r.error);
+    return null;
+  }
+
+  imageDescription = r.choices[0].message.content;
+
+  return imageDescription;
+}
+
+export async function getImageToText(prompt) {
+  if (imageSource) {
+    return getImageDescription(imageSource, prompt);
+  }
+
+  return "No image has been uploaded, or the uploaded file was not an image.";
+}
+
+export async function setImageSource(src) {
+  imageSource = src;
 }

@@ -6,7 +6,7 @@
     import { Navbar, Sidebar } from './components';
     import { BIDARA_CONFIG } from './assistant/bidara';
     import { funcCalling } from './assistant/bidaraFunctions';
-    import { setOpenAIKey, setAsst, getKeyAsstAndThread, getBidaraAssistant, syncMessagesWithThread } from './utils/openaiUtils';
+    import { setOpenAIKey, setAsst, getKeyAsstAndThread, getBidaraAssistant, syncMessagesWithThread, setImageSource } from './utils/openaiUtils';
     import * as threadUtils from './utils/threadUtils';
     import { createBidaraDB, closeBidaraDB } from "./utils/bidaraDB";
     import hljs from "highlight.js";
@@ -91,6 +91,20 @@
           activeThread.messages = messages;
           activeThread.length = messages.length;
           await threadUtils.setThreadMessages(activeThread.id, messages);
+        }
+      }
+
+      if (message.message.role === "user") {
+        if (message.message.files && 
+          message.message.files.length > 0 && 
+          message.message.files[0].src && 
+          message.message.files[0].src.slice(0,10) === "data:image"
+        ) {
+
+          const fileSource = message.message.files[0].src;
+          await setImageSource(fileSource);
+        }  else if (message.message.files) {
+          await setImageSource(null);
         }
       }
     }
@@ -198,6 +212,10 @@
       threads = await threadUtils.getThreads();
       activeThread = await threadUtils.getActiveThread();
     }
+
+    async function requestInterceptor(requestDetails) {
+      return requestDetails;
+    }
   </script>
 
   <main class="flex">
@@ -287,6 +305,7 @@
           onError={onError}
           onNewMessage={onNewMessage}
           onComponentRender={onComponentRender}
+          requestInterceptor={requestInterceptor}
           _insertKeyViewStyles={{displayCautionText: false}}
           demo={false}
           speechToText={{
