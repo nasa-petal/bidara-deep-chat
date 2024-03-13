@@ -1,6 +1,7 @@
 <script>
-    import Logo from './Logo.svelte'
     import Hamburger from './Hamburger.svelte'
+    import Menu from './Menu.svelte';
+    import MenuItem from './MenuItem.svelte';
 	
     export let sidebar = false
     export let chat_name;
@@ -58,18 +59,21 @@
   {:else}
     <button tabindex="0" class="focus:no-outline px-3 py-1 rounded-full" on:click={handleButtonClick}>{chat_name}</button>
   {/if}
-  <Logo/>	
+  <Menu>
+    <MenuItem><a class="w-full h-full p-1" tabindex="0" href="https://forms.gle/xDEixG5UJrFBwDKv5" target="_blank" rel="noopener">Send Feedback</a></MenuItem>
+    <MenuItem><a class="w-full h-full p-1" tabindex="0" href="https://www1.grc.nasa.gov/research-and-engineering/vine/petal/" target="_blank" rel="noopener">Vist PeTaL</a></MenuItem>
+  </Menu>
 </header>
 
 <style>
   header {
     background-color: rgb(229, 229, 234);
-    z-index: 10;
+    z-index: 30;
     border-bottom: 1px solid rgb(180, 180, 180);
     width: 100%;
     height: 10em;
     margin-top: -7em;
-    padding-top: 7.5em;
+    padding: 7.5em env(safe-area-inset-right) 0.5em env(safe-area-inset-left);
   }
   button {
     width: 50%;

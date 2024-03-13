@@ -1,6 +1,6 @@
-export const BIDARA_NAME = "YourAssistant";
+export const BIDARA_NAME = "BIDARA";
 
-export const BIDARA_VERSION = "1.2";
+export const BIDARA_VERSION = "1.3";
 
 export const BIDARA_LOGO = "bidara.png";
 export const BIDARA_LOGO_DESC = "girl with dark hair";
@@ -150,9 +150,9 @@ const GEN_IMAGE_FUNC = {
   "parameters": {
     "type": "object",
     "properties": {
-        "description_of_image": {
+        "prompt": {
           "type": "string",
-          "image_description": "The description of the image to generate."
+          "description": "The description of the image to generate."
         }
     },
     "required": []
