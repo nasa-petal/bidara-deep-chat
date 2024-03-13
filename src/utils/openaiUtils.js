@@ -1,16 +1,16 @@
 import * as bidara from "../assistant/bidara";
 
 import { getStoredAPIKey, getStoredAsstId, setStoredAPIKey, setStoredAsstId } from "./storageUtils";
-import { getThread } from "./threadUtils";
+import { getActiveThread } from "./threadUtils";
 
 let openaiKey = null;
 let openaiAsst = null;
 
 export async function validAssistant(id) {
-  if(!openaiKey) {
+  if (!openaiKey) {
     throw new Error('openai key not set. cannot validate assistant.');
   }
-  const response = await fetch("https://api.openai.com/v1/assistants/"+id, {
+  const response = await fetch("https://api.openai.com/v1/assistants/" + id, {
     method: "GET",
     headers: {
       Authorization: 'Bearer ' + openaiKey,
@@ -19,7 +19,7 @@ export async function validAssistant(id) {
     },
     body: null
   });
-  
+
   const r = await response.json();
   if (r.hasOwnProperty('error') && r.error.type === 'invalid_request_error') {
     return false;
@@ -33,10 +33,10 @@ export async function validAssistant(id) {
 
 export async function updateAssistant(id) {
   // returns id on successful update, null otherwise.
-  if(!openaiKey) {
+  if (!openaiKey) {
     throw new Error('openai key not set. cannot update assistant.');
   }
-  const response = await fetch("https://api.openai.com/v1/assistants/"+id, {
+  const response = await fetch("https://api.openai.com/v1/assistants/" + id, {
     method: "POST",
     headers: {
       Authorization: 'Bearer ' + openaiKey,
@@ -45,7 +45,7 @@ export async function updateAssistant(id) {
     },
     body: JSON.stringify(bidara.BIDARA_CONFIG)
   });
-  
+
   const r = await response.json();
   if (r.hasOwnProperty('id')) {
     return r.id;
@@ -54,7 +54,7 @@ export async function updateAssistant(id) {
 }
 
 export async function getBidaraAssistant() {
-  if(!openaiKey) {
+  if (!openaiKey) {
     throw new Error('openai key not set. cannot search for bidara assistant.');
   }
   // get assistants
@@ -67,7 +67,7 @@ export async function getBidaraAssistant() {
     },
     body: null
   });
-  
+
   const r = await response.json();
 
   if (r.hasOwnProperty('data')) {
@@ -83,7 +83,7 @@ export async function getBidaraAssistant() {
         return bidaraAsst.id;
       }
       else {
-      // otherwise update it.
+        // otherwise update it.
         bidaraAsst.id = await updateAssistant(bidaraAsst.id);
         return bidaraAsst.id;
       }
@@ -95,10 +95,10 @@ export async function getBidaraAssistant() {
 export async function validApiKey(key) {
   const response = await fetch("https://api.openai.com/v1/models", {
     method: "GET",
-    headers: {Authorization: 'Bearer ' + key, 'Content-Type': 'application/json'},
+    headers: { Authorization: 'Bearer ' + key, 'Content-Type': 'application/json' },
     body: null
   });
-  
+
   const r = await response.json();
   if (r.hasOwnProperty('error') && r.error.code === 'invalid_api_key') {
     return false;
@@ -124,7 +124,7 @@ export async function getOpenAIKey() {
   if (localOpenAiKey !== null) {
     // validate key. if invalid set openai_key to null
     let isValidApiKey = await validApiKey(localOpenAiKey);
-    if(!isValidApiKey) {
+    if (!isValidApiKey) {
       openaiKey = null;
     }
     else {
@@ -144,7 +144,7 @@ export function setOpenAIKey(key) {
 }
 
 export async function getAsst() {
-  if(!openaiKey) {
+  if (!openaiKey) {
     throw new Error('openai key not set. cannot get assistant.');
   }
   if (openaiAsst) {
@@ -157,8 +157,8 @@ export async function getAsst() {
   if (openaiAsst !== null) {
     isValidAsstId = await validAssistant(openaiAsst);
   }
-  
-  if(!isValidAsstId) {
+
+  if (!isValidAsstId) {
     openaiAsst = getBidaraAssistant(); // returns asst_id or null.
   }
 
@@ -167,14 +167,14 @@ export async function getAsst() {
 
 export function setAsst(id) {
   // assistant id must have already been validated
-  if(id) {
+  if (id) {
     openaiAsst = id;
     setStoredAsstId(openaiAsst);
   }
 }
 
 export async function validThread(thread_id) {
-  if(!openaiKey) {
+  if (!openaiKey) {
     throw new Error('openai key not set. cannot validate thread.');
   }
 
@@ -228,7 +228,7 @@ export async function getNewThreadId() {
     },
     body: null
   });
-  
+
   const r = await response.json();
   if (r.hasOwnProperty('error') && r.error.type === 'invalid_request_error') {
     return null;
@@ -249,15 +249,16 @@ export async function getKeyAsstAndThread() {
 
   let asst = await getAsst();
 
-  let thread = await getThread();
+  let thread = await getActiveThread();
 
   return [key, asst, thread]
 }
 
-export async function getDalleImageGeneration(prompt, image_size = null, image_quality = null, num_images = null) {
+export async function getDalleImageGeneration(prompt, image_size = null, image_quality = null, num_images = null, response_format = null) {
   if (!image_size) image_size = "1024x1024";
   if (!image_quality) image_quality = "standard";
   if (!num_images) num_images = 1;
+  if (!response_format) response_format = "b64_json";
 
   try {
     if (!openaiKey) {
@@ -277,7 +278,8 @@ export async function getDalleImageGeneration(prompt, image_size = null, image_q
         prompt: prompt,
         n: num_images,
         size: image_size,
-        quality: image_quality
+        quality: image_quality,
+        response_format: response_format
       })
     }
 
@@ -294,4 +296,123 @@ export async function getDalleImageGeneration(prompt, image_size = null, image_q
 
     return null;
   }
+}
+
+export async function getThreadMessages(threadId) {
+  const url = `https://api.openai.com/v1/threads/${threadId}/messages`;
+
+  if (!openaiKey) {
+    throw new Error('openai key not set. cannot validate thread.');
+  }
+
+  if (!threadId) {
+    return [];
+  }
+
+  const method = 'GET';
+  const headers = {
+    'Authorization': 'Bearer ' + openaiKey,
+    'Content-Type': 'application/json',
+    'OpenAI-Beta': 'assistants=v1'
+  };
+
+  const request = {
+    method,
+    headers
+  }
+
+  const response = await fetch(url, request);
+
+  const r = await response.json();
+  if (r.error && r.error.type === 'invalid_request_error') {
+    console.error(r.error);
+    return [];
+  }
+
+  return r.data
+}
+
+function convertThreadMessagesToMessages(threadMessages) {
+  const messages = threadMessages
+    .map(msg => {
+      return msg.content.map(d => {
+        if (msg.role === "assistant") {
+          msg.role = "ai";
+        }
+
+        const isText = d.type === 'text';
+
+        return {
+          role: msg.role,
+          text: isText ? d.text.value : null,
+        }
+      })
+    })
+    .flat()
+    .reverse()
+
+  return messages;
+}
+
+export async function syncMessagesWithThread(messages, threadId) {
+  const threadMessages = await getThreadMessages(threadId);
+  const convertedThreadMessages = convertThreadMessagesToMessages(threadMessages);
+
+  // Case 1
+  //  messages are the same as thread
+  // Case 2
+  //   messages contains image not present in thread
+  // Case 3
+  //   thread contains text not present in messages
+
+  let messageIndex = 0;
+  let threadIndex = 0;
+
+  const updatedMessages = [];
+
+  while (threadIndex < convertedThreadMessages.length || updatedMessages.length < messages.length) {
+    const threadMsg = convertedThreadMessages[threadIndex];
+
+    // Reached end of messages, but thread has new messages
+    if (messageIndex >= messages.length) {
+      updatedMessages.push({...threadMsg, _sessionId: threadId});
+      threadIndex++;
+
+      continue;
+    } 
+
+    const msg = messages[messageIndex];
+
+    // Message contains file 
+    // If message contains text, then the thread will also have that text
+    if (msg?.files) {
+      updatedMessages.push(msg);
+      messageIndex++;
+
+      if (msg?.text === threadMsg?.text) {
+        threadIndex++;
+      }
+
+      continue;
+    } 
+
+    // messages don't match
+    // which means the thread contains a message that local doesn't have
+    if (msg.role !== threadMsg.role && msg.text !== threadMsg.text) {
+      updatedMessages.push({...threadMsg, _sessionId: threadId});
+      threadIndex++;
+
+      continue;
+    } 
+
+    updatedMessages.push(msg);
+
+    messageIndex++;
+    threadIndex++;
+
+  }
+
+  
+  // Thread messages will only be longer by files, which we don't want to include in sync 
+  return updatedMessages;
 }

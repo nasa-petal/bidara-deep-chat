@@ -1,9 +1,11 @@
 <script>
+  import { onMount, onDestroy } from 'svelte';
   import { Navbar, Sidebar, AssistantDeepChat, Login } from './components';
   import { BIDARA_CONFIG, BIDARA_INITIAL_MESSAGES } from './assistant/bidara';
   import { funcCalling } from './assistant/bidaraFunctions';
-  import { getKeyAsstAndThread  } from './utils/openaiUtils';
-  import { setThread, getThread, deleteThreadFromThreads, getNewThread, getThreads, setThreads, setActiveThreadName, updateThreadAndThreads, getEmptyThreads } from './utils/threadUtils';
+  import * as threadUtils from './utils/threadUtils';
+  import { setOpenAIKey, setAsst, getKeyAsstAndThread, getBidaraAssistant, syncMessagesWithThread } from './utils/openaiUtils';
+  import { createBidaraDB, closeBidaraDB } from "./utils/bidaraDB";
   import hljs from "highlight.js";
   window.hljs = hljs;
 
@@ -18,6 +20,8 @@
   let loading = true;
   let loggedIn = false;
   let open = false;
+
+  let loadedMessages = false;
 
   async function initKeyAsstAndThreads() {
     const keyAsstAndThread = await getKeyAsstAndThread();
@@ -34,81 +38,82 @@
     activeAsstConfig = BIDARA_CONFIG;
     activeFuncCalling = funcCalling;
 
-    threads = getThreads();
-
+    threads = await theadUtils.getThreads();
     loggedIn = true;
   }
+
+  onMount(async () => {
+    await createBidaraDB();
+    await initKeyAsstAndThreads();
+  });
+
+  onDestroy(async () => {
+    await closeBidaraDB();
+  })
 
   async function newThreadAndSwitch() {
     // If the thread is already "new", stay on it
     if (activeThread && activeThread.length <= 0) {
-      if (activeThread.name != "New Chat") {
-        await renameActiveThread("New Chat");
-      }
-      return true;
+     if (activeThread.name != "New Chat") {
+       await threadUtils.setThreadName(activeThread.id, "New Chat");
+     }
+     return;
     } 
 
     // If an empty thead is already created, prevents creating a new one
-    const emptyThreads = getEmptyThreads();
-    if (emptyThreads && emptyThreads.length >= 1) {
+    const emptyThread = await threadUtils.getEmptyThread();
+    if (emptyThread) {
+      await switchActiveThread(emptyThread);
 
-      const emptyThread = emptyThreads[0];
-      switchActiveThread(emptyThread);
-
-      return true;
+      return;
     }
 
-    const thread = await getNewThread();
-    threads.unshift(thread);
-
-    setThreads(threads);
-
+    const thread = await threadUtils.getNewThread();
     await switchActiveThread(thread);
-    
-    return true;
+    threads = await threadUtils.getThreads();
   }
 
   async function deleteThreadAndSwitch(thread) {
 
-    threads = deleteThreadFromThreads(thread.id);
+    await threadUtils.deleteThread(thread.id);
+    threads = await threadUtils.getThreads();
 
-    if (thread.id === activeThread.id) {
-      activeThread = {};
-      if (threads && threads.length > 0) {
-        switchActiveThread(threads[0]);
-      } else {
-        await newThreadAndSwitch();
-      }
-    }
-
-    return true;
-  }
-
-  
-  async function switchActiveThread(thread) {
-    if (thread.id === activeThread.id) {
+    if (thread.id !== activeThread.id) {
       return;
     }
+
+    if (threads && threads.length > 0) {
+      const thread = await threadUtils.getRecentThread();
+      await switchActiveThread(thread);
+
+    } else {
+      // temporary fix stops newThreadAndSwitch from not giving new thread on empty delete
+      // this won't be written to storage
+      activeThread.length = 1; 
+      await newThreadAndSwitch();
+    }
+  }
+
+
+  async function switchActiveThread(thread) {
+    if (activeThread && thread.id === activeThread.id) {
+      return;
+    }
+
+    loadedMessages = false;
     loading = true;
 
-    await setThread(thread);
+    await threadUtils.setActiveThread(thread.id);
+
     const keyAsstAndThread = await getKeyAsstAndThread();
     activeThread = keyAsstAndThread[2];
-
-    return true;
   }
 
   async function renameActiveThread(name) {
-    await setActiveThreadName(name);
+    await threadUtils.setThreadName(activeThread.id, name);
 
-    threads = getThreads();
-    activeThread = await getThread();
-
-    return true;
-  }
-
-  async function updateThread(thread) {
-    updateThreadAndThreads(thread, threads);
+    threads = await threadUtils.getThreads();
+    activeThread = await threadUtils.getActiveThread();
   }
 </script>
 
@@ -153,6 +158,9 @@
 
 <style>
   #content-container {
+    height: calc(100% - 3rem);
+    padding-right: env(safe-area-inset-right);
+    padding-left: env(safe-area-inset-left);
     overflow-y: hidden;
   }
 
