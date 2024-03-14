@@ -9,6 +9,12 @@
 	let image = BIDARA_LOGO;
 	let image_alt = BIDARA_LOGO_DESC;
 	let tagline = BIDARA_TAGLINE;
+  let showLoginField = true; 
+
+  async function handleLogin(){
+		showLoginField = false;
+		loginHandler()
+  }
 
 </script>
 
@@ -34,11 +40,13 @@
 		<li>After you send your first message to {BIDARA_NAME}, it will also be available to interact with through the <a href="https://platform.openai.com/assistants" class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600">OpenAI Assistants Playground</a>. This interface is more complex, but also provides more customizability. Just select {BIDARA_NAME}, then click the 'Test' button.</li>
 	</ul>
 
+  {#if showLoginField}
 	<AssistantDeepChat
-	 bind:loginHandler
-	 updateThread={null}
-	 height="100px"
+     loginHandler={handleLogin}
+     loadedMessages={null}
+     height="100px"
 	 />
+  {/if}
 </div>
 
 <style>
