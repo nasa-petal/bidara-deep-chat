@@ -104,14 +104,14 @@
 
     await threadUtils.setActiveThread(thread.id);
 
-    const keyAsstAndThread = await getKeyAsstAndThread();
-    activeThread = keyAsstAndThread[2];
+    activeThread = await threadUtils.getActiveThread();
   }
 
   async function renameActiveThread(name) {
     await threadUtils.setThreadName(activeThread.id, name);
 
     threads = await threadUtils.getThreads();
+    loadedMessages = false;
     activeThread = await threadUtils.getActiveThread();
   }
 </script>
