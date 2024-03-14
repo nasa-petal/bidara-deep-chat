@@ -4,7 +4,7 @@
   import { BIDARA_CONFIG, BIDARA_INITIAL_MESSAGES } from './assistant/bidara';
   import { funcCalling } from './assistant/bidaraFunctions';
   import * as threadUtils from './utils/threadUtils';
-  import { setOpenAIKey, setAsst, getKeyAsstAndThread, getBidaraAssistant, syncMessagesWithThread } from './utils/openaiUtils';
+  import { getKeyAsstAndThread } from './utils/openaiUtils';
   import { createBidaraDB, closeBidaraDB } from "./utils/bidaraDB";
   import hljs from "highlight.js";
   window.hljs = hljs;
@@ -38,13 +38,12 @@
     activeAsstConfig = BIDARA_CONFIG;
     activeFuncCalling = funcCalling;
 
-    threads = await theadUtils.getThreads();
+    threads = await threadUtils.getThreads();
     loggedIn = true;
   }
 
   onMount(async () => {
     await createBidaraDB();
-    await initKeyAsstAndThreads();
   });
 
   onDestroy(async () => {
@@ -140,9 +139,9 @@
             thread={activeThread}
             funcCalling={activeFuncCalling}
             initialMessages={activeInitialMessages}
-            updateThread={updateThread}
             loginHandler={null}
             bind:loading
+            bind:loadedMessages
 
             width="100%"
             height="100%"

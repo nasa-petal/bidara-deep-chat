@@ -1,6 +1,7 @@
 <script>
   import { DeepChat } from 'deep-chat';
-  import { setOpenAIKey } from '../utils/openaiUtils';
+  import { setOpenAIKey, syncMessagesWithThread } from '../utils/openaiUtils';
+  import * as threadUtils from '../utils/threadUtils';
 
 	export let key = null;
 	export let asstId = null;
@@ -10,7 +11,7 @@
 	export let funcCalling = null;
 
 	export let loginHandler;
-	export let updateThread;
+	export let loadedMessages;
 
   export let loading = true;
 	export let width = "100%";
@@ -24,16 +25,34 @@
 		console.log(error);
 	}
 
-	async function onNewMessage(message) { 
-    const len = this.getMessages().length;
-    console
-
-    const role = message.message.role;
-    if (role === "user" && len !== thread.length) {
-      thread.length = len;
-      updateThread(thread);
+  async function loadMessages(thread) {
+    if (!thread || !thread?.messages) {
+      return;
     }
-	}
+
+    let messages = thread.messages.slice(initialMessages.length);
+
+    if (messages?.length > 0 && messages[messages.length - 1].role === "user") {
+      messages = await syncMessagesWithThread(messages, thread.id);
+    }
+
+    messages.forEach((message) => {
+      deepChatRef._addMessage(message);
+    });
+
+    loadedMessages = true;
+  }
+
+  async function onNewMessage(message) { 
+    if (thread && thread.id === message.message._sessionId) {
+      const messages = deepChatRef.getMessages();
+      if (messages.length > 0) {
+        thread.messages = messages;
+        thread.length = messages.length;
+        await threadUtils.setThreadMessages(thread.id, messages);
+      }
+    }
+  }
 
 	async function onComponentRender() {
     deepChatRef = document.getElementById("chat-element");
@@ -42,8 +61,12 @@
 		if (!key && this._activeService.key) {
 			// if key set through UI or in URL variable, save it to localStorage.
 			setOpenAIKey(this._activeService.key);
-			loginHandler();
+			await loginHandler();
 		}
+
+    if (!loadedMessages) {
+      await loadMessages(thread)
+    }
 
 		setTimeout(()=> loading = false, 400);
 	}
@@ -60,7 +83,7 @@
         assistant_id: asstId,
         new_assistant: asstConfig,
         thread_id: threadId,
-        load_thread_history: threadId ? true : false,
+        load_thread_history: false,
         function_handler: funcCalling
       }
     }
