@@ -1,4 +1,7 @@
-export const BIDARA_NAME = "BIDARA";
+const BIDARA_PROD_NAME = "BIDARA";
+const BIDARA_TEST_NAME = "BIDARA-TEST";
+
+export const BIDARA_NAME = BIDARA_PROD_NAME;
 
 export const BIDARA_VERSION = "1.3";
 
@@ -159,6 +162,13 @@ const GEN_IMAGE_FUNC = {
   }
 }
 
+const BIDARA_FUNCTIONS = [
+  { type: "code_interpreter" },
+  { type: "retrieval" },
+  { type: "function", function: PAPER_SEARCH_FUNC },
+  { type: "function", function: GEN_IMAGE_FUNC },
+]
+
 export const BIDARA_INITIAL_MESSAGES = [
   { role: "ai", text: `Hi, I'm **${BIDARA_NAME}**, ${BIDARA_TAGLINE}. ${BIDARA_DESCRIPTION}` },
   { role: "ai", text: `Before we begin, please be advised:\n\n‣ ${BIDARA_ADVISORY}` },
@@ -169,16 +179,5 @@ export const BIDARA_CONFIG = {
   model: BIDARA_MODEL,
   name: BIDARA_NAME+"v"+BIDARA_VERSION,
   instructions: BIDARA_INSTRUCTIONS,
-  tools: [
-    { type: "code_interpreter" },
-    { type: "retrieval" },
-    { 
-      type: "function",
-      function: PAPER_SEARCH_FUNC
-    },
-    {
-      type: "function",
-      function: GEN_IMAGE_FUNC
-    }
-  ]
+  tools: BIDARA_FUNCTIONS
 }
