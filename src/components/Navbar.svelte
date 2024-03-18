@@ -70,6 +70,7 @@
     background-color: rgb(229, 229, 234);
     z-index: 30;
     border-bottom: 1px solid rgb(180, 180, 180);
+    width: 100%;
     height: 10em;
     margin-top: -7em;
     padding: 7.5em env(safe-area-inset-right) 0.5em env(safe-area-inset-left);
