@@ -1,6 +1,6 @@
 <script>
   import { DeepChat } from 'deep-chat';
-  import { setOpenAIKey, syncMessagesWithThread } from '../utils/openaiUtils';
+  import { setOpenAIKey, syncMessagesWithThread, setImageSource } from '../utils/openaiUtils';
   import * as threadUtils from '../utils/threadUtils';
 
 	export let key = null;
@@ -50,6 +50,20 @@
         thread.messages = messages;
         thread.length = messages.length;
         await threadUtils.setThreadMessages(thread.id, messages);
+      }
+    }
+
+    if (message.message.role === "user") {
+        if (message.message.files && 
+          message.message.files.length > 0 && 
+          message.message.files[0].src && 
+          message.message.files[0].src.slice(0,10) === "data:image"
+        ) {
+
+        const fileSource = message.message.files[0].src;
+        await setImageSource(fileSource);
+      }  else if (message.message.files) {
+        await setImageSource(null);
       }
     }
   }
