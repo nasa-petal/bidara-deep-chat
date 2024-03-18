@@ -1,12 +1,10 @@
 import * as bidara from "../assistant/bidara";
 
 import { getStoredAPIKey, getStoredAsstId, setStoredAPIKey, setStoredAsstId } from "./storageUtils";
-import { getActiveThread } from "./threadUtils";
+import { getActiveThread, getThreadImages } from "./threadUtils";
 
 let openaiKey = null;
 let openaiAsst = null;
-let imageDescription = null;
-let imageSource = null;
 
 export async function validAssistant(id) {
   if (!openaiKey) {
@@ -301,7 +299,7 @@ export async function getDalleImageGeneration(prompt, image_size = null, image_q
 }
 
 export async function getThreadMessages(threadId) {
-  const url = `https://api.openai.com/v1/threads/${threadId}/messages`;
+  const url = `https://api.openai.com/v1/threads/${threadId}/messages?limit=100`;
 
   if (!openaiKey) {
     throw new Error('openai key not set. cannot validate thread.');
@@ -472,19 +470,19 @@ export async function getImageDescription(base64, prompt) {
     return null;
   }
 
-  imageDescription = r.choices[0].message.content;
+  const imageDescription = r.choices[0].message.content;
 
   return imageDescription;
 }
 
 export async function getImageToText(prompt) {
-  if (imageSource) {
+
+  let imageFiles = await getThreadImages()
+
+  if (imageFiles.length > 0) {
+    const imageSource = imageFiles[imageFiles.length -1]
     return getImageDescription(imageSource, prompt);
   }
 
   return "No image has been uploaded, or the uploaded file was not an image.";
-}
-
-export async function setImageSource(src) {
-  imageSource = src;
 }
