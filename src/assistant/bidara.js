@@ -1,6 +1,22 @@
-export const BIDARA_VERSION = "1.3"
+const BIDARA_PROD_NAME = "BIDARA";
+const BIDARA_TEST_NAME = "BIDARA-TEST";
 
-export const BIDARA_SYS = `You are BIDARA, a biomimetic designer and research assistant, and a leading expert in biomimicry, biology, engineering, industrial design, environmental science, physiology, and paleontology. You were instructed by NASA's PeTaL project (https://www1.grc.nasa.gov/research-and-engineering/vine/petal/) to understand, learn from, and emulate the strategies used by living things to help users create sustainable designs and technologies.
+export const BIDARA_NAME = BIDARA_PROD_NAME;
+
+export const BIDARA_VERSION = "1.3";
+
+export const BIDARA_LOGO = "bidara.png";
+export const BIDARA_LOGO_DESC = "girl with dark hair";
+
+
+export const BIDARA_TAGLINE = "Bio-Inspired Design and Research Assisant";
+export const BIDARA_DESCRIPTION = "I'm an OpenAI [GPT-4](https://openai.com/research/gpt-4) [assistant](https://platform.openai.com/docs/assistants/how-it-works), that was instructed by [NASA's PeTaL initiative](https://www1.grc.nasa.gov/research-and-engineering/vine/petal/) to help others understand, learn from, and emulate the strategies used by living things to create sustainable designs and technologies using the [Biomimicry Institute's design process](https://toolbox.biomimicry.org/methods/process/)."
+export const BIDARA_ADVISORY = "**Do not share any sensitive information** in your conversations including but not limited to, personal information, sensitive or non-public government/company data, ITAR, CUI, export controlled, or trade secrets.  \n‣ While OpenAI has safeguards in place, BIDARA may occasionally generate incorrect or misleading information and produce offensive or biased content.";
+export const BIDARA_GREETING = "How can I assist you today?";
+
+export const BIDARA_MODEL = "gpt-4-1106-preview";
+
+export const BIDARA_INSTRUCTIONS = `You are BIDARA, a biomimetic designer and research assistant, and a leading expert in biomimicry, biology, engineering, industrial design, environmental science, physiology, and paleontology. You were instructed by NASA's PeTaL project (https://www1.grc.nasa.gov/research-and-engineering/vine/petal/) to understand, learn from, and emulate the strategies used by living things to help users create sustainable designs and technologies.
 
 Your goal is to help the user work in a step by step way through the Biomimicry Design Process (https://toolbox.biomimicry.org/methods/process/) to propose biomimetic solutions to a challenge. Cite peer reviewed sources for your information. Stop often (at a minimum after every step) to ask the user for feedback or clarification.
 
@@ -146,20 +162,22 @@ const GEN_IMAGE_FUNC = {
   }
 }
 
+const BIDARA_FUNCTIONS = [
+  { type: "code_interpreter" },
+  { type: "retrieval" },
+  { type: "function", function: PAPER_SEARCH_FUNC },
+  { type: "function", function: GEN_IMAGE_FUNC },
+]
+
+export const BIDARA_INITIAL_MESSAGES = [
+  { role: "ai", text: `Hi, I'm **${BIDARA_NAME}**, ${BIDARA_TAGLINE}. ${BIDARA_DESCRIPTION}` },
+  { role: "ai", text: `Before we begin, please be advised:\n\n‣ ${BIDARA_ADVISORY}` },
+  { role: "ai", text: `${BIDARA_GREETING}` }
+];
+
 export const BIDARA_CONFIG = {
-  model: "gpt-4-1106-preview",
-  name: "BIDARAv"+BIDARA_VERSION,
-  instructions: BIDARA_SYS,
-  tools: [
-    { type: "code_interpreter" },
-    { type: "retrieval" },
-    { 
-      type: "function",
-      function: PAPER_SEARCH_FUNC
-    },
-    {
-      type: "function",
-      function: GEN_IMAGE_FUNC
-    }
-  ]
+  model: BIDARA_MODEL,
+  name: BIDARA_NAME+"v"+BIDARA_VERSION,
+  instructions: BIDARA_INSTRUCTIONS,
+  tools: BIDARA_FUNCTIONS
 }
