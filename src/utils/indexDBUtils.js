@@ -1,26 +1,26 @@
 export async function openDB(name, stores, version) {
-  return new Promise((resolve, reject) => {
+	return new Promise((resolve, reject) => {
 
-    const request = indexedDB.open(name, version)
+		const request = indexedDB.open(name, version)
 
-    request.onupgradeneeded = (event) => {
-      const db = event.target.result;
+		request.onupgradeneeded = (event) => {
+			const db = event.target.result;
 
-      stores.forEach((store) => {
+			stores.forEach((store) => {
 				createStore(event, db, store.name, store.primaryKey, store.indices);
-      });
-    };
+			});
+		};
 
-    request.onsuccess = (event) => {
-      const db = event.target.result;
-      resolve(db);
-    }
+		request.onsuccess = (event) => {
+			const db = event.target.result;
+			resolve(db);
+		}
 
-    request.onerror = (event) => {
-      const error = event.target.error;
-      reject(error);
-    }
-  });
+		request.onerror = (event) => {
+			const error = event.target.error;
+			reject(error);
+		}
+	});
 }
 
 export async function closeDB(db) {
@@ -40,18 +40,18 @@ function createStore(event, db, name, primaryKey, indices) {
 		const existingStore = event.currentTarget.transaction.objectStore(name);
 		if (storeIsUpdated(existingStore, primaryKey, indices)) {
 			return;
-		} 
+		}
 
 		db.deleteObjectStore(name);
 	}
 
-  const objectStore = db.createObjectStore(name, { keyPath: primaryKey });
+	const objectStore = db.createObjectStore(name, { keyPath: primaryKey });
 
-  if (indices) {
-    indices.forEach((index) => {
-      objectStore.createIndex(index.name, index.property, index.options);
-    });
-  }
+	if (indices) {
+		indices.forEach((index) => {
+			objectStore.createIndex(index.name, index.property, index.options);
+		});
+	}
 }
 
 function storeIsUpdated(objectStore, primaryKey, indices) {
@@ -69,36 +69,36 @@ function storeIsUpdated(objectStore, primaryKey, indices) {
 }
 
 export async function readByKey(db, storeName, key, transaction = null, callback = null) {
-  return new Promise((resolve, reject) => {
+	return new Promise((resolve, reject) => {
 		if (!transaction) {
 			transaction = db.transaction([storeName], 'readonly');
 		}
-    const objectStore = transaction.objectStore(storeName);
+		const objectStore = transaction.objectStore(storeName);
 
-    const getRequest = objectStore.get(key);
+		const getRequest = objectStore.get(key);
 
-    getRequest.onsuccess = (event) => {
-      const result = event.target.result;
-      resolve(result);
-    }
+		getRequest.onsuccess = (event) => {
+			const result = event.target.result;
+			resolve(result);
+		}
 
-    getRequest.onerror = (event) => {
-      const error = event.target.error;
-      reject(error);
-    }
+		getRequest.onerror = (event) => {
+			const error = event.target.error;
+			reject(error);
+		}
 
 		if (typeof callback === 'function') {
 			callback(transaction);
 		}
-  });
+	});
 }
 
 export async function readAll(db, storeName, storeIndex = null, reversed = null, transaction = null, callback = null) {
-  return new Promise((resolve, reject) => {
+	return new Promise((resolve, reject) => {
 		if (!transaction) {
 			transaction = db.transaction([storeName], 'readonly');
 		}
-    const objectStore = transaction.objectStore(storeName);
+		const objectStore = transaction.objectStore(storeName);
 
 		let store;
 
@@ -109,50 +109,50 @@ export async function readAll(db, storeName, storeIndex = null, reversed = null,
 			store = objectStore;
 		}
 
-    const getRequest = store.getAll();
+		const getRequest = store.getAll();
 
-    getRequest.onsuccess = (event) => {
-      const result = event.target.result;
+		getRequest.onsuccess = (event) => {
+			const result = event.target.result;
 
 			if (reversed) {
 				result.reverse();
 			}
 
-      resolve(result);
-    }
+			resolve(result);
+		}
 
-    getRequest.onerror = (event) => {
-      const error = event.target.error;
-      reject(error);
-    }
+		getRequest.onerror = (event) => {
+			const error = event.target.error;
+			reject(error);
+		}
 
 		if (typeof callback === 'function') {
 			callback(transaction);
 		}
-  });
+	});
 }
 
 export async function readByProperty(db, storeName, propertyKey, propertyValue, storeIndex = null, reversed = null, transaction = null, callback = null) {
-  return new Promise((resolve, reject) => {
+	return new Promise((resolve, reject) => {
 		if (!transaction) {
 			transaction = db.transaction([storeName], 'readonly');
 		}
-    const objectStore = transaction.objectStore(storeName);
+		const objectStore = transaction.objectStore(storeName);
 
-    let store;
-    if (storeIndex) {
-      store = objectStore.index(storeIndex);
-    } else {
+		let store;
+		if (storeIndex) {
+			store = objectStore.index(storeIndex);
+		} else {
 			store = objectStore;
-    }
+		}
 
 		const cursorRequest = reversed ? store.openCursor(null, 'prev') : store.openCursor();
-		let skipFirst = reversed; 
+		let skipFirst = reversed;
 
-    const matchedItems = [];
-    cursorRequest.onsuccess = (event) => {
-      const cursor = event.target.result;
-      if (cursor) {
+		const matchedItems = [];
+		cursorRequest.onsuccess = (event) => {
+			const cursor = event.target.result;
+			if (cursor) {
 				// Cursor always starts at beginning of db.
 				// Reversed should skip and go to next (which will be the last)
 				if (skipFirst) {
@@ -169,14 +169,15 @@ export async function readByProperty(db, storeName, propertyKey, propertyValue, 
 			}
 		};
 
-    transaction.onerror = (event) => {
-      const error = event.target.error;
-      reject(error); }
-  });
-
-		if (typeof callback === 'function') {
-			callback(transaction);
+		transaction.onerror = (event) => {
+			const error = event.target.error;
+			reject(error);
 		}
+	});
+
+	if (typeof callback === 'function') {
+		callback(transaction);
+	}
 }
 
 export async function readFirstByIndex(db, storeName, storeIndex, reversed, transaction = null, callback = null) {
@@ -184,17 +185,17 @@ export async function readFirstByIndex(db, storeName, storeIndex, reversed, tran
 		if (!transaction) {
 			transaction = db.transaction([storeName], 'readonly');
 		}
-    const objectStore = transaction.objectStore(storeName);
+		const objectStore = transaction.objectStore(storeName);
 
 		const index = objectStore.index(storeIndex);
 
 		// 'prev' tells cursor what direction `cursor.continue()` will go
 		const cursorRequest = reversed ? index.openCursor(null, 'prev') : index.openCursor();
-		let skipFirst = reversed; 
+		let skipFirst = reversed;
 
-    cursorRequest.onsuccess = (event) => {
-      const cursor = event.target.result;
-      if (cursor) {
+		cursorRequest.onsuccess = (event) => {
+			const cursor = event.target.result;
+			if (cursor) {
 				// Cursor always starts at beginning of db.
 				// Reversed should skip and go to next (which will be the last)
 				if (skipFirst) {
@@ -203,28 +204,28 @@ export async function readFirstByIndex(db, storeName, storeIndex, reversed, tran
 				}
 
 				resolve(cursor.value)
-			} 
+			}
 			resolve(null);
 		};
 
-    transaction.onerror = (event) => {
-      const error = event.target.error;
-      reject(error);
+		transaction.onerror = (event) => {
+			const error = event.target.error;
+			reject(error);
 		}
 
 		if (typeof callback === 'function') {
 			callback(transaction);
 		}
-  });
+	});
 
 }
 
 export async function write(db, storeName, value, transaction = null, callback = null) {
-  return new Promise((resolve, reject) => {
+	return new Promise((resolve, reject) => {
 		if (!transaction) {
 			transaction = db.transaction([storeName], 'readwrite');
 		}
-    const objectStore = transaction.objectStore(storeName);
+		const objectStore = transaction.objectStore(storeName);
 
 		const now = Date.now();
 		if (!value?.created_time) {
@@ -232,21 +233,21 @@ export async function write(db, storeName, value, transaction = null, callback =
 		}
 		value.updated_time = now;
 
-    const putRequest = objectStore.put(value);
+		const putRequest = objectStore.put(value);
 
-    putRequest.onsuccess = (event) => {
-      resolve();
-    }
+		putRequest.onsuccess = (event) => {
+			resolve();
+		}
 
-    putRequest.onerror = (event) => {
-      const error = event.target.error;
-      reject(error);
-    }
+		putRequest.onerror = (event) => {
+			const error = event.target.error;
+			reject(error);
+		}
 
 		if (typeof callback === 'function') {
 			callback(transaction);
 		}
-  });
+	});
 }
 
 export async function deleteByKey(db, storeName, key, transaction = null, callback = null) {
@@ -274,109 +275,109 @@ export async function deleteByKey(db, storeName, key, transaction = null, callba
 }
 
 export async function updateProperty(db, storeName, key, propertyKey, propertyValue, transaction = null, callback = null) {
-  // Did not reuse for transaction purposes. 
-  // This way, the read and write happens as one transaction
-  return new Promise((resolve, reject) => {
+	// Did not reuse for transaction purposes. 
+	// This way, the read and write happens as one transaction
+	return new Promise((resolve, reject) => {
 		if (!transaction) {
 			transaction = db.transaction([storeName], 'readwrite');
 		}
-    const objectStore = transaction.objectStore(storeName);
+		const objectStore = transaction.objectStore(storeName);
 
-    const getRequest = objectStore.get(key);
+		const getRequest = objectStore.get(key);
 
-    // Successful get, so update and write back
-    getRequest.onsuccess = (event) => {
-      const result = event.target.result;
+		// Successful get, so update and write back
+		getRequest.onsuccess = (event) => {
+			const result = event.target.result;
 
-      // Ensure resulting object has desired property. 
-      // Would error anyways, but gives a better message
-      if (!result.hasOwnProperty(propertyKey)) {
+			// Ensure resulting object has desired property. 
+			// Would error anyways, but gives a better message
+			if (!result.hasOwnProperty(propertyKey)) {
 				reject(`Object has no property: '${propertyKey}' (in store: ${storeName} by key: '${result}')`);
-      }
+			}
 
-      result[propertyKey] = propertyValue;
+			result[propertyKey] = propertyValue;
 
-      const putRequest = objectStore.put(result);
+			const putRequest = objectStore.put(result);
 
-      // Successfully wrote updated object back to db
-      putRequest.onsuccess = (event) => {
+			// Successfully wrote updated object back to db
+			putRequest.onsuccess = (event) => {
 				resolve();
-      }
+			}
 
-      putRequest.onerror = (event) => {
+			putRequest.onerror = (event) => {
 				const error = event.target.error;
 				reject(error);
-      }
-    }
+			}
+		}
 
-    getRequest.onerror = (event) => {
-      const error = event.target.error;
-      reject(error);
-    }
+		getRequest.onerror = (event) => {
+			const error = event.target.error;
+			reject(error);
+		}
 
 		if (typeof callback === 'function') {
 			callback(transaction);
 		}
-  });
+	});
 }
 
 // Made into own function because updating list will happen very frequently, 
 // and would rather it be one transaction
 export async function pushToListProperty(db, storeName, key, listPropertyKey, appendValue, transaction = null, callback = null) {
-  // Did not reuse for transaction purposes. 
-  // This way, the read and write happens as one transaction
-  return new Promise((resolve, reject) => {
+	// Did not reuse for transaction purposes. 
+	// This way, the read and write happens as one transaction
+	return new Promise((resolve, reject) => {
 		if (!transaction) {
 			transaction = db.transaction([storeName], 'readwrite');
 		}
-    const objectStore = transaction.objectStore(storeName);
+		const objectStore = transaction.objectStore(storeName);
 
-    const getRequest = objectStore.get(key);
+		const getRequest = objectStore.get(key);
 
-    // Successful get, so update and write back
-    getRequest.onsuccess = (event) => {
-      const result = event.target.result;
+		// Successful get, so update and write back
+		getRequest.onsuccess = (event) => {
+			const result = event.target.result;
 
-      // Ensure resulting object has desired property. 
-      // Would error anyways, but gives a better message
-      if (!result.hasOwnProperty(listPropertyKey)) {
+			// Ensure resulting object has desired property. 
+			// Would error anyways, but gives a better message
+			if (!result.hasOwnProperty(listPropertyKey)) {
 				reject(`Object has no property: '${listPropertyKey}' (in store: ${storeName} by key: '${result}')`);
-      }
-      // Ensure resulting object property is a list. 
-      // Would error anyways, but gives a better message
-      if (!Array.isArray(result[listPropertyKey])) {
+			}
+			// Ensure resulting object property is a list. 
+			// Would error anyways, but gives a better message
+			if (!Array.isArray(result[listPropertyKey])) {
 				reject(`Object property is not list: '${listPropertyKey}' (in store: ${storeName} by key: '${result}')`);
-      }
+			}
 
-      result[listPropertyKey].push(appendValue);
+			result[listPropertyKey].push(appendValue);
 
-      // Unsure if these truly belong here, but for our current use case they do
-      if (result.hasOwnProperty("length")) {
+			// Unsure if these truly belong here, but for our current use case they do
+			if (result.hasOwnProperty("length")) {
 				result.length += 1;
-      }
+			}
 			if (result.hasOwnProperty("updated_time")) {
 				result.updated_time = Date.now();
 			}
 
-      const putRequest = objectStore.put(result);
+			const putRequest = objectStore.put(result);
 
-      putRequest.onsuccess = (event) => {
+			putRequest.onsuccess = (event) => {
 				resolve();
-      }
+			}
 
-      putRequest.onerror = (event) => {
+			putRequest.onerror = (event) => {
 				const error = event.target.error;
 				reject(error);
-      }
-    }
+			}
+		}
 
-    getRequest.onerror = (event) => {
-      const error = event.target.error;
-      reject(error);
-    }
+		getRequest.onerror = (event) => {
+			const error = event.target.error;
+			reject(error);
+		}
 
 		if (typeof callback === 'function') {
 			callback(transaction);
 		}
-  });
+	});
 }

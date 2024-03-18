@@ -3,27 +3,27 @@
   import { setOpenAIKey, syncMessagesWithThread, setImageSource } from '../utils/openaiUtils';
   import * as threadUtils from '../utils/threadUtils';
 
-	export let key = null;
-	export let asstId = null;
-	export let asstConfig = null;
-	export let thread = null;
-	export let initialMessages = null;
-	export let funcCalling = null;
+  export let key = null;
+  export let asstId = null;
+  export let asstConfig = null;
+  export let thread = null;
+  export let initialMessages = null;
+  export let funcCalling = null;
 
-	export let loginHandler;
-	export let loadedMessages;
+  export let loginHandler;
+  export let loadedMessages;
 
   export let loading = true;
-	export let width = "100%";
-	export let height = "100%";
+  export let width = "100%";
+  export let height = "100%";
 
   let threadId = thread?.id; 
 
   let deepChatRef;
 
-	function onError(error) {
-		console.log(error);
-	}
+  function onError(error) {
+    console.log(error);
+  }
 
   async function loadMessages(thread) {
     if (!thread || !thread?.messages) {
@@ -68,22 +68,22 @@
     }
   }
 
-	async function onComponentRender() {
+  async function onComponentRender() {
     deepChatRef = document.getElementById("chat-element");
-		// save key to localStorage.
-		// The event occurs before key is set, and again, after key is set.
-		if (!key && this._activeService.key) {
-			// if key set through UI or in URL variable, save it to localStorage.
-			setOpenAIKey(this._activeService.key);
-			await loginHandler();
-		}
+    // save key to localStorage.
+    // The event occurs before key is set, and again, after key is set.
+    if (!key && this._activeService.key) {
+      // if key set through UI or in URL variable, save it to localStorage.
+      setOpenAIKey(this._activeService.key);
+      await loginHandler();
+    }
 
     if (!loadedMessages) {
       await loadMessages(thread)
     }
 
-		setTimeout(()=> loading = false, 400);
-	}
+    setTimeout(()=> loading = false, 400);
+  }
 
 </script>
 
