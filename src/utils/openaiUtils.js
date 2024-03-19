@@ -26,7 +26,7 @@ export async function validAssistant(id) {
     return false;
   }
 
-  if (r.hasOwnProperty('name') && r.name == bidara.BIDARA_NAME+"v"+bidara.BIDARA_VERSION) {
+  if (r.hasOwnProperty('name') && r.name == bidara.BIDARA_NAME + "v" + bidara.BIDARA_VERSION) {
     return true;
   }
   return false;
@@ -73,10 +73,10 @@ export async function getBidaraAssistant() {
 
   if (r.hasOwnProperty('data')) {
     // find assistant with name == BIDARAvX.X
-    
+
     const bidaraRegex = new RegExp(`^${bidara.BIDARA_NAME}v[0-9]+\.[0-9]+$`)
     let bidaraAsst = r.data.find(item => bidaraRegex.test(item.name));
-    if(bidaraAsst && bidaraAsst.hasOwnProperty('id')) {
+    if (bidaraAsst && bidaraAsst.hasOwnProperty('id')) {
       // get version of assistant.
       let bidaraVersion = bidaraAsst.name.substring(7);
       // if assistant version is up to date, use it.
@@ -333,14 +333,9 @@ export async function getThreadMessages(threadId, limit) {
   return r.data
 }
 
-export async function getImageDescription(base64, prompt) {
-
+export async function getChatCompletion(model, messages, tokenLimit) {
   if (!openaiKey) {
     throw new Error('openai key not set. cannot validate thread.');
-  }
-
-  if (!prompt) {
-    prompt = "Give a detailed but concise description of the image. If there are any engineering, biological, or mechanical processes present, include how they're present."
   }
 
   const url = `https://api.openai.com/v1/chat/completions`;
@@ -350,25 +345,9 @@ export async function getImageDescription(base64, prompt) {
     'Content-Type': 'application/json',
   };
   const body = JSON.stringify({
-    "model": "gpt-4-vision-preview",
-    "messages": [
-      { 
-        "role": "user",
-        "content": [
-          {
-            "type": "text",
-            "text": prompt
-          },
-          {
-            "type": "image_url",
-            "image_url": {
-              "url": base64
-            }
-          }
-        ]
-      }
-    ],
-    "max_tokens": 300
+    "model": model,
+    "messages": messages,
+    "max_tokens": tokenLimit
   })
 
   const request = {
@@ -385,7 +364,43 @@ export async function getImageDescription(base64, prompt) {
     return null;
   }
 
-  const imageDescription = r.choices[0].message.content;
+  return r;
+}
+
+export async function getImageDescription(base64, prompt) {
+
+  if (!openaiKey) {
+    throw new Error('openai key not set. cannot validate thread.');
+  }
+
+  if (!prompt) {
+    prompt = "Give a detailed but concise description of the image. If there are any engineering, biological, or mechanical processes present, include how they're present."
+  }
+
+  const model = "gpt-4-vision-preview"
+  const messages = [
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": prompt
+        },
+        {
+          "type": "image_url",
+          "image_url": {
+            "url": base64
+          }
+        }
+      ]
+    }
+  ]
+
+  const tokenLimit = 300;
+
+  const res = await getChatCompletion(model, messages, tokenLimit);
+
+  const imageDescription = res.choices[0].message.content;
 
   return imageDescription;
 }
@@ -395,7 +410,7 @@ export async function getImageToText(prompt) {
   let imageFiles = await getThreadImages()
 
   if (imageFiles.length > 0) {
-    const imageSource = imageFiles[imageFiles.length -1]
+    const imageSource = imageFiles[imageFiles.length - 1]
     return getImageDescription(imageSource, prompt);
   }
 
