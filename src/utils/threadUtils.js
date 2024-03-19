@@ -1,4 +1,4 @@
-import { validThread, getNewThreadId } from "./openaiUtils";
+import { validThread, getNewThreadId, getThreadMessages } from "./openaiUtils";
 import * as bidaraDB from "./bidaraDB";
 
 async function createNewThread() {
@@ -88,3 +88,144 @@ export async function deleteThread(threadId) {
   await bidaraDB.deleteThreadById(threadId);
 }
 
+function convertThreadMessagesToMessages(threadMessages) {
+  const messages = threadMessages
+    .map(msg => {
+      return msg.content.map(d => {
+        if (msg.role === "assistant") {
+          msg.role = "ai";
+        }
+
+        const isText = d.type === 'text';
+
+        return {
+          role: msg.role,
+          text: isText ? d.text.value : null,
+        }
+      })
+    })
+    .flat()
+    .reverse()
+
+  return messages;
+}
+
+function getLastSyncedIndex(messages, threadMessages) {
+  let i = 0;
+  while (i < threadMessages.length) {
+    if (threadMessages[i]?.role === "ai") {
+      break;
+    }
+
+    i++;
+  }
+
+  let j = 0;
+  while (j < messages.length) {
+    if (messages[j].role != "ai") {
+      j++;
+      continue;
+    }
+
+    if (messages[j].text != threadMessages[i]?.text) {
+      j++;
+      continue;
+    }
+
+    return [i, j]
+  }
+
+  return [-1, -1]
+}
+
+function syncInterval(messagesOnInterval, threadMessagesOnInterval) {
+  // Case 1
+  //  messages are the same as thread
+  // Case 2
+  //   messages contains image not present in thread
+  // Case 3
+  //   thread contains text not present in messages
+
+
+  let updatedMessages = [];
+
+  while (threadIndex < threadMessagesOnInterval.length) {
+    const threadMsg = threadMessagesOnInterval[threadIndex];
+
+    // Reached end of messages, but thread has new messages
+    if (messageIndex >= messages.length) {
+      updatedMessages.push({...threadMsg, _sessionId: threadId});
+      threadIndex++;
+
+      continue;
+    } 
+
+    const msg = messagesOnInterval[messageIndex];
+
+    // Message contains file 
+    // If message contains text, then the thread will also have that text
+    if (msg?.files) {
+      updatedMessages.push(msg);
+      messageIndex++;
+
+      if (msg?.text === threadMsg?.text) {
+        threadIndex++;
+      } else {
+      }
+
+      continue;
+    } 
+
+    // messages don't match
+    // which means the thread contains a message that local doesn't have
+    if (msg.role !== threadMsg.role && msg.text !== threadMsg.text) {
+      updatedMessages.push({...threadMsg, _sessionId: threadId});
+      threadIndex++;
+
+      continue;
+    } 
+
+    updatedMessages.push(msg);
+
+    messageIndex++;
+    threadIndex++;
+
+  }
+
+}
+
+export async function syncMessagesWithThread(messages, threadId) {
+  const limit = 100;
+  const threadMessages = await getThreadMessages(threadId, limit);
+  const convertedThreadMessages = convertThreadMessagesToMessages(threadMessages);
+
+  if (messages[messages.length - 1]?.text === convertedThreadMessages[convertedThreadMessages.length -1]?.text) {
+    console.log("Matching last element")
+    return messages;
+  }
+
+  if (threadMessages.length < limit) {
+    const updatedMessages = syncInterval(messages, convertedThreadMessages);
+    return updatedMessages
+  }
+
+  const syncedIndices = getLastSyncedIndex(messages, convertedThreadMessages);
+
+  // No sync found, default to local to preserve images/files
+  if (syncedIndices[0] === -1 || syncedIndices[1] === -1) { 
+    return messages;
+
+  } 
+
+  const threadIndex = syncedIndices[0];
+  const messageIndex = syncedIndices[1];
+
+  const messagesInterval = messages.slice(messageIndex);
+  const threadInterval = convertedThreadMessages.slice(threadIndex);
+
+  let updatedMessages = syncInterval(messagesInterval, threadInterval);
+  if (messageIndex != 0) {
+    updatedMessages = messages.slice(0, messageIndex - 1).concat(updatedMessages);
+  }
+  return updatedMessages;
+}

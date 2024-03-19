@@ -1,6 +1,6 @@
 <script>
   import { DeepChat } from 'deep-chat';
-  import { setOpenAIKey, syncMessagesWithThread } from '../utils/openaiUtils';
+  import { setOpenAIKey } from '../utils/openaiUtils';
   import * as threadUtils from '../utils/threadUtils';
 
   export let key = null;
@@ -33,7 +33,7 @@
     let messages = thread.messages.slice(initialMessages.length);
 
     if (messages?.length > 0 && messages[messages.length - 1].role === "user") {
-      messages = await syncMessagesWithThread(messages, thread.id);
+      messages = await threadUtils.syncMessagesWithThread(messages, thread.id);
     }
 
     messages.forEach((message) => {
