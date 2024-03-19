@@ -88,6 +88,14 @@ export async function deleteThread(threadId) {
   await bidaraDB.deleteThreadById(threadId);
 }
 
+export async function pushMessageToThread(threadId, message) {
+  if (!message?.role || (!message?.text && !message?.files) || !message?._sessionId) {
+    throw new Error("Invalid message attempted to push to thread in db.")
+  }
+
+  await bidaraDB.pushMessageToId(threadId, message)
+}
+
 function convertThreadMessagesToMessages(threadMessages) {
   const messages = threadMessages
     .map(msg => {
@@ -132,13 +140,16 @@ function getLastSyncedIndex(messages, threadMessages) {
       continue;
     }
 
-    return [i, j]
+    return {
+      threadIndex: i,
+      messageIndex: j
+    }
   }
 
-  return [-1, -1]
+  return null
 }
 
-function syncInterval(messagesOnInterval, threadMessagesOnInterval) {
+function syncInterval(messagesOnInterval, threadMessagesOnInterval, threadId) {
   // Case 1
   //  messages are the same as thread
   // Case 2
@@ -148,12 +159,14 @@ function syncInterval(messagesOnInterval, threadMessagesOnInterval) {
 
 
   let updatedMessages = [];
+  let threadIndex = 0;
+  let messageIndex = 0;
 
   while (threadIndex < threadMessagesOnInterval.length) {
     const threadMsg = threadMessagesOnInterval[threadIndex];
 
     // Reached end of messages, but thread has new messages
-    if (messageIndex >= messages.length) {
+    if (messageIndex >= messagesOnInterval.length) {
       updatedMessages.push({...threadMsg, _sessionId: threadId});
       threadIndex++;
 
@@ -170,8 +183,7 @@ function syncInterval(messagesOnInterval, threadMessagesOnInterval) {
 
       if (msg?.text === threadMsg?.text) {
         threadIndex++;
-      } else {
-      }
+      } 
 
       continue;
     } 
@@ -189,43 +201,67 @@ function syncInterval(messagesOnInterval, threadMessagesOnInterval) {
 
     messageIndex++;
     threadIndex++;
-
   }
 
+  return updatedMessages;
+}
+
+function areSynced(messages, threadMessages) {
+
+  let i = 1;
+  while (i < messages.length && messages[messages.length - i].role != "ai") {
+    console.log(i)
+    i++;
+  }
+
+  const lastAIMessage = messages[messages.length - i];
+  const lastAIThreadMessage = threadMessages[threadMessages.length - i];
+
+  return lastAIMessage?.text === lastAIThreadMessage?.text
+}
+
+function prependMessages(originalMessages, updatedMessages, index) {
+  if (index != 0) {
+    updatedMessages = originalMessages.slice(0, index - 1).concat(updatedMessages);
+  }
+
+  return updatedMessages;
 }
 
 export async function syncMessagesWithThread(messages, threadId) {
-  const limit = 100;
-  const threadMessages = await getThreadMessages(threadId, limit);
-  const convertedThreadMessages = convertThreadMessagesToMessages(threadMessages);
+  const limit = 100; // limit for number of messages returned for thread (max 100)
+  const rawThreadMessages = await getThreadMessages(threadId, limit);
+  const threadMessages = convertThreadMessagesToMessages(rawThreadMessages);
 
-  if (messages[messages.length - 1]?.text === convertedThreadMessages[convertedThreadMessages.length -1]?.text) {
-    console.log("Matching last element")
+  if (messages.length === 0 && threadMessages.length === 0) {
+    return messages
+  }
+
+  if (areSynced(messages, threadMessages)) {
     return messages;
   }
 
-  if (threadMessages.length < limit) {
-    const updatedMessages = syncInterval(messages, convertedThreadMessages);
+  // Did not hit limit, so no special handling
+  if (rawThreadMessages.length < limit) {
+    const updatedMessages = syncInterval(messages, threadMessages, threadId);
     return updatedMessages
   }
 
-  const syncedIndices = getLastSyncedIndex(messages, convertedThreadMessages);
+  const syncedIndices = getLastSyncedIndex(messages, threadMessages);
 
   // No sync found, default to local to preserve images/files
-  if (syncedIndices[0] === -1 || syncedIndices[1] === -1) { 
+  if (!syncedIndices) { 
     return messages;
-
   } 
 
-  const threadIndex = syncedIndices[0];
-  const messageIndex = syncedIndices[1];
+  // Limit of thread messages, so should sync the slices that should be matching
+  const messagesInterval = messages.slice(syncedIndices.messageIndex);
+  const threadInterval = threadMessages.slice(syncedIndices.threadIndex);
 
-  const messagesInterval = messages.slice(messageIndex);
-  const threadInterval = convertedThreadMessages.slice(threadIndex);
+  let updatedMessages = syncInterval(messagesInterval, threadInterval, threadId);
 
-  let updatedMessages = syncInterval(messagesInterval, threadInterval);
-  if (messageIndex != 0) {
-    updatedMessages = messages.slice(0, messageIndex - 1).concat(updatedMessages);
-  }
+  // Add back the local messages that weren't included in the sync
+  updatedMessages = prependMessages(messages, updatedMessages, syncedIndices.messageIndex);
+
   return updatedMessages;
 }
