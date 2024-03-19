@@ -1,27 +1,5 @@
 import { getDalleImageGeneration, getImageToText } from "../utils/openaiUtils";
 
-export function getCurrentWeather(location) {
-  location = location.toLowerCase();
-  if (location.includes('tokyo')) {
-    return 'Good';
-  } else if (location.includes('san francisco')) {
-    return 'Mild';
-  } else {
-    return 'Very Hot';
-  }
-}
-
-export function getCurrentTime(location) {
-  location = location.toLowerCase();
-  if (location.includes('tokyo')) {
-    return '10p';
-  } else if (location.includes('san francisco')) {
-    return '6p';
-  } else {
-    return '12p';
-  }
-}
-
 export async function ssSearch(params) {
   //call api and return results
   let searchParams = JSON.parse(params);
@@ -83,7 +61,6 @@ async function genImage(params, context) {
 async function imageToText(params) {
   let imageParams = JSON.parse(params);
 
-
   if ("parameters" in imageParams) {
     imageParams = imageParams.parameters;
   }
@@ -105,12 +82,6 @@ export async function callFunc(functionDetails, context) {
   }
   else if (functionDetails.name == "image_to_text") {
     tmp = await imageToText(functionDetails.arguments);
-  }
-  else if(functionDetails.name == "get_weather") {
-    tmp = getCurrentWeather(functionDetails.arguments);
-  }
-  else if(functionDetails.name == "get_time") {
-    tmp = getCurrentTime(functionDetails.arguments);
   }
   return tmp;
 }
