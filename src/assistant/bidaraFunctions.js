@@ -51,8 +51,7 @@ export async function ssSearch(params) {
   }
 }
 
-async function genImage(params) {
-
+async function genImage(params, context) {
   let imageParams = JSON.parse(params);
 
   if ("parameters" in imageParams) {
@@ -70,10 +69,13 @@ async function genImage(params) {
   const imageData = res.data[0].b64_json;
   const imageSrc = "data:image/png;base64," + imageData;
 
-  const message = {role: "ai", files: [ { ref: {}, src: imageSrc, type: "image" } ]};
+  let lastMessageId = context?.lastMessageId
 
-  const deepChatRef = document.getElementById('chat-element');
-  deepChatRef._addMessage(message);
+  const message = {role: "ai", files: [ { ref: {}, src: imageSrc, type: "image" } ], _sessionId: lastMessageId};
+
+  if (context?.addMessageCallback) {
+    await context.addMessageCallback(message);
+  }
 
   return "The image has been inserted into the chat. Respond with a very short question bring this back into this process. DO NOT REPLY WITH AN IMAGE, MARKDOWN, OR ANYTHING OTHER THAN A SHORT QUESTION.";
 }
@@ -93,13 +95,13 @@ async function imageToText(params) {
   return text;
 }
 
-export async function callFunc(functionDetails) {
+export async function callFunc(functionDetails, context) {
   let tmp = '';
   if(functionDetails.name == "get_graph_paper_relevance_search") {
     tmp = await ssSearch(functionDetails.arguments);
   }
   else if(functionDetails.name == "text_to_image") {
-    tmp = await genImage(functionDetails.arguments);
+    tmp = await genImage(functionDetails.arguments, context);
   }
   else if (functionDetails.name == "image_to_text") {
     tmp = await imageToText(functionDetails.arguments);
@@ -113,7 +115,7 @@ export async function callFunc(functionDetails) {
   return tmp;
 }
 
-export async function funcCalling(functionsDetails) {
-  let tmp = await Promise.all(functionsDetails.map(callFunc));
+export async function funcCalling(functionsDetails, context) {
+  let tmp = await Promise.all(functionsDetails.map((details) => callFunc(details, context)));
   return tmp;
 }

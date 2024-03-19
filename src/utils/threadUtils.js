@@ -157,7 +157,6 @@ function syncInterval(messagesOnInterval, threadMessagesOnInterval, threadId) {
   // Case 3
   //   thread contains text not present in messages
 
-
   let updatedMessages = [];
   let threadIndex = 0;
   let messageIndex = 0;
@@ -210,7 +209,6 @@ function areSynced(messages, threadMessages) {
 
   let i = 1;
   while (i < messages.length && messages[messages.length - i].role != "ai") {
-    console.log(i)
     i++;
   }
 

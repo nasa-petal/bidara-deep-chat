@@ -17,6 +17,8 @@
   export let width = "100%";
   export let height = "100%";
 
+  let lastMessageId = null;
+
   let threadId = thread?.id; 
 
   let deepChatRef;
@@ -32,9 +34,7 @@
 
     let messages = thread.messages.slice(initialMessages.length);
 
-    if (messages?.length > 0 && messages[messages.length - 1].role === "user") {
-      messages = await threadUtils.syncMessagesWithThread(messages, thread.id);
-    }
+    messages = await threadUtils.syncMessagesWithThread(messages, thread.id);
 
     messages.forEach((message) => {
       deepChatRef._addMessage(message);
@@ -43,14 +43,25 @@
     loadedMessages = true;
   }
 
+  async function updateMessages() {
+    const messages = deepChatRef.getMessages();
+    if (messages.length > 0) {
+      thread.messages = messages;
+      thread.length = messages.length;
+      await threadUtils.setThreadMessages(thread.id, messages);
+    }
+  }
+
   async function onNewMessage(message) { 
-    if (thread && thread.id === message.message._sessionId) {
-      const messages = deepChatRef.getMessages();
-      if (messages.length > 0) {
-        thread.messages = messages;
-        thread.length = messages.length;
-        await threadUtils.setThreadMessages(thread.id, messages);
-      }
+    if (!deepChatRef) {
+      return
+    }
+
+    updateMessages();
+
+    // for funcCalling context
+    if (message.message.role === "user") {
+      lastMessageId = message.message._sessionId;
     }
   }
 
@@ -71,6 +82,18 @@
     setTimeout(()=> loading = false, 400);
   }
 
+  async function addMessageCallback(message) {
+    deepChatRef._addMessage(message);
+  }
+
+  async function handleFuncCalling(functionDetails) {
+    let context = {
+      lastMessageId,
+      addMessageCallback
+    }
+
+    return funcCalling(functionDetails, context)
+  }
 </script>
 
 <deep-chat
@@ -84,7 +107,7 @@
         new_assistant: asstConfig,
         thread_id: threadId,
         load_thread_history: false,
-        function_handler: funcCalling
+        function_handler: handleFuncCalling 
       }
     }
   }}
