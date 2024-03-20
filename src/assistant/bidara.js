@@ -3,7 +3,7 @@ const BIDARA_TEST_NAME = "BIDARA-TEST";
 
 export const BIDARA_NAME = BIDARA_PROD_NAME;
 
-export const BIDARA_VERSION = "1.3";
+export const BIDARA_VERSION = "1.4";
 
 export const BIDARA_LOGO = "bidara.png";
 export const BIDARA_LOGO_DESC = "girl with dark hair";
