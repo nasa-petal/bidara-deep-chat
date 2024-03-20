@@ -1,4 +1,3 @@
-import { argv0 } from "process";
 import * as bidara from "../assistant/bidara";
 
 import { getStoredAPIKey, getStoredAsstId, setStoredAPIKey, setStoredAsstId } from "./storageUtils";
