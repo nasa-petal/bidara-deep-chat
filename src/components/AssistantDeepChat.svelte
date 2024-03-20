@@ -1,5 +1,6 @@
 <script>
   import { DeepChat } from 'deep-chat';
+  import { onMount } from 'svelte';
   import { setOpenAIKey } from '../utils/openaiUtils';
   import * as threadUtils from '../utils/threadUtils';
 
@@ -27,20 +28,19 @@
     console.log(error);
   }
 
-  async function loadMessages(thread) {
-    if (!thread || !thread?.messages) {
+  async function loadMessages(threadToLoad) {
+    loadedMessages = true;
+
+    if (!threadToLoad || !threadToLoad?.messages) {
       return;
     }
+    const messages = threadToLoad.messages.slice(initialMessages.length);
 
-    let messages = thread.messages.slice(initialMessages.length);
-
-    messages = await threadUtils.syncMessagesWithThread(messages, thread.id);
-
-    messages.forEach((message) => {
+    const updatedMessages = await threadUtils.syncMessagesWithThread(messages, threadToLoad.id);
+    
+    updatedMessages.forEach((message) => {
       deepChatRef._addMessage(message);
     });
-
-    loadedMessages = true;
   }
 
   async function updateMessages() {
@@ -76,7 +76,7 @@
     }
 
     if (!loadedMessages) {
-      await loadMessages(thread)
+      await loadMessages(thread);
     }
 
     setTimeout(()=> loading = false, 400);
