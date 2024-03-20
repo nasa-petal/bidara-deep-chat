@@ -34,13 +34,19 @@
     if (!threadToLoad || !threadToLoad?.messages) {
       return;
     }
-    const messages = threadToLoad.messages.slice(initialMessages.length);
+    const threadMessages = threadToLoad.messages;
+
+    const messages = threadMessages.slice(initialMessages.length);
 
     const updatedMessages = await threadUtils.syncMessagesWithThread(messages, threadToLoad.id);
     
     updatedMessages.forEach((message) => {
       deepChatRef._addMessage(message);
     });
+
+    if (threadToLoad != updateMessages) {
+      updateMessages();
+    }
   }
 
   async function updateMessages() {

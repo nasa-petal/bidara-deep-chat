@@ -52,7 +52,7 @@
 
   async function newThreadAndSwitch() {
     // If the thread is already "new", stay on it
-    if (activeThread && activeThread.length <= 0) {
+    if (activeThread && activeThread.length <= activeInitialMessages.length) {
      if (activeThread.name != "New Chat") {
        await threadUtils.setThreadName(activeThread.id, "New Chat");
      }
