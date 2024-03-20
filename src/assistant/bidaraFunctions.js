@@ -29,7 +29,7 @@ export async function ssSearch(params) {
   }
 }
 
-async function genImage(params, context) {
+async function genImage(params, threadId, addMessageCallback) {
   let imageParams = JSON.parse(params);
 
   if ("parameters" in imageParams) {
@@ -47,13 +47,9 @@ async function genImage(params, context) {
   const imageData = res.data[0].b64_json;
   const imageSrc = "data:image/png;base64," + imageData;
 
-  let lastMessageId = context?.lastMessageId
+  const message = {role: "ai", files: [ { ref: {}, src: imageSrc, type: "image" } ], _sessionId: threadId};
 
-  const message = {role: "ai", files: [ { ref: {}, src: imageSrc, type: "image" } ], _sessionId: lastMessageId};
-
-  if (context?.addMessageCallback) {
-    await context.addMessageCallback(message);
-  }
+  await addMessageCallback(message);
 
   return "The image has been inserted into the chat. Respond with a very short question bring this back into this process. DO NOT REPLY WITH AN IMAGE, MARKDOWN, OR ANYTHING OTHER THAN A SHORT QUESTION.";
 }
@@ -78,7 +74,13 @@ export async function callFunc(functionDetails, context) {
     tmp = await ssSearch(functionDetails.arguments);
   }
   else if(functionDetails.name == "text_to_image") {
-    tmp = await genImage(functionDetails.arguments, context);
+    if (context?.addMessageCallback && context?.lastMessageId) {
+      tmp = await genImage(functionDetails.arguments, context.lastMessageId, context.addMessageCallback);
+
+    } else {
+      tmp = "There was an error in retrieving `text_to_image`."
+
+    }
   }
   else if (functionDetails.name == "image_to_text") {
     tmp = await imageToText(functionDetails.arguments);
