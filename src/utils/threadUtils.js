@@ -140,19 +140,22 @@ async function getNewMessages(messages, threadMessages) {
   // 2. Find matching message in thread messages
   while (tI >= 0) {
     if (threadMessages[tI].role !== "user" && threadMessages[tI]?.text === messages[mI]?.text) {
-      tI++; // disclude matching message, 
       break;
     }
     tI--;
   }
 
+  tI++; // disclude matching message, 
   // 3. Now disclude user messages (local will always have these)
   while (tI < threadMessages.length && threadMessages[tI].role === "user") {
     tI++;
   }
 
-  const newMessages = threadMessages.slice(tI);
+  if (tI < 0 && tI >= threadMessages.length) {
+    return [];
+  }
 
+  const newMessages = threadMessages.slice(tI);
   return newMessages;
 }
 
