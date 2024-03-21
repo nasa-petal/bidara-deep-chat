@@ -88,7 +88,7 @@
     } else {
       // temporary fix stops newThreadAndSwitch from not giving new thread on empty delete
       // this won't be written to storage
-      activeThread.length = 1; 
+      activeThread.length = activeInitialMessages.length + 1; 
       await newThreadAndSwitch();
     }
   }

@@ -118,112 +118,42 @@ function convertThreadMessagesToMessages(threadMessages) {
   return messages;
 }
 
-function getLastSyncedIndex(messages, threadMessages) {
-  let i = 0;
-  while (i < threadMessages.length) {
-    if (threadMessages[i]?.role === "ai") {
+async function getNewMessages(messages, threadMessages) {
+  if (messages.length === 0) {
+    return threadMessages;
+  }
+  
+  let mI = messages.length - 1;
+  let tI = threadMessages.length - 1;
+
+
+  // 1. Find most recent assistant local message
+  while (mI >= 0 && messages[mI].role === "user") {
+    mI--;
+  }
+
+  // 1.a. no assistant messages in local
+  if (mI === -1) {
+    return [];
+  }
+
+  // 2. Find matching message in thread messages
+  while (tI >= 0) {
+    if (threadMessages[tI].role !== "user" && threadMessages[tI]?.text === messages[mI]?.text) {
+      tI++; // disclude matching message, 
       break;
     }
-
-    i++;
+    tI--;
   }
 
-  let j = 0;
-  while (j < messages.length) {
-    if (messages[j].role != "ai") {
-      j++;
-      continue;
-    }
-
-    if (messages[j].text != threadMessages[i]?.text) {
-      j++;
-      continue;
-    }
-
-    return {
-      threadIndex: i,
-      messageIndex: j
-    }
+  // 3. Now disclude user messages (local will always have these)
+  while (tI < threadMessages.length && threadMessages[tI].role === "user") {
+    tI++;
   }
 
-  return null
-}
+  const newMessages = threadMessages.slice(tI);
 
-function syncInterval(messagesOnInterval, threadMessagesOnInterval, threadId) {
-  // Case 1
-  //  messages are the same as thread
-  // Case 2
-  //   messages contains image not present in thread
-  // Case 3
-  //   thread contains text not present in messages
-
-  let updatedMessages = [];
-  let threadIndex = 0;
-  let messageIndex = 0;
-
-  while (threadIndex < threadMessagesOnInterval.length) {
-    const threadMsg = threadMessagesOnInterval[threadIndex];
-
-    // Reached end of messages, but thread has new messages
-    if (messageIndex >= messagesOnInterval.length) {
-      updatedMessages.push({...threadMsg, _sessionId: threadId});
-      threadIndex++;
-
-      continue;
-    } 
-
-    const msg = messagesOnInterval[messageIndex];
-
-    // Message contains file 
-    // If message contains text, then the thread will also have that text
-    if (msg?.files) {
-      updatedMessages.push(msg);
-      messageIndex++;
-
-      if (msg?.text === threadMsg?.text) {
-        threadIndex++;
-      } 
-
-      continue;
-    } 
-
-    // messages don't match
-    // which means the thread contains a message that local doesn't have
-    if (msg.role !== threadMsg.role && msg.text !== threadMsg.text) {
-      updatedMessages.push({...threadMsg, _sessionId: threadId});
-      threadIndex++;
-
-      continue;
-    } 
-
-    updatedMessages.push(msg);
-
-    messageIndex++;
-    threadIndex++;
-  }
-
-  return updatedMessages;
-}
-
-function areSynced(messages, threadMessages) {
-
-  let i = 1;
-  while (i < messages.length && messages[messages.length - i].role != "ai") {
-    i++;
-  }
-
-  const lastAIMessage = messages[messages.length - i];
-  const lastAIThreadMessage = threadMessages[threadMessages.length - i];
-
-  return lastAIMessage?.text === lastAIThreadMessage?.text
-}
-
-function prependMessages(originalMessages, updatedMessages, index) {
-  if (index != 0) {
-    updatedMessages = originalMessages.slice(0, index - 1).concat(updatedMessages);
-  }
-
-  return updatedMessages;
+  return newMessages;
 }
 
 export async function syncMessagesWithThread(messages, threadId) {
@@ -234,32 +164,9 @@ export async function syncMessagesWithThread(messages, threadId) {
   if (messages.length === 0 && threadMessages.length === 0) {
     return messages
   }
+  const newMessages = await getNewMessages(messages, threadMessages);
 
-  if (areSynced(messages, threadMessages)) {
-    return messages;
-  }
-
-  // Did not hit limit, so no special handling
-  if (rawThreadMessages.length < limit) {
-    const updatedMessages = syncInterval(messages, threadMessages, threadId);
-    return updatedMessages
-  }
-
-  const syncedIndices = getLastSyncedIndex(messages, threadMessages);
-
-  // No sync found, default to local to preserve images/files
-  if (!syncedIndices) { 
-    return messages;
-  } 
-
-  // Limit of thread messages, so should sync the slices that should be matching
-  const messagesInterval = messages.slice(syncedIndices.messageIndex);
-  const threadInterval = threadMessages.slice(syncedIndices.threadIndex);
-
-  let updatedMessages = syncInterval(messagesInterval, threadInterval, threadId);
-
-  // Add back the local messages that weren't included in the sync
-  updatedMessages = prependMessages(messages, updatedMessages, syncedIndices.messageIndex);
+  const updatedMessages = messages.concat(newMessages);
 
   return updatedMessages;
 }
