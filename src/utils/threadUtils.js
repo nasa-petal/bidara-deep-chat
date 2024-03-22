@@ -45,8 +45,13 @@ export async function getThreads() {
   return threads;
 }
 
-export async function getEmptyThread() {
-  return await bidaraDB.getEmptyThread();
+export async function getEmptyThread(emptyLength) {
+  const smallestThread = await bidaraDB.getSmallestThread();
+
+  if (smallestThread.length <= emptyLength) {
+    return smallestThread;
+  }
+  return null;
 }
 
 export async function getThreadImages() {

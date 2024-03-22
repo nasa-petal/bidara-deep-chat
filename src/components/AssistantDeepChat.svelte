@@ -1,6 +1,5 @@
 <script>
   import { DeepChat } from 'deep-chat';
-  import { onMount } from 'svelte';
   import { setOpenAIKey } from '../utils/openaiUtils';
   import * as threadUtils from '../utils/threadUtils';
 
@@ -59,7 +58,7 @@
   }
 
   async function onNewMessage(message) { 
-    if (!deepChatRef) {
+    if (!deepChatRef || message.isInitial) {
       return
     }
 
