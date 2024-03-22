@@ -81,13 +81,8 @@ export async function getMostRecentlyUpdatedThread() {
 	return await dbUtils.readFirstByIndex(BIDARA_DB, CHAT_STORE_NAME, "updated_time", true);
 }
 
-export async function getEmptyThread() {
-	const emptyThread = await dbUtils.readFirstByIndex(BIDARA_DB, CHAT_STORE_NAME, "length", false);
-	if (emptyThread && emptyThread.length === 0) {
-		return emptyThread;
-	}
-
-	return null;
+export async function getSmallestThread() {
+	return await dbUtils.readFirstByIndex(BIDARA_DB, CHAT_STORE_NAME, "length", false);
 }
 
 export async function getNameById(id) {

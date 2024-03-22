@@ -52,7 +52,7 @@
 
   async function newThreadAndSwitch() {
     // If the thread is already "new", stay on it
-    if (activeThread && activeThread.length <= 0) {
+    if (activeThread && activeThread.length <= activeInitialMessages.length) {
      if (activeThread.name != "New Chat") {
        await threadUtils.setThreadName(activeThread.id, "New Chat");
      }
@@ -60,7 +60,7 @@
     } 
 
     // If an empty thead is already created, prevents creating a new one
-    const emptyThread = await threadUtils.getEmptyThread();
+    const emptyThread = await threadUtils.getEmptyThread(activeInitialMessages.length);
     if (emptyThread) {
       await switchActiveThread(emptyThread);
 
@@ -88,7 +88,7 @@
     } else {
       // temporary fix stops newThreadAndSwitch from not giving new thread on empty delete
       // this won't be written to storage
-      activeThread.length = 1; 
+      activeThread.length = activeInitialMessages.length + 1; 
       await newThreadAndSwitch();
     }
   }
