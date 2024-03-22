@@ -123,6 +123,17 @@ function convertThreadMessagesToMessages(threadMessages) {
   return messages;
 }
 
+function findReplaceRegEx(string, regex, replacement) {
+  const matches = (string.match(regex) || [])
+  console.log("find replace matches: ")
+
+  matches.forEach(match => {
+    string = string.replace(match, replacement)
+  })
+
+  return string
+}
+
 async function getNewMessages(messages, threadMessages) {
   if (messages.length === 0) {
     return threadMessages;
@@ -144,8 +155,20 @@ async function getNewMessages(messages, threadMessages) {
 
   // 2. Find matching message in thread messages
   while (tI >= 0) {
-    if (threadMessages[tI].role !== "user" && threadMessages[tI]?.text === messages[mI]?.text) {
-      break;
+    if (threadMessages[tI].role !== "user") {
+
+      const threadFileLinkRegEx = /\]\(sandbox:[\S]+\)/igm;
+      const msgFileLinkRegEx = /\]\(data:[\S]+\)/igm;
+
+      const threadMessage = threadMessages[tI]?.text;
+      const message = messages[mI]?.text;
+
+      const threadsMsg = findReplaceRegEx(threadMessage, threadFileLinkRegEx, ']()')
+      const messagesMsg = findReplaceRegEx(message, msgFileLinkRegEx, ']()')
+
+      if (threadsMsg === messagesMsg) {
+        break;
+      }
     }
     tI--;
   }
@@ -172,6 +195,7 @@ export async function syncMessagesWithThread(messages, threadId) {
   if (messages.length === 0 && threadMessages.length === 0) {
     return messages
   }
+
   const newMessages = await getNewMessages(messages, threadMessages);
 
   const updatedMessages = messages.concat(newMessages);
