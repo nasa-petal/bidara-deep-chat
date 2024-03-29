@@ -3,74 +3,102 @@
   import { setOpenAIKey, syncMessagesWithThread } from '../utils/openaiUtils';
   import * as threadUtils from '../utils/threadUtils';
 
-	export let key = null;
-	export let asstId = null;
-	export let asstConfig = null;
-	export let thread = null;
-	export let initialMessages = null;
-	export let funcCalling = null;
+  export let key = null;
+  export let asstId = null;
+  export let asstConfig = null;
+  export let thread = null;
+  export let initialMessages = null;
+  export let funcCalling = null;
 
-	export let loginHandler;
-	export let loadedMessages;
+  export let loginHandler;
+  export let loadedMessages;
 
   export let loading = true;
-	export let width = "100%";
-	export let height = "100%";
+  export let width = "100%";
+  export let height = "100%";
 
+  let lastMessageId;
   let threadId = thread?.id; 
 
   let deepChatRef;
 
-	function onError(error) {
-		console.log(error);
-	}
+  function onError(error) {
+    console.log(error);
+  }
 
-  async function loadMessages(thread) {
-    if (!thread || !thread?.messages) {
+  async function loadMessages(threadToLoad) {
+    loadedMessages = true;
+
+    if (!threadToLoad || !threadToLoad?.messages) {
       return;
     }
+    const threadMessages = threadToLoad.messages;
 
-    let messages = thread.messages.slice(initialMessages.length);
+    const messages = threadMessages.slice(initialMessages.length);
 
-    if (messages?.length > 0 && messages[messages.length - 1].role === "user") {
-      messages = await syncMessagesWithThread(messages, thread.id);
-    }
-
-    messages.forEach((message) => {
+    const updatedMessages = await syncMessagesWithThread(messages, threadToLoad.id);
+    
+    updatedMessages.forEach((message) => {
       deepChatRef._addMessage(message);
     });
 
-    loadedMessages = true;
-  }
-
-  async function onNewMessage(message) { 
-    if (thread && thread.id === message.message._sessionId) {
-      const messages = deepChatRef.getMessages();
-      if (messages.length > 0) {
-        thread.messages = messages;
-        thread.length = messages.length;
-        await threadUtils.setThreadMessages(thread.id, messages);
-      }
+    if (threadToLoad != updateMessages) {
+      updateMessages();
     }
   }
 
-	async function onComponentRender() {
+  async function updateMessages() {
+    const messages = deepChatRef.getMessages();
+    if (messages.length > 0) {
+      thread.messages = messages;
+      thread.length = messages.length;
+      await threadUtils.setThreadMessages(thread.id, messages);
+    }
+  }
+
+  async function onNewMessage(message) { 
+    if (!deepChatRef || message.isInitial) {
+      return
+    }
+
+    updateMessages();
+
+    // for funcCalling context
+    if (message.message.role === "user") {
+      lastMessageId = message.message._sessionId;
+    }
+  }
+
+  async function onComponentRender() {
     deepChatRef = document.getElementById("chat-element");
-		// save key to localStorage.
-		// The event occurs before key is set, and again, after key is set.
-		if (!key && this._activeService.key) {
-			// if key set through UI or in URL variable, save it to localStorage.
-			setOpenAIKey(this._activeService.key);
-			await loginHandler();
-		}
+    // save key to localStorage.
+    // The event occurs before key is set, and again, after key is set.
+    if (!key && this._activeService.key) {
+      // if key set through UI or in URL variable, save it to localStorage.
+      setOpenAIKey(this._activeService.key);
+      await loginHandler();
+    }
 
     if (!loadedMessages) {
       await loadMessages(thread)
     }
 
-		setTimeout(()=> loading = false, 400);
-	}
+    setTimeout(()=> loading = false, 400);
+  }
 
+
+  async function addMessageCallback(message) {
+    deepChatRef._addMessage(message);
+  }
+
+  async function handleFuncCalling(functionDetails) {
+    let context = {
+      lastMessageId,
+      addMessageCallback
+    }
+
+    return funcCalling(functionDetails, context)
+  }
 </script>
 
 <deep-chat
@@ -84,7 +112,7 @@
         new_assistant: asstConfig,
         thread_id: threadId,
         load_thread_history: false,
-        function_handler: funcCalling
+        function_handler: handleFuncCalling
       }
     }
   }}
