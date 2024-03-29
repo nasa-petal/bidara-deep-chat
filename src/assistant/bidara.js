@@ -3,7 +3,7 @@ const BIDARA_TEST_NAME = "BIDARA-TEST";
 
 export const BIDARA_NAME = BIDARA_PROD_NAME;
 
-export const BIDARA_VERSION = "1.3";
+export const BIDARA_VERSION = "1.4";
 
 export const BIDARA_LOGO = "bidara.png";
 export const BIDARA_LOGO_DESC = "girl with dark hair";
@@ -147,9 +147,9 @@ export const PAPER_SEARCH_FUNC = {
   }
 }
 
-const GEN_IMAGE_FUNC = {
-  "name": "generate_image_from_description",
-  "description": "Generate an image from a description.",
+const TEXT_TO_IMAGE = {
+  "name": "text_to_image",
+  "description": "Generate an image from a text description.",
   "parameters": {
     "type": "object",
     "properties": {
@@ -162,11 +162,27 @@ const GEN_IMAGE_FUNC = {
   }
 }
 
+const IMAGE_TO_TEXT = {
+  "name": "image_to_text",
+  "description": "Get text description of image.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "prompt": {
+        "type": "string",
+        "description": "The prompt to query about the image."
+      },
+    },
+    "required": []
+  }
+}
+
 const BIDARA_FUNCTIONS = [
   { type: "code_interpreter" },
   { type: "retrieval" },
   { type: "function", function: PAPER_SEARCH_FUNC },
-  { type: "function", function: GEN_IMAGE_FUNC },
+  { type: "function", function: TEXT_TO_IMAGE },
+  { type: "function", function: IMAGE_TO_TEXT },
 ]
 
 export const BIDARA_INITIAL_MESSAGES = [

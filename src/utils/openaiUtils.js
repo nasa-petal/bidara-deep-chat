@@ -1,7 +1,7 @@
 import * as bidara from "../assistant/bidara";
 
 import { getStoredAPIKey, getStoredAsstId, setStoredAPIKey, setStoredAsstId } from "./storageUtils";
-import { getActiveThread } from "./threadUtils";
+import { getActiveThread, getThreadImages } from "./threadUtils";
 
 let openaiKey = null;
 let openaiAsst = null;
@@ -352,6 +352,90 @@ function convertThreadMessagesToMessages(threadMessages) {
     .reverse()
 
   return messages;
+}
+
+export async function getChatCompletion(model, messages, tokenLimit) {
+  if (!openaiKey) {
+    throw new Error('openai key not set. cannot validate thread.');
+  }
+
+  const url = `https://api.openai.com/v1/chat/completions`;
+  const method = 'POST';
+  const headers = {
+    'Authorization': 'Bearer ' + openaiKey,
+    'Content-Type': 'application/json',
+  };
+  const body = JSON.stringify({
+    "model": model,
+    "messages": messages,
+    "max_tokens": tokenLimit
+  })
+
+  const request = {
+    method,
+    headers,
+    body
+  }
+
+  const response = await fetch(url, request);
+
+  const r = await response.json();
+  if (r.error && r.error.type === 'invalid_request_error') {
+    console.error(r.error);
+    return null;
+  }
+
+  return r;
+}
+
+export async function getImageDescription(base64, prompt) {
+
+  if (!openaiKey) {
+    throw new Error('openai key not set. cannot validate thread.');
+  }
+
+  if (!prompt) {
+    prompt = "Give a detailed but concise description of the image. If there are any engineering, biological, or mechanical processes present, include how they're present."
+  }
+
+  const model = "gpt-4-vision-preview"
+  const messages = [
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": prompt
+        },
+        {
+          "type": "image_url",
+          "image_url": {
+            "url": base64
+          }
+        }
+      ]
+    }
+  ]
+
+  const tokenLimit = 300;
+
+  const res = await getChatCompletion(model, messages, tokenLimit);
+
+  const imageDescription = res.choices[0].message.content;
+
+  return imageDescription;
+}
+
+export async function getImageToText(prompt) {
+
+  let imageFiles = await getThreadImages()
+
+  if (imageFiles.length > 0) {
+    const imageSource = imageFiles[imageFiles.length - 1]
+    return getImageDescription(imageSource, prompt);
+  }
+
+  return "No image has been uploaded, or the uploaded file was not an image.";
 }
 
 export async function syncMessagesWithThread(messages, threadId) {
