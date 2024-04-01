@@ -298,8 +298,8 @@ export async function getDalleImageGeneration(prompt, image_size = null, image_q
   }
 }
 
-export async function getThreadMessages(threadId) {
-  const url = `https://api.openai.com/v1/threads/${threadId}/messages`;
+export async function getThreadMessages(threadId, limit) {
+  const url = `https://api.openai.com/v1/threads/${threadId}/messages?limit=${limit}`;
 
   if (!openaiKey) {
     throw new Error('openai key not set. cannot validate thread.');
@@ -439,7 +439,7 @@ export async function getImageToText(prompt) {
 }
 
 export async function syncMessagesWithThread(messages, threadId) {
-  const threadMessages = await getThreadMessages(threadId);
+  const threadMessages = await getThreadMessages(threadId, 100);
   const convertedThreadMessages = convertThreadMessagesToMessages(threadMessages);
 
   // Case 1

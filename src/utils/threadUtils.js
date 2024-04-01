@@ -1,4 +1,4 @@
-import { validThread, getNewThreadId } from "./openaiUtils";
+import { validThread, getNewThreadId, getThreadMessages } from "./openaiUtils";
 import * as bidaraDB from "./bidaraDB";
 
 async function createNewThread() {
@@ -6,7 +6,7 @@ async function createNewThread() {
 
   if (new_id) {
     const new_name = "New Chat";
-    return {name: new_name, id: new_id, length: 0, messages: [], active: true};
+    return {name: new_name, id: new_id, length: 0, files: [], active: true};
   }
 
   return null;
@@ -75,16 +75,92 @@ export async function setThreadName(id, name) {
   await bidaraDB.setNameById(id, name);
 }
 
-export async function setThreadMessages(threadId, messages) {
-  await bidaraDB.setMessagesById(threadId, messages);
-  await bidaraDB.setLengthById(threadId, messages.length);
-}
-
 export async function updateThread(thread) {
   await bidaraDB.setThread(thread);
+}
+
+export async function setThreadLength(id, length) {
+  await bidaraDB.setLengthById(id, length);
 }
 
 export async function deleteThread(threadId) {
   await bidaraDB.deleteThreadById(threadId);
 }
 
+export async function pushFile(threadId, file) {
+  await bidaraDB.pushFileToId(threadId, file);
+}
+
+export async function pushFiles(threadId, files) {
+  await files.forEach(async ( file ) => {
+    await pushFile(threadId, file);
+  })
+}
+
+export async function syncThreadFiles(threadId, messages) {
+  const files = await bidaraDB.getThreadFiles(threadId);
+
+  if (files.length <= 0) {
+    return messages;
+  }
+
+  const attachedFiles = files.filter(file => file.attached);
+  const insertedFiles = files.filter(file => !file.attached);
+
+  insertedFiles.forEach(file => {
+    const fileInsert = { src: file.src, type: file.type, ref: {} }
+    if (file.name) {
+      fileInsert.ref.name = file.name
+    }
+
+    const msg = { role: file.role, files: [ fileInsert ], _sessionId: threadId }
+    messages.splice(file.index, 0, msg)
+  })
+
+  attachedFiles.forEach(file => {
+    const fileInsert = { src: file.src, type: file.type, ref: {} }
+    if (file.name) {
+      fileInsert.ref.name = file.name
+    }
+
+    if (messages[file.index].files) {
+      messages[file.index].files.push(fileInsert);
+    } else {
+      messages[file.index].files = [fileInsert];
+    }
+  })
+
+  return messages;
+}
+
+function convertThreadMessagesToMessages(threadMessages) {
+  const messages = threadMessages
+    .map(msg => {
+      return msg.content.map(d => {
+        if (msg.role === "assistant") {
+          msg.role = "ai";
+        }
+
+        const isText = d.type === 'text';
+
+        return {
+          role: msg.role,
+          text: isText ? d.text.value : null,
+        }
+      })
+    })
+    .flat()
+    .reverse()
+
+  return messages;
+}
+
+export async function syncMessages(threadId, initialMessages) {
+  const rawThreadMessages = await getThreadMessages(threadId, 100);
+  const threadMessages = convertThreadMessagesToMessages(rawThreadMessages);
+  const messages = initialMessages.concat(threadMessages);
+
+  const syncedMessages = await syncThreadFiles(threadId, messages);
+
+  return syncedMessages;
+}
