@@ -1,4 +1,49 @@
+:root {
+  --chat-background-color: var(--light-chat-background-color);
+  --border-color: var(--light-border-color);
+  --border-off-color: var(--light-border-off-color);
+  --ai-message-background-color: var(--light-ai-message-background-color);
+  --user-message-background-color: var(--light-user-message-background-color);
+  --nav-color: var(--light-nav-color);
+  --nav-off-color: var(--light-nav-off-color);
+  --text-primary-color: var(--light-text-primary-color);
+  --text-secondary-color: var(--light-text-secondary-color);
+  --text-important-color: var(--light-text-important-color);
+
+  --black: black;
+  --light-black: rgb(25,25,25);
+  --dark-gray: rgb(51,51,51);
+  --gray: rgb(150,150,150);
+  --light-gray: rgb(229, 229, 234);
+  --dark-blue: rgb(0,112,216);
+  --blue: rgb(0,132,255);
+  --white: white;
+
+  --light-chat-background-color: var(--white);
+  --light-border-color: var(--gray);
+  --light-border-off-color: var(--dark-gray);
+  --light-ai-message-background-color: var(--light-gray);
+  --light-user-message-background-color: var(--blue);
+  --light-nav-color: var(--light-gray);
+  --light-nav-off-color: var(--white);
+  --light-text-primary-color: var(--black);
+  --light-text-secondary-color: var(--white);
+  --light-text-important-color: var(--blue);
+
+  --dark-chat-background-color: var(--light-black);
+  --dark-border-color: var(--dark-gray);
+  --dark-border-off-color: var(--light-black);
+  --dark-ai-message-background-color: var(--dark-gray);
+  --dark-user-message-background-color: var(--dark-blue);
+  --dark-nav-color: var(--black);
+  --dark-nav-off-color: var(--light-black);
+  --dark-text-primary-color: var(--white);
+  --dark-text-secondary-color: var(--black);
+  --dark-text-important-color: var(--dark-blue);
+}
+
 html {
+  background: var(--nav-color);
   text-size-adjust: 100%; /* Prevent font scaling in landscape while allowing user zoom */
   height: 100%;
 }
