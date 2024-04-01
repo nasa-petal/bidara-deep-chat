@@ -187,10 +187,16 @@ function convertThreadMessagesToMessages(threadMessages) {
   return messages;
 }
 
+function clearNullChats(messages) {
+  return messages.filter(msg => msg.text !== null || msg.files );
+}
+
 export async function syncMessages(threadId, initialMessages) {
   const rawThreadMessages = await getThreadMessages(threadId, 100);
   const threadMessages = convertThreadMessagesToMessages(rawThreadMessages);
-  const messages = initialMessages.concat(threadMessages);
+  const fullMessages = initialMessages.concat(threadMessages);
+
+  const messages = clearNullChats(fullMessages);
 
   const syncedMessages = await syncThreadFiles(threadId, messages);
 
