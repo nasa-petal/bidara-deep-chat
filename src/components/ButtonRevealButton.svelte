@@ -42,7 +42,6 @@
         padding: 1em;
         width: 100%;
         height: 100%;
-        border-bottom: 1px solid rgb(180, 180, 180);
     }
 
     .button-text {
@@ -56,8 +55,8 @@
 
     .selected {
         transition: background-color 0.3s ease;
-        background-color: rgb(0, 122, 255) !important;
-        color: rgb(242, 242, 247) !important;
+        background-color: var(--user-message-background-color) !important;
+        color: var(--text-secondary-color) !important;
     }
 
     .selected .revealed-button .unfocused {

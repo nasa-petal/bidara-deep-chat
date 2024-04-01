@@ -2,6 +2,7 @@
     import Hamburger from './Hamburger.svelte'
     import Menu from './Menu.svelte';
     import MenuItem from './MenuItem.svelte';
+    import ThemeSwitcher from './ThemeSwitcher.svelte';
 	
     export let sidebar = false
     export let chat_name;
@@ -60,16 +61,26 @@
     <button tabindex="0" class="focus:no-outline px-3 py-1 rounded-full" on:click={handleButtonClick}>{chat_name}</button>
   {/if}
   <Menu>
-    <MenuItem><a class="w-full h-full p-1" tabindex="0" href="https://forms.gle/xDEixG5UJrFBwDKv5" target="_blank" rel="noopener">Send Feedback</a></MenuItem>
-    <MenuItem><a class="w-full h-full p-1" tabindex="0" href="https://www1.grc.nasa.gov/research-and-engineering/vine/petal/" target="_blank" rel="noopener">Vist PeTaL</a></MenuItem>
+    <div class="function-container">
+      <MenuItem><ThemeSwitcher/></MenuItem>
+    </div>
+    <div class="info-container">
+      <MenuItem><a class="w-full h-full p-1" tabindex="0" href="https://forms.gle/xDEixG5UJrFBwDKv5" target="_blank" rel="noopener">Send Feedback</a></MenuItem>
+      <MenuItem><a class="w-full h-full p-1" tabindex="0" href="https://www1.grc.nasa.gov/research-and-engineering/vine/petal/" target="_blank" rel="noopener">Vist PeTaL</a></MenuItem>
+    </div>
   </Menu>
 </header>
 
 <style>
+  .function-container {
+    border-bottom: 1px solid var(--light-border-color);
+  }
+
   header {
-    background-color: rgb(229, 229, 234);
+    background-color: var(--nav-color);
     z-index: 30;
-    border-bottom: 1px solid rgb(180, 180, 180);
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary-color);
     width: 100%;
     height: 10em;
     margin-top: -7em;
@@ -80,7 +91,10 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    background-color: rgb(229, 229, 234);
+    background-color: var(--nav-color);
+    color: var(--text-primary-color);
   }
-
+  input {
+    background-color: var(--nav-off-color);
+  }
 </style>

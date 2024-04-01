@@ -161,7 +161,6 @@
         top: 0;
         padding: 1em;
         z-index: 25 !important;
-        border-bottom: 1px solid rgb(180, 180, 180);
         transition: background-color 0.3s ease;
     }
 
@@ -183,7 +182,6 @@
         left: 0;
         top: 0;
         transition: margin-right 0.3s ease;
-        border-bottom: 1px solid rgb(180, 180, 180);
     }
 
     .reveal-image {
@@ -215,7 +213,7 @@
 
     .selected {
         transition: background-color 0.3s ease;
-        background-color: rgb(0, 122, 255) !important;
-        color: rgb(242, 242, 247) !important;
+        background-color: var(--user-message-background-color) !important;
+        color: var(--text-secondary-color) !important;
     }
 </style>
