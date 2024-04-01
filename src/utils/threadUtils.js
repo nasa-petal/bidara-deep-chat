@@ -110,7 +110,7 @@ export async function syncThreadFiles(threadId, messages) {
   insertedFiles.forEach(file => {
     const fileInsert = { src: file.src, type: file.type, ref: {} }
     if (file.name) {
-      fileInsert.ref.name = file.name
+      fileInsert.name = file.name
     }
 
     const msg = { role: file.role, files: [ fileInsert ], _sessionId: threadId }
@@ -120,7 +120,15 @@ export async function syncThreadFiles(threadId, messages) {
   attachedFiles.forEach(file => {
     const fileInsert = { src: file.src, type: file.type, ref: {} }
     if (file.name) {
-      fileInsert.ref.name = file.name
+      fileInsert.name = file.name
+    }
+
+    while (file.text && !equivalentMessages(file.text, messages[file.index].text)) {
+      file.index += 1;
+    }
+
+    if (file.text) {
+      messages[file.index].text = file.text;
     }
 
     if (messages[file.index].files) {
@@ -131,6 +139,30 @@ export async function syncThreadFiles(threadId, messages) {
   })
 
   return messages;
+}
+
+function equivalentMessages(message, threadMessage) {
+  const msgFileLinkRegEx = /\]\(data:[\S]+\)/igm;
+  const threadFileLinkRegEx = /\]\(sandbox:[\S]+\)/igm;
+
+  const messagesMsg = findReplaceRegEx(message, msgFileLinkRegEx, ']()')
+  const threadsMsg = findReplaceRegEx(threadMessage, threadFileLinkRegEx, ']()')
+
+  return messagesMsg === threadsMsg;
+}
+
+function findReplaceRegEx(string, regex, replacement) {
+  if (!string) {
+    return string;
+  }
+
+  const matches = (string.match(regex) || [])
+
+  matches.forEach(match => {
+    string = string.replace(match, replacement)
+  })
+
+  return string
 }
 
 function convertThreadMessagesToMessages(threadMessages) {

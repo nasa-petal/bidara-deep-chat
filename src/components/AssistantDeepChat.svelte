@@ -65,7 +65,7 @@
     const formattedFiles = files.map(file => {
       let type = file.type;
       let src = file.src;
-      let name = file?.ref?.name ? file.ref.name : "";
+      let name = file?.name ? file.name : "";
 
       return {
         type,
