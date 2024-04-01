@@ -81,6 +81,17 @@ export async function getMostRecentlyUpdatedThread() {
 	return await dbUtils.readFirstByIndex(BIDARA_DB, CHAT_STORE_NAME, "updated_time", true);
 }
 
+export async function getThreadFiles(id) {
+	const thread = await getThreadById(id);
+	const files = thread?.files;
+
+	if (!files) {
+		return [];
+	}
+
+	return files;
+}
+
 export async function getEmptyThread() {
 	const emptyThread = await dbUtils.readFirstByIndex(BIDARA_DB, CHAT_STORE_NAME, "length", false);
 	if (emptyThread && emptyThread.length === 0) {
@@ -104,8 +115,21 @@ export async function getFilteredThreads(thread_filter) {
 	return await getAllThreads().filter(thread_filter);
 }
 
+async function updateTimeById(id) {
+	const updated_time = Date.now();
+	await dbUtils.updateProperty(BIDARA_DB, CHAT_STORE_NAME, id, "update_time", updated_time)
+}
+
 export async function pushMessageToId(id, message) {
 	await dbUtils.pushToListProperty(BIDARA_DB, CHAT_STORE_NAME, id, "messages", message,);
+	const length = await getLengthById(id);
+	await setLengthById(id, length + 1);
+	await updateTimeById(id);
+}
+
+export async function pushFileToId(id, file) {
+	// { index: int, file: b64Data }
+	await dbUtils.pushToListProperty(BIDARA_DB, CHAT_STORE_NAME, id, "files", file)
 }
 
 export async function setThread(thread) {

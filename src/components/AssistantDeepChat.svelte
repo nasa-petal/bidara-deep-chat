@@ -1,6 +1,6 @@
 <script>
   import { DeepChat } from 'deep-chat';
-  import { setOpenAIKey, syncMessagesWithThread } from '../utils/openaiUtils';
+  import { setOpenAIKey } from '../utils/openaiUtils';
   import * as threadUtils from '../utils/threadUtils';
 
   export let key = null;
@@ -29,31 +29,56 @@
   async function loadMessages(threadToLoad) {
     loadedMessages = true;
 
-    if (!threadToLoad || !threadToLoad?.messages) {
+    if (!threadToLoad || !threadToLoad?.id) {
       return;
     }
-    const threadMessages = threadToLoad.messages;
 
-    const messages = threadMessages.slice(initialMessages.length);
-
-    const updatedMessages = await syncMessagesWithThread(messages, threadToLoad.id);
-    
-    updatedMessages.forEach((message) => {
-      deepChatRef._addMessage(message);
-    });
-
-    if (threadToLoad != updateMessages) {
-      updateMessages();
-    }
+    const updatedMessages = await threadUtils.syncMessages(threadToLoad.id, initialMessages);
+    const messagesToLoad = updatedMessages.slice(initialMessages.length);
+    messagesToLoad.forEach(msg => deepChatRef._addMessage(msg));
   }
 
   async function updateMessages() {
     const messages = deepChatRef.getMessages();
     if (messages.length > 0) {
-      thread.messages = messages;
       thread.length = messages.length;
-      await threadUtils.setThreadMessages(thread.id, messages);
+      await threadUtils.setThreadLength(thread.id, thread.length);
     }
+  }
+
+  async function updateFiles(message) {
+    const files = message.message?.files;
+    if (!files || files.length <= 0) {
+      return;
+    }
+
+    const index = thread.length - 1;
+    let attached = false;
+    if (message.message?.text?.length > 0) {
+      attached = true;
+    }
+    
+    const role = message.message.role;
+
+    const text = message.message.text;
+
+    const formattedFiles = files.map(file => {
+      let type = file.type;
+      let src = file.src;
+      let name = file?.ref?.name ? file.ref.name : "";
+
+      return {
+        type,
+        name,
+        src,
+        index,
+        attached,
+        role,
+        text,
+      }
+    });
+
+    await threadUtils.pushFiles(threadId, formattedFiles);
   }
 
   async function onNewMessage(message) { 
@@ -62,6 +87,7 @@
     }
 
     updateMessages();
+    updateFiles(message);
 
     // for funcCalling context
     if (message.message.role === "user") {
@@ -89,6 +115,9 @@
 
   async function addMessageCallback(message) {
     deepChatRef._addMessage(message);
+
+    await updateMessages();
+    await updateFiles({ message });
   }
 
   async function handleFuncCalling(functionDetails) {

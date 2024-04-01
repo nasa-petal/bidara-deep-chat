@@ -19,6 +19,7 @@ export async function openDB(name, stores, version) {
     request.onerror = (event) => {
       const error = event.target.error;
       reject(error);
+			return;
     }
   });
 }
@@ -85,6 +86,7 @@ export async function readByKey(db, storeName, key, transaction = null, callback
     getRequest.onerror = (event) => {
       const error = event.target.error;
       reject(error);
+			return;
     }
 
 		if (typeof callback === 'function') {
@@ -124,6 +126,7 @@ export async function readAll(db, storeName, storeIndex = null, reversed = null,
     getRequest.onerror = (event) => {
       const error = event.target.error;
       reject(error);
+			return;
     }
 
 		if (typeof callback === 'function') {
@@ -171,7 +174,9 @@ export async function readByProperty(db, storeName, propertyKey, propertyValue, 
 
     transaction.onerror = (event) => {
       const error = event.target.error;
-      reject(error); }
+			reject(error); 
+			return;
+		}
   });
 
 		if (typeof callback === 'function') {
@@ -210,6 +215,7 @@ export async function readFirstByIndex(db, storeName, storeIndex, reversed, tran
     transaction.onerror = (event) => {
       const error = event.target.error;
       reject(error);
+			return;
 		}
 
 		if (typeof callback === 'function') {
@@ -241,6 +247,7 @@ export async function write(db, storeName, value, transaction = null, callback =
     putRequest.onerror = (event) => {
       const error = event.target.error;
       reject(error);
+			return;
     }
 
 		if (typeof callback === 'function') {
@@ -265,6 +272,7 @@ export async function deleteByKey(db, storeName, key, transaction = null, callba
 		deleteRequest.onerror = (event) => {
 			const error = event.target.error;
 			reject(error);
+			return;
 		}
 
 		if (typeof callback === 'function') {
@@ -292,6 +300,7 @@ export async function updateProperty(db, storeName, key, propertyKey, propertyVa
       // Would error anyways, but gives a better message
       if (!result.hasOwnProperty(propertyKey)) {
 				reject(`Object has no property: '${propertyKey}' (in store: ${storeName} by key: '${result}')`);
+				return;
       }
 
       result[propertyKey] = propertyValue;
@@ -306,12 +315,14 @@ export async function updateProperty(db, storeName, key, propertyKey, propertyVa
       putRequest.onerror = (event) => {
 				const error = event.target.error;
 				reject(error);
+				return;
       }
     }
 
     getRequest.onerror = (event) => {
       const error = event.target.error;
       reject(error);
+			return;
     }
 
 		if (typeof callback === 'function') {
@@ -341,22 +352,16 @@ export async function pushToListProperty(db, storeName, key, listPropertyKey, ap
       // Would error anyways, but gives a better message
       if (!result.hasOwnProperty(listPropertyKey)) {
 				reject(`Object has no property: '${listPropertyKey}' (in store: ${storeName} by key: '${result}')`);
+				return;
       }
       // Ensure resulting object property is a list. 
       // Would error anyways, but gives a better message
       if (!Array.isArray(result[listPropertyKey])) {
 				reject(`Object property is not list: '${listPropertyKey}' (in store: ${storeName} by key: '${result}')`);
+				return;
       }
 
       result[listPropertyKey].push(appendValue);
-
-      // Unsure if these truly belong here, but for our current use case they do
-      if (result.hasOwnProperty("length")) {
-				result.length += 1;
-      }
-			if (result.hasOwnProperty("updated_time")) {
-				result.updated_time = Date.now();
-			}
 
       const putRequest = objectStore.put(result);
 
@@ -367,12 +372,14 @@ export async function pushToListProperty(db, storeName, key, listPropertyKey, ap
       putRequest.onerror = (event) => {
 				const error = event.target.error;
 				reject(error);
+				return;
       }
     }
 
     getRequest.onerror = (event) => {
       const error = event.target.error;
       reject(error);
+			return;
     }
 
 		if (typeof callback === 'function') {
