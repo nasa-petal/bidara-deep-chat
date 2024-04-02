@@ -34,6 +34,7 @@
 		const attributesToChange = [
 			"chat-background-color",
 			"border-color",
+			"border-off-color",
 			"nav-color",
 			"nav-off-color",
 			"text-primary-color",

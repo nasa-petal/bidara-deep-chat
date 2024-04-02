@@ -117,18 +117,4 @@
       border-right: none;
     }
   }
-
-  ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background-color: #d0d0d0;
-    border-radius: 5px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background-color: #f2f2f2;
-  }
 </style>

@@ -237,6 +237,19 @@
       }
     }
   }}
+  auxiliaryStyle={`
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background-color: var(--border-off-color);
+      border-radius: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background-color: var(--chat-background-color);
+    }`
+  }
 />
 
 <style>

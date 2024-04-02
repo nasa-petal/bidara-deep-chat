@@ -98,7 +98,7 @@
         position: relative;
         padding: 1em;
         transition: background-color 0.3s ease, border 0.3s ease;
-        border: 1px solid rgba(180, 180, 180,0);
+        border: 1px solid var(--transparent-gray);
     }
 
     .revealed-button:hover .unfocused{
