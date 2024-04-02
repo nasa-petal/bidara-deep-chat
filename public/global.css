@@ -30,13 +30,13 @@
   --light-text-secondary-color: var(--white);
   --light-text-important-color: var(--blue);
 
-  --dark-chat-background-color: var(--light-black);
+  --dark-chat-background-color: var(--black);
   --dark-border-color: var(--dark-gray);
   --dark-border-off-color: var(--light-black);
   --dark-ai-message-background-color: var(--dark-gray);
   --dark-user-message-background-color: var(--dark-blue);
-  --dark-nav-color: var(--black);
-  --dark-nav-off-color: var(--light-black);
+  --dark-nav-color: var(--light-black);
+  --dark-nav-off-color: var(--black);
   --dark-text-primary-color: var(--white);
   --dark-text-secondary-color: var(--black);
   --dark-text-important-color: var(--dark-blue);
