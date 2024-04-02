@@ -214,6 +214,6 @@
     .selected {
         transition: background-color 0.3s ease;
         background-color: var(--user-message-background-color) !important;
-        color: var(--text-secondary-color) !important;
+        color: var(--white) !important;
     }
 </style>
