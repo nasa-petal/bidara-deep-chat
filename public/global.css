@@ -16,7 +16,7 @@
   --light-black: rgb(25,25,25);
   --dark-gray: rgb(51,51,51);
   --gray: rgb(150,150,150);
-  --translucent-gray: rgba(150,150,150, 0.2);
+  --translucent-gray: rgba(150,150,150, 0.25);
   --transparent-gray: rgba(150,150,150, 0); /* for transitions */
   --light-gray: rgb(208, 208, 208);
   --dark-white: rgb(229, 229, 234);
@@ -28,7 +28,7 @@
   --red: rgb(255,59,48);
 
   --light-chat-background-color: var(--white);
-  --light-ai-message-background-color: var(--dark-white);
+  --light-ai-message-background-color: var(--translucent-gray);
   --light-user-message-background-color: var(--blue);
   --light-border-color: var(--light-gray);
   --light-border-off-color: var(--gray);
@@ -40,7 +40,7 @@
   --light-box-shadow-color: var(--translucent-black);
 
   --dark-chat-background-color: var(--black);
-  --dark-ai-message-background-color: var(--dark-gray);
+  --dark-ai-message-background-color: var(--translucent-gray);
   --dark-user-message-background-color: var(--dark-blue);
   --dark-border-color: var(--dark-gray);
   --dark-border-off-color: var(--gray);
