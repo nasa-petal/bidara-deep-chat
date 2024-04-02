@@ -4,13 +4,29 @@
 	const lightMode = "light";
 	const darkMode = "dark";
 
-	let currentTheme = getStoredTheme();
-	let buttonText = getThemeText(currentTheme);
-	setCssVars(currentTheme);
+	let currentTheme;
+	let buttonText;
 
 	onMount(() => {
-		rotateImage(currentTheme);
+		initializeColorTheme();
 	})
+
+	function initializeColorTheme() {
+		const storedTheme = getStoredTheme();
+
+		if (storedTheme) {
+			currentTheme = storedTheme;
+		} else {
+			currentTheme = getSystemTheme();
+		}
+
+
+		buttonText = getThemeText(currentTheme);
+
+		setCssVars(currentTheme);
+		rotateImage(currentTheme);
+		watchSystemTheme();
+	}
 
 	function setCssVars(colorTheme) {
 		const root = document.documentElement;
@@ -72,7 +88,7 @@
 		if (storedTheme) {
 			return storedTheme;
 		} else {
-			return lightMode;
+			return null;
 		}
 	}
 
@@ -86,13 +102,39 @@
 		}
 	}
 
+	function getSystemTheme() {
+		if (window.matchMedia) {
+			if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+				// dark
+				return darkMode;
+			} else {
+				// light
+				return lightMode;
+			}
+		} else {
+			// default light
+			return lightMode;
+		}
+	}
+
+	function watchSystemTheme() {
+		window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+			const updatedSystemTheme = event.matches ? darkMode : lightMode;
+			changeTheme(updatedSystemTheme);
+		});
+	}
+
+	function changeTheme(colorTheme) {
+		currentTheme = colorTheme;
+		storeTheme(colorTheme);
+		setCssVars(colorTheme);
+		rotateImage(colorTheme);
+		buttonText = getThemeText(colorTheme);
+	}
+
 	function handleChangeTheme() {
-		currentTheme = toggleTheme(currentTheme);
-		storeTheme(currentTheme);
-		
-		setCssVars(currentTheme);
-		rotateImage(currentTheme);
-		buttonText = getThemeText(currentTheme);
+		const newTheme = toggleTheme(currentTheme);
+		changeTheme(newTheme);
 	}
 </script>
 
