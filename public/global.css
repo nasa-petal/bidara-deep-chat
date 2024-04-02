@@ -1,9 +1,9 @@
 :root {
   --chat-background-color: var(--light-chat-background-color);
-  --border-color: var(--light-border-color);
-  --border-off-color: var(--light-border-off-color);
   --ai-message-background-color: var(--light-ai-message-background-color);
   --user-message-background-color: var(--light-user-message-background-color);
+  --border-color: var(--light-border-color);
+  --border-off-color: var(--light-border-off-color);
   --nav-color: var(--light-nav-color);
   --nav-off-color: var(--light-nav-off-color);
   --text-primary-color: var(--light-text-primary-color);
@@ -11,39 +11,45 @@
   --text-important-color: var(--light-text-important-color);
   --box-shadow-color: var(--light-box-shadow-color);
 
-  --black: black;
+  --translucent-black: rgba(0, 0, 0, 0.35);
+  --black: black; 
   --light-black: rgb(25,25,25);
   --dark-gray: rgb(51,51,51);
   --gray: rgb(150,150,150);
-  --light-gray: rgb(229, 229, 234);
+  --translucent-gray: rgba(150,150,150, 0.2);
+  --transparent-gray: rgba(150,150,150, 0); /* for transitions */
+  --light-gray: rgb(208, 208, 208);
+  --dark-white: rgb(229, 229, 234);
+  --white: rgb(242,242,242);
+  --translucent-white: rgba(242, 242, 242, 0.2);
+
   --dark-blue: rgb(0,118,229);
   --blue: rgb(0,132,255);
   --red: rgb(255,59,48);
-  --white: white;
 
   --light-chat-background-color: var(--white);
-  --light-border-color: var(--gray);
-  --light-border-off-color: var(--dark-gray);
-  --light-ai-message-background-color: var(--light-gray);
+  --light-ai-message-background-color: var(--dark-white);
   --light-user-message-background-color: var(--blue);
-  --light-nav-color: var(--light-gray);
+  --light-border-color: var(--light-gray);
+  --light-border-off-color: var(--gray);
+  --light-nav-color: var(--dark-white);
   --light-nav-off-color: var(--white);
   --light-text-primary-color: var(--black);
   --light-text-secondary-color: var(--white);
   --light-text-important-color: var(--blue);
-  --light-box-shadow-color: rgba(0, 0, 0, 0.35);
+  --light-box-shadow-color: var(--translucent-black);
 
   --dark-chat-background-color: var(--black);
-  --dark-border-color: var(--dark-gray);
-  --dark-border-off-color: var(--light-black);
   --dark-ai-message-background-color: var(--dark-gray);
   --dark-user-message-background-color: var(--dark-blue);
+  --dark-border-color: var(--dark-gray);
+  --dark-border-off-color: var(--gray);
   --dark-nav-color: var(--light-black);
   --dark-nav-off-color: var(--black);
   --dark-text-primary-color: var(--white);
   --dark-text-secondary-color: var(--black);
   --dark-text-important-color: var(--dark-blue);
-  --dark-box-shadow-color: rgba(255, 255, 255, 0.2);
+  --dark-box-shadow-color: var(--translucent-white);;
 }
 
 html {
@@ -55,4 +61,18 @@ html {
 body {
   margin: 0;
   height: 100%;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--border-off-color);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: var(--chat-background-color);
 }
