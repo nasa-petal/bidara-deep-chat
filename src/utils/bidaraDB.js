@@ -92,9 +92,9 @@ export async function getThreadFiles(id) {
 	return files;
 }
 
-export async function getEmptyThread() {
+export async function getEmptyThread(emptyLength) {
 	const emptyThread = await dbUtils.readFirstByIndex(BIDARA_DB, CHAT_STORE_NAME, "length", false);
-	if (emptyThread && emptyThread.length === 0) {
+	if (emptyThread && emptyThread.length <= emptyLength) {
 		return emptyThread;
 	}
 
