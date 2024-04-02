@@ -9,6 +9,7 @@
   --text-primary-color: var(--light-text-primary-color);
   --text-secondary-color: var(--light-text-secondary-color);
   --text-important-color: var(--light-text-important-color);
+  --box-shadow-color: var(--light-box-shadow-color);
 
   --black: black;
   --light-black: rgb(25,25,25);
@@ -17,6 +18,7 @@
   --light-gray: rgb(229, 229, 234);
   --dark-blue: rgb(0,118,229);
   --blue: rgb(0,132,255);
+  --red: rgb(255,59,48);
   --white: white;
 
   --light-chat-background-color: var(--white);
@@ -29,6 +31,7 @@
   --light-text-primary-color: var(--black);
   --light-text-secondary-color: var(--white);
   --light-text-important-color: var(--blue);
+  --light-box-shadow-color: rgba(0, 0, 0, 0.35);
 
   --dark-chat-background-color: var(--black);
   --dark-border-color: var(--dark-gray);
@@ -40,6 +43,7 @@
   --dark-text-primary-color: var(--white);
   --dark-text-secondary-color: var(--black);
   --dark-text-important-color: var(--dark-blue);
+  --dark-box-shadow-color: rgba(255, 255, 255, 0.2);
 }
 
 html {

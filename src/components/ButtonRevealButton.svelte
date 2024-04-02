@@ -111,7 +111,7 @@
 
     .revealed-button:hover {
         cursor: pointer;
-        background-color: rgb(255, 59, 48);
-        border: 1px solid rgb(180, 180, 180);
+        background-color: var(--red);
+        border: 1px solid var(--border-color);
     }
 </style>
