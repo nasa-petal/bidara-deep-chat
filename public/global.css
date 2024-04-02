@@ -18,11 +18,10 @@
   --gray: rgb(150,150,150);
   --translucent-gray: rgba(150,150,150, 0.25);
   --transparent-gray: rgba(150,150,150, 0); /* for transitions */
-  --light-gray: rgb(208, 208, 208);
+  --light-gray: rgb(180, 180, 180);
   --dark-white: rgb(229, 229, 234);
   --white: rgb(242,242,242);
   --translucent-white: rgba(242, 242, 242, 0.2);
-
   --dark-blue: rgb(0,118,229);
   --blue: rgb(0,132,255);
   --red: rgb(255,59,48);
