@@ -9,11 +9,11 @@
     export let sliderId;
     export let sliderText;
     export let sliderImage;
-    export let slideBgColor = 'rgb(229, 229, 234)';
+    export let slideBgColor = 'var(--light-gray)';
 
     export let revealId;
     export let revealImage;
-    export let revealBgColor = 'rgb(255, 59, 48)';
+    export let revealBgColor = 'var(--red)';
 
     export let slideThresh = (1/3);
     export let maxSlide = (3/4);

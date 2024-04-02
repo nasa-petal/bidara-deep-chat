@@ -14,7 +14,7 @@
     const trashImageWhite = "trash-can-white.svg";
     const trashImageRed = "trash-can-red.svg";
     const chatBgColor = 'var(--nav-color)';
-    const trashBgColor = 'rgb(255, 59, 48)';
+    const trashBgColor = 'var(--red)';
 
     async function handleSelectThread() {
         handleSelect();

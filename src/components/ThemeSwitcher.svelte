@@ -40,6 +40,7 @@
 			"text-secondary-color",
 			"ai-message-background-color",
 			"user-message-background-color",
+			"box-shadow-color",
 		]
 
 		if (colorTheme === lightMode) {
