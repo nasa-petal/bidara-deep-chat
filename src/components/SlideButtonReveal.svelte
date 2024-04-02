@@ -86,10 +86,14 @@
         }
     }
 
-    function onMouseUp () {
+    async function handleButtonClick() {
+        await handleClick();
+        clicked = false;
+    }
+
+    async function onMouseUp () {
         if (! wasDragged && ! clicked) {
-            handleClick();
-            clicked = true;
+            await handleButtonClick();
         }
 
 
