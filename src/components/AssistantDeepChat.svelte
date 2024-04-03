@@ -47,20 +47,20 @@
   }
 
   async function updateFiles(message) {
-    const files = message.message?.files;
+    const files = message?.files;
     if (!files || files.length <= 0) {
       return;
     }
 
     const index = thread.length - 1;
     let attached = false;
-    if (message.message?.text?.length > 0) {
+    if (message?.text?.length > 0) {
       attached = true;
     }
     
-    const role = message.message.role;
+    const role = message.role;
 
-    const text = message.message.text;
+    const text = message.text;
 
     const formattedFiles = files.map(file => {
       let type = file.type;
@@ -87,7 +87,7 @@
     }
 
     updateMessages();
-    updateFiles(message);
+    updateFiles(message.message);
 
     // for funcCalling context
     if (message.message.role === "user") {
@@ -117,7 +117,7 @@
     deepChatRef._addMessage(message);
 
     await updateMessages();
-    await updateFiles({ message });
+    await updateFiles(message);
   }
 
   async function handleFuncCalling(functionDetails) {
