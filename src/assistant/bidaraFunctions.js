@@ -1,4 +1,15 @@
 import { getDalleImageGeneration, getImageToText } from "../utils/openaiUtils";
+import { getThreadFiles } from "../utils/threadUtils";
+
+const fileTypes = {
+  "csv": "csv",
+  "xlsx": "excel",
+  "pdf": "pdf",
+  "txt": "txt",
+  "png": "image",
+  "jpg": "image",
+  "jpeg": "image",
+}
 
 export function getCurrentWeather(location) {
   location = location.toLowerCase();
@@ -90,6 +101,56 @@ async function imageToText(params) {
   return text;
 }
 
+function getFileTypeByName(fileName) {
+  if (!fileName) {
+    return "";
+  }
+
+  const extensionMatches = /^.*\.(csv|xlsx|pdf|txt|png|jpg|jpeg)$/gm.exec(fileName);
+
+  // first is whole match, second is capture group. Only one capture group can appear.
+  if (!extensionMatches || extensionMatches.length !== 2) {
+    return "none";
+  }
+
+  const extension = extensionMatches[1];
+
+  const type = fileTypes[extension];
+
+  if (!type) {
+    return "none";
+  }
+
+  return type;
+}
+
+async function getFileType(params) {
+  let fileTypeParams = JSON.parse(params);
+
+  if ("parameters" in fileTypeParams) {
+    fileTypeParams = fileTypeParams.parameters;
+  }
+
+  let files = await getThreadFiles();
+
+  if (files.length < 1) {
+    return "No files have been uploaded.";
+  }
+
+  let recentFile = files[files.length - 1];
+
+  if (recentFile.type === "image") {
+    return "The file is an image. Analyze the image before responding to determine its contents."
+  }
+
+  if (recentFile.name !== null) {
+    const type = getFileTypeByName(recentFile.name);
+    return type;
+  }
+
+  return "Unable to determine filetype";
+}
+
 export async function callFunc(functionDetails, context) {
   let tmp = '';
   if(functionDetails.name == "get_graph_paper_relevance_search") {
@@ -103,6 +164,9 @@ export async function callFunc(functionDetails, context) {
       tmp = "There was an error in retrieving `text_to_image`."
 
     }
+  }
+  else if (functionDetails.name == "get_file_type") {
+    tmp = await getFileType(functionDetails.arguments);
   }
   else if (functionDetails.name == "image_to_text") {
     tmp = await imageToText(functionDetails.arguments);

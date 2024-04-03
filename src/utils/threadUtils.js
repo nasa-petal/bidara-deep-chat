@@ -50,17 +50,23 @@ export async function getEmptyThread() {
 }
 
 export async function getThreadImages() {
-  let thread = await bidaraDB.getActiveThread();
-
-  let messagesWithFiles = thread.messages.filter(msg => { return msg?.files && msg.files.length > 0 })
-
-  let files = messagesWithFiles.map(msg => { return msg.files }).flat()
+  let files = await getThreadFiles();
 
   let imageFiles = files.filter(file => file.type === "image")
 
   let imageSources = imageFiles.map(file => { return file.src })
 
   return imageSources 
+}
+
+export async function getThreadFiles() {
+  let thread = await bidaraDB.getActiveThread();
+
+  let messagesWithFiles = thread.messages.filter(msg => { return msg?.files && msg.files.length > 0 })
+
+  let files = messagesWithFiles.map(msg => { return msg.files }).flat()
+
+  return files
 }
 
 export async function setActiveThread(threadId) {
