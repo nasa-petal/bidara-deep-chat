@@ -1,76 +1,133 @@
 <script>
   import { DeepChat } from 'deep-chat';
-  import { setOpenAIKey, syncMessagesWithThread } from '../utils/openaiUtils';
+  import { setOpenAIKey } from '../utils/openaiUtils';
   import * as threadUtils from '../utils/threadUtils';
 
-	export let key = null;
-	export let asstId = null;
-	export let asstConfig = null;
-	export let thread = null;
-	export let initialMessages = null;
-	export let funcCalling = null;
+  export let key = null;
+  export let asstId = null;
+  export let asstConfig = null;
+  export let thread = null;
+  export let initialMessages = null;
+  export let funcCalling = null;
 
-	export let loginHandler;
-	export let loadedMessages;
+  export let loginHandler;
+  export let loadedMessages;
 
   export let loading = true;
-	export let width = "100%";
-	export let height = "100%";
+  export let width = "100%";
+  export let height = "100%";
 
+  let lastMessageId;
   let threadId = thread?.id; 
 
   let deepChatRef;
 
-	function onError(error) {
-		console.log(error);
-	}
+  function onError(error) {
+    console.log(error);
+  }
 
-  async function loadMessages(thread) {
-    if (!thread || !thread?.messages) {
+  async function loadMessages(threadToLoad) {
+    loadedMessages = true;
+
+    if (!threadToLoad || !threadToLoad?.id) {
       return;
     }
 
-    let messages = thread.messages.slice(initialMessages.length);
+    const updatedMessages = await threadUtils.syncMessages(threadToLoad.id, initialMessages);
+    const messagesToLoad = updatedMessages.slice(initialMessages.length);
+    messagesToLoad.forEach(msg => deepChatRef._addMessage(msg));
+  }
 
-    if (messages?.length > 0 && messages[messages.length - 1].role === "user") {
-      messages = await syncMessagesWithThread(messages, thread.id);
+  async function updateMessages() {
+    const messages = deepChatRef.getMessages();
+    if (messages.length > 0) {
+      thread.length = messages.length;
+      await threadUtils.setThreadLength(thread.id, thread.length);
+    }
+  }
+
+  async function updateFiles(message) {
+    const files = message?.files;
+    if (!files || files.length <= 0) {
+      return;
     }
 
-    messages.forEach((message) => {
-      deepChatRef._addMessage(message);
+    const index = thread.length - 1;
+    let attached = false;
+    if (message?.text?.length > 0) {
+      attached = true;
+    }
+    
+    const role = message.role;
+
+    const text = message.text;
+
+    const formattedFiles = files.map(file => {
+      let type = file.type;
+      let src = file.src;
+      let name = file?.name ? file.name : "";
+
+      return {
+        type,
+        name,
+        src,
+        index,
+        attached,
+        role,
+        text,
+      }
     });
 
-    loadedMessages = true;
+    await threadUtils.pushFiles(threadId, formattedFiles);
   }
 
   async function onNewMessage(message) { 
-    if (thread && thread.id === message.message._sessionId) {
-      const messages = deepChatRef.getMessages();
-      if (messages.length > 0) {
-        thread.messages = messages;
-        thread.length = messages.length;
-        await threadUtils.setThreadMessages(thread.id, messages);
-      }
+    if (!deepChatRef || message.isInitial) {
+      return
+    }
+
+    updateMessages();
+    updateFiles(message.message);
+
+    // for funcCalling context
+    if (message.message.role === "user") {
+      lastMessageId = message.message._sessionId;
     }
   }
 
-	async function onComponentRender() {
+  async function onComponentRender() {
     deepChatRef = document.getElementById("chat-element");
-		// save key to localStorage.
-		// The event occurs before key is set, and again, after key is set.
-		if (!key && this._activeService.key) {
-			// if key set through UI or in URL variable, save it to localStorage.
-			setOpenAIKey(this._activeService.key);
-			await loginHandler();
-		}
+    // save key to localStorage.
+    // The event occurs before key is set, and again, after key is set.
+    if (!key && this._activeService.key) {
+      // if key set through UI or in URL variable, save it to localStorage.
+      setOpenAIKey(this._activeService.key);
+      await loginHandler();
+    }
 
     if (!loadedMessages) {
       await loadMessages(thread)
     }
 
-		setTimeout(()=> loading = false, 400);
-	}
+    setTimeout(()=> loading = false, 400);
+  }
 
+
+  async function addMessageCallback(message) {
+    deepChatRef._addMessage(message);
+
+    await updateMessages();
+    await updateFiles(message);
+  }
+
+  async function handleFuncCalling(functionDetails) {
+    let context = {
+      lastMessageId,
+      addMessageCallback
+    }
+
+    return funcCalling(functionDetails, context)
+  }
 </script>
 
 <deep-chat
@@ -84,7 +141,7 @@
         new_assistant: asstConfig,
         thread_id: threadId,
         load_thread_history: false,
-        function_handler: funcCalling
+        function_handler: handleFuncCalling
       }
     }
   }}
