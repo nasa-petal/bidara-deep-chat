@@ -99,7 +99,7 @@
   function getImgNode(src) {
     const node = getNode("img");
     node.src = src;
-    node.style.height = "500px";
+    node.style.maxHeight = "500px";
     return node;
   }
 
