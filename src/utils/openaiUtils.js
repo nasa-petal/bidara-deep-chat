@@ -1,7 +1,7 @@
 import * as bidara from "../assistant/bidara";
 
 import { getStoredAPIKey, getStoredAsstId, setStoredAPIKey, setStoredAsstId } from "./storageUtils";
-import { getActiveThread } from "./threadUtils";
+import { getActiveThread, getThreadImages } from "./threadUtils";
 
 let openaiKey = null;
 let openaiAsst = null;
@@ -298,8 +298,8 @@ export async function getDalleImageGeneration(prompt, image_size = null, image_q
   }
 }
 
-export async function getThreadMessages(threadId) {
-  const url = `https://api.openai.com/v1/threads/${threadId}/messages`;
+export async function getThreadMessages(threadId, limit) {
+  const url = `https://api.openai.com/v1/threads/${threadId}/messages?limit=${limit}`;
 
   if (!openaiKey) {
     throw new Error('openai key not set. cannot validate thread.');
@@ -332,87 +332,86 @@ export async function getThreadMessages(threadId) {
   return r.data
 }
 
-function convertThreadMessagesToMessages(threadMessages) {
-  const messages = threadMessages
-    .map(msg => {
-      return msg.content.map(d => {
-        if (msg.role === "assistant") {
-          msg.role = "ai";
-        }
-
-        const isText = d.type === 'text';
-
-        return {
-          role: msg.role,
-          text: isText ? d.text.value : null,
-        }
-      })
-    })
-    .flat()
-    .reverse()
-
-  return messages;
-}
-
-export async function syncMessagesWithThread(messages, threadId) {
-  const threadMessages = await getThreadMessages(threadId);
-  const convertedThreadMessages = convertThreadMessagesToMessages(threadMessages);
-
-  // Case 1
-  //  messages are the same as thread
-  // Case 2
-  //   messages contains image not present in thread
-  // Case 3
-  //   thread contains text not present in messages
-
-  let messageIndex = 0;
-  let threadIndex = 0;
-
-  const updatedMessages = [];
-
-  while (threadIndex < convertedThreadMessages.length || updatedMessages.length < messages.length) {
-    const threadMsg = convertedThreadMessages[threadIndex];
-
-    // Reached end of messages, but thread has new messages
-    if (messageIndex >= messages.length) {
-      updatedMessages.push({...threadMsg, _sessionId: threadId});
-      threadIndex++;
-
-      continue;
-    } 
-
-    const msg = messages[messageIndex];
-
-    // Message contains file 
-    // If message contains text, then the thread will also have that text
-    if (msg?.files) {
-      updatedMessages.push(msg);
-      messageIndex++;
-
-      if (msg?.text === threadMsg?.text) {
-        threadIndex++;
-      }
-
-      continue;
-    } 
-
-    // messages don't match
-    // which means the thread contains a message that local doesn't have
-    if (msg.role !== threadMsg.role && msg.text !== threadMsg.text) {
-      updatedMessages.push({...threadMsg, _sessionId: threadId});
-      threadIndex++;
-
-      continue;
-    } 
-
-    updatedMessages.push(msg);
-
-    messageIndex++;
-    threadIndex++;
-
+export async function getChatCompletion(model, messages, tokenLimit) {
+  if (!openaiKey) {
+    throw new Error('openai key not set. cannot validate thread.');
   }
 
-  
-  // Thread messages will only be longer by files, which we don't want to include in sync 
-  return updatedMessages;
+  const url = `https://api.openai.com/v1/chat/completions`;
+  const method = 'POST';
+  const headers = {
+    'Authorization': 'Bearer ' + openaiKey,
+    'Content-Type': 'application/json',
+  };
+  const body = JSON.stringify({
+    "model": model,
+    "messages": messages,
+    "max_tokens": tokenLimit
+  })
+
+  const request = {
+    method,
+    headers,
+    body
+  }
+
+  const response = await fetch(url, request);
+
+  const r = await response.json();
+  if (r.error && r.error.type === 'invalid_request_error') {
+    console.error(r.error);
+    return null;
+  }
+
+  return r;
+}
+
+export async function getImageDescription(base64, prompt) {
+
+  if (!openaiKey) {
+    throw new Error('openai key not set. cannot validate thread.');
+  }
+
+  if (!prompt) {
+    prompt = "Give a detailed but concise description of the image. If there are any engineering, biological, or mechanical processes present, include how they're present."
+  }
+
+  const model = "gpt-4-vision-preview"
+  const messages = [
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": prompt
+        },
+        {
+          "type": "image_url",
+          "image_url": {
+            "url": base64
+          }
+        }
+      ]
+    }
+  ]
+
+  const tokenLimit = 300;
+
+  const res = await getChatCompletion(model, messages, tokenLimit);
+
+  const imageDescription = res.choices[0].message.content;
+
+  return imageDescription;
+}
+
+export async function getImageToText(prompt) {
+
+  let imageFiles = await getThreadImages()
+
+  if (imageFiles.length > 0) {
+    const imageSource = imageFiles[imageFiles.length - 1]
+    return getImageDescription(imageSource, prompt);
+  }
+
+  return "No image has been uploaded, or the uploaded file was not an image.";
 }
