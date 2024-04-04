@@ -8,15 +8,32 @@
 		return messages;
 	}
 
+	function findReplaceRegEx(string, regex, replacement) {
+
+		if (!string) {
+			return string;
+		}
+
+		const matches = (string.match(regex) || [])
+
+		matches.forEach(match => {
+			string = string.replace(match, replacement)
+		})
+
+		return string
+	}
+
 	function getMessageAsMarkdown(author, text, files) {
+		const msgFileLinkRegEx = /\]\(data:[\S]+\)/igm;
+		text = findReplaceRegEx(text, msgFileLinkRegEx, '](Removed file source because it exceeded limit.)')
+
 		if (!files || files.length < 1) {
 			return `## ${author}\n ${text}\n\n`
 		}
 
-
 		let fileContent = ""
 		files.forEach(file => {
-			if (file.src && file.src.length > 500) {
+			if (file.src && file.src.length > 200) {
 				file.src = "Removed file source because it exceeded limit."
 			}
 
