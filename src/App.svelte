@@ -60,7 +60,7 @@
     } 
 
     // If an empty thead is already created, prevents creating a new one
-    const emptyThread = await threadUtils.getEmptyThread();
+    const emptyThread = await threadUtils.getEmptyThread(activeInitialMessages.length);
     if (emptyThread) {
       await switchActiveThread(emptyThread);
 
@@ -111,8 +111,7 @@
     await threadUtils.setThreadName(activeThread.id, name);
 
     threads = await threadUtils.getThreads();
-    loadedMessages = false;
-    activeThread = await threadUtils.getActiveThread();
+    activeThread.name = name;
   }
 </script>
 
@@ -130,7 +129,7 @@
           <Sidebar handleChatSelect={switchActiveThread} handleChatDelete={deleteThreadAndSwitch} handleChatNew={newThreadAndSwitch} bind:threads bind:open bind:selectedThreadId={activeThread.id}/>
         </div>
 
-        {#key activeThread}
+        {#key activeThread.id}
         <div id="chat-container" class="w-full" class:loading>
           <AssistantDeepChat
             key={activeKey}
