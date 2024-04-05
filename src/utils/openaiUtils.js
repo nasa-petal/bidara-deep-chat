@@ -332,6 +332,51 @@ export async function getThreadMessages(threadId, limit) {
   return r.data
 }
 
+export async function getFileContent(fileId) {
+  const url = `https://api.openai.com/v1/files/${fileId}/content`;
+
+  if (!openaiKey) {
+    throw new Error('openai key not set. cannot validate thread.');
+  }
+
+  const method = 'GET';
+  const headers = {
+    'Authorization': 'Bearer ' + openaiKey,
+    'Content-Type': 'application/json',
+  };
+
+  const request = {
+    method,
+    headers
+  }
+
+  const response = await fetch(url, request);
+
+  if (!response.ok) {
+    console.error("Error with response: ");
+    console.error(response);
+    return "";
+  }
+
+  return response.blob();
+}
+
+export async function getFileSrc(fileId) {
+  const blob = await getFileContent(fileId);
+  const src = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(blob);
+    reader.onload = (event) => {
+      resolve(event.target.result);
+    }
+    reader.onerror = (event) => {
+      reject("error reading file");
+    }
+  })
+
+  return src;
+}
+
 export async function getChatCompletion(model, messages, tokenLimit) {
   if (!openaiKey) {
     throw new Error('openai key not set. cannot validate thread.');
