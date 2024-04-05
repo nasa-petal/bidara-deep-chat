@@ -1,4 +1,4 @@
-import { validThread, getNewThreadId, getThreadMessages } from "./openaiUtils";
+import { validThread, getNewThreadId, getThreadMessages, getFileSrc } from "./openaiUtils";
 import * as bidaraDB from "./bidaraDB";
 
 async function createNewThread() {
@@ -50,7 +50,7 @@ export async function getEmptyThread(emptyLength) {
 }
 
 export async function getThreadImages() {
-  let files = await getThreadFiles();
+  let files = await replaceThreadFiles();
 
   let imageFiles = files.filter(file => file.type === "image")
 
@@ -205,9 +205,46 @@ function clearNullChats(messages) {
   return messages.filter(msg => msg.text !== null || msg.files );
 }
 
+async function replaceThreadFiles(threadMessages) {
+  const withFiles = await Promise.all(threadMessages.map(async (message, i) => {
+    const content = await Promise.all(message.content.map(async (content, j) => {
+      if (content.type !== "text") {
+        return content;
+      }
+
+      if (!content.text?.annotations || content.text?.annotations?.length < 1) {
+        return content;
+      }
+
+      const replacements = await Promise.all(content.text.annotations.map(async (annotation) => {
+        if (annotation.type !== "file_path" || !annotation?.file_path?.file_id || annotation.text.substring(0,7) !== "sandbox") {
+          return {};
+        }
+
+        const fileSrc = await getFileSrc(annotation.file_path.file_id);
+
+        return { link: annotation.text, src: fileSrc };
+      }));
+
+      console.log(replacements);
+
+      replacements.forEach((replacement) => {
+        content.text.value = content.text.value.replaceAll(replacement.link, replacement.src);
+      })
+
+      return content;
+    }));
+    message.content = content;
+    return message;
+  }));
+
+  return withFiles;
+}
+
 export async function syncMessages(threadId, initialMessages) {
   const rawThreadMessages = await getThreadMessages(threadId, 100);
-  const threadMessages = convertThreadMessagesToMessages(rawThreadMessages);
+  const threadMessagesWithFiles = await replaceThreadFiles(rawThreadMessages);
+  const threadMessages = convertThreadMessagesToMessages(threadMessagesWithFiles);
   const fullMessages = initialMessages.concat(threadMessages);
 
   const messages = clearNullChats(fullMessages);
