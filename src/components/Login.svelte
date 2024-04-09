@@ -1,4 +1,5 @@
 <script>
+	import { onDestroy } from 'svelte';
 	import AssistantDeepChat from './AssistantDeepChat.svelte';
 
 	import { BIDARA_LOGO, BIDARA_LOGO_DESC, BIDARA_NAME, BIDARA_TAGLINE} from '../assistant/bidara';
@@ -41,16 +42,18 @@
 	</ul>
 
   {#if showLoginField}
-	<AssistantDeepChat
-     loginHandler={handleLogin}
-     loadedMessages={null}
-     height="100px"
-	 />
+		<AssistantDeepChat
+			loginHandler={handleLogin}
+			loadedMessages={null}
+			height="100px"
+		 />
   {/if}
 </div>
 
 <style>
 	#welcome {
+		background-color: var(--chat-background-color);
+		color: var(--text-primary-color);
 		z-index: 1;
 		line-height: 1.5em;
 		padding-left: 1em;

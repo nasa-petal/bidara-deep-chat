@@ -13,8 +13,8 @@
     const sliderImage = "grip-lines-vertical-gray.svg";
     const trashImageWhite = "trash-can-white.svg";
     const trashImageRed = "trash-can-red.svg";
-    const chatBgColor = 'rgb(229, 229, 234)';
-    const trashBgColor = 'rgb(255, 59, 48)';
+    const chatBgColor = 'var(--nav-color)';
+    const trashBgColor = 'var(--red)';
 
     async function handleSelectThread() {
         handleSelect();
@@ -71,6 +71,8 @@
 <style>
     .chat-button-container {
         height: 3em;
+        color: var(--text-primary-color);
+        border-bottom: 1px solid var(--border-color);
     }
 
     .chat-button {

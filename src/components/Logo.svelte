@@ -6,7 +6,7 @@
     img {
         width: 2em;
         height: 2em;
-        border: 1px solid rgb(142, 142, 142);
+        border: 1px solid var(--border-color);
         border-radius: 2em;
         max-width: inherit;
     }

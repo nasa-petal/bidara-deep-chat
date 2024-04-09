@@ -30,5 +30,47 @@
     <script defer src='build/bundle.js'></script>
   </head>
   <body>
+    <script>
+      let colorTheme = "light";
+
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+        console.log("change theme in index")
+        colorTheme = event.matches ? "dark" : "light";
+        setCssVars(colorTheme);
+      });
+
+      const root = document.documentElement;
+
+      function setCssVars(colorTheme) {
+        const attributesToChange = [
+          "chat-background-color",
+          "border-color",
+          "nav-color",
+          "nav-off-color",
+          "translucent-nav-color",
+          "text-primary-color",
+          "text-secondary-color",
+          "ai-message-background-color",
+          "user-message-background-color",
+        ]
+
+        if (colorTheme === "light") {
+          attributesToChange.forEach(attr => {
+            const attrToChange = "--" + attr;
+            const colorChange = `var(--light-${attr})`;
+            root.style.setProperty(attrToChange, colorChange);
+          });
+
+        } else if (colorTheme === "dark") {
+          attributesToChange.forEach(attr => {
+            const attrToChange = "--" + attr;
+            const colorChange = `var(--dark-${attr})`;
+            root.style.setProperty(attrToChange, colorChange);
+          });
+        }
+      }
+
+      setCssVars(colorTheme);
+    </script>
   </body>
 </html>
