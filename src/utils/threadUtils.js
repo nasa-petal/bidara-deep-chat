@@ -147,8 +147,11 @@ function equivalentMessages(message, threadMessage) {
   const msgFileLinkRegEx = /\]\(data:[\S]+\)/igm;
   const threadFileLinkRegEx = /\]\(sandbox:[\S]+\)/igm;
 
-  const messagesMsg = findReplaceListRegEx(message, [msgFileLinkRegEx, threadFileLinkRegEx], [']()',']()'])
-  const threadsMsg = findReplaceListRegEx(threadMessage, [msgFileLinkRegEx, threadFileLinkRegEx], [']()',']()'])
+  const regEx = [ msgFileLinkRegEx, threadFileLinkRegEx ];
+  const replacements = [ ']()', ']()'];
+
+  const messagesMsg = findReplaceListRegEx(message, regEx, replacements)
+  const threadsMsg = findReplaceListRegEx(threadMessage, regEx, replacements)
 
   return messagesMsg === threadsMsg;
 }
@@ -206,8 +209,8 @@ function clearNullChats(messages) {
 }
 
 async function replaceThreadFiles(threadMessages) {
-  const withFiles = await Promise.all(threadMessages.map(async (message, i) => {
-    const content = await Promise.all(message.content.map(async (content, j) => {
+  const withFiles = await Promise.all(threadMessages.map(async (message) => {
+    const content = await Promise.all(message.content.map(async (content) => {
       if (content.type !== "text") {
         return content;
       }
