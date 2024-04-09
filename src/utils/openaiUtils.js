@@ -298,6 +298,37 @@ export async function getDalleImageGeneration(prompt, image_size = null, image_q
   }
 }
 
+export async function cancelThreadRun(threadId, runId) {
+  const url = `https://api.openai.com/v1/threads/${threadId}/runs/${runId}/cancel`;
+
+  if (!openaiKey) {
+    throw new Error('openai key not set. cannot validate thread.');
+  }
+
+  if (!threadId) {
+    return [];
+  }
+
+  const method = 'POST';
+  const headers = {
+    'Authorization': 'Bearer ' + openaiKey,
+    'OpenAI-Beta': 'assistants=v1'
+  };
+
+  const request = {
+    method,
+    headers
+  }
+
+  const response = await fetch(url, request);
+
+  const r = await response.json();
+  if (r.error && r.error.type === 'invalid_request_error') {
+    console.error(r.error);
+    return [];
+  }
+}
+
 export async function getThreadMessages(threadId, limit) {
   const url = `https://api.openai.com/v1/threads/${threadId}/messages?limit=${limit}`;
 
@@ -449,9 +480,9 @@ export async function getImageDescription(base64, prompt) {
   return imageDescription;
 }
 
-export async function getImageToText(prompt) {
+export async function getImageToText(prompt, id) {
 
-  let imageFiles = await getThreadImages()
+  let imageFiles = await getThreadImages(id)
 
   if (imageFiles.length > 0) {
     const imageSource = imageFiles[imageFiles.length - 1]
