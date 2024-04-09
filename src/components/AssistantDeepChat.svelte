@@ -213,12 +213,12 @@
     }
   }}
   attachmentContainerStyle={{
-    backgroundColor: "var(--nav-color)",
+    backgroundColor: "var(--translucent-nav-color)",
     borderRadius: "5px 5px 0 0",
     border: "1px solid var(--border-color)",
     top: "-2.55em",
     height: "4em",
-    width: "calc(100% - 6.2em)"
+    width: "calc(100% - 6.2em - 2px)"
   }}
   textInput={{
     styles: {
@@ -295,6 +295,12 @@
     }
   }}
   auxiliaryStyle={`
+    a {
+    color: var(--link-color);
+    }
+    a:visited {
+    color: var(--link-visited-color);
+    }
     ::-webkit-scrollbar {
       width: 8px;
       height: 8px;

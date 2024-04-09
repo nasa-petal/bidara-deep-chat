@@ -32,11 +32,6 @@
   <body>
     <script>
       let colorTheme = "light";
-      if (window.matchMedia) {
-        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-          colorTheme = "dark";
-        }
-      } 
 
       window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
         console.log("change theme in index")
@@ -52,6 +47,7 @@
           "border-color",
           "nav-color",
           "nav-off-color",
+          "translucent-nav-color",
           "text-primary-color",
           "text-secondary-color",
           "ai-message-background-color",

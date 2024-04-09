@@ -12,18 +12,6 @@
 	let tagline = BIDARA_TAGLINE;
   let showLoginField = true; 
 
-	setLoginVars();
-	const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-	mediaQuery.addEventListener('change', setLoginVars);
-
-	onDestroy(() => {
-		mediaQuery.removeEventListener('change', setLoginVars);
-	});
-
-	function setLoginVars() {
-		document.documentElement.style.setProperty('--chat-background-color', 'var(--nav-color)')
-	}
-
   async function handleLogin(){
 		showLoginField = false;
 		loginHandler()
@@ -64,7 +52,7 @@
 
 <style>
 	#welcome {
-		background-color: var(--nav-color);
+		background-color: var(--chat-background-color);
 		color: var(--text-primary-color);
 		z-index: 1;
 		line-height: 1.5em;
