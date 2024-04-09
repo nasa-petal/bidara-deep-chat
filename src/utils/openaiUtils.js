@@ -435,9 +435,9 @@ export async function getImageDescription(base64, prompt) {
   return imageDescription;
 }
 
-export async function getImageToText(prompt) {
+export async function getImageToText(prompt, id) {
 
-  let imageFiles = await getThreadImages()
+  let imageFiles = await getThreadImages(id)
 
   if (imageFiles.length > 0) {
     const imageSource = imageFiles[imageFiles.length - 1]
