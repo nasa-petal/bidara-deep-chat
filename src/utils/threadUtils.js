@@ -49,8 +49,8 @@ export async function getEmptyThread(emptyLength) {
   return await bidaraDB.getEmptyThread(emptyLength);
 }
 
-export async function getThreadImages() {
-  let files = await replaceThreadFiles();
+export async function getThreadImages(id) {
+  let files = await bidaraDB.getThreadFiles(id);
 
   let imageFiles = files.filter(file => file.type === "image")
 
