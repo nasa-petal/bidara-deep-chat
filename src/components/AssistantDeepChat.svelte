@@ -170,7 +170,7 @@
             bottom: ".7em",
             borderRadius: "100vmax",
             padding: "0.5em",
-            backgroundColor: "rgba(0, 0, 0, 0.1)",
+            backgroundColor: "var(--nav-color)",
             left: "calc(11px - 0.25em)"
           }
         },
@@ -197,7 +197,7 @@
             bottom: ".7em",
             borderRadius: "100vmax",
             padding: "0.5em",
-            backgroundColor: "rgba(0, 0, 0, 0.1)"
+            backgroundColor: "var(--nav-color)"
           }
         },
         svg: {
@@ -213,9 +213,9 @@
     }
   }}
   attachmentContainerStyle={{
-    backgroundColor: "rgba(255, 255, 255, 0.6)",
+    backgroundColor: "var(--nav-color)",
     borderRadius: "5px 5px 0 0",
-    border: "1px solid rgba(0,0,0,0.2)",
+    border: "1px solid var(--border-color)",
     top: "-2.55em",
     height: "4em",
     width: "calc(100% - 6.2em)"
@@ -226,7 +226,9 @@
         width: "calc(100% - 6em)",
         boxShadow: "none",
         borderRadius: "1em",
-        border: "1px solid rgba(0,0,0,0.2)"
+        border: "1px solid var(--border-color)",
+        backgroundColor: "var(--chat-background-color)",
+        color: "var(--text-primary-color)",
       },
       text: {
         padding: "0.4em 2.5em 0.4em 0.8em",
@@ -239,7 +241,7 @@
     display: "block",
     width: width,
     height: height,
-    backgroundColor: "white",
+    backgroundColor: "var(--chat-background-color)",
     border: "none",
     fontSize: "17px",
     fontFamily: 'system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"'
@@ -251,6 +253,18 @@
           maxWidth: "75%",
           borderRadius: "1em",
           padding: ".42em .7em"
+        }
+      },
+      ai: {
+        bubble: {
+          color: "var(--text-primary-color)",
+          backgroundColor: "var(--ai-message-background-color)",
+        }
+      },
+      user: {
+        bubble: {
+          color: "white",
+          backgroundColor: "var(--user-message-background-color)",
         }
       }
     },
@@ -272,7 +286,7 @@
           bottom: ".87em",
           borderRadius: "100vmax",
           padding: "0.3em",
-          backgroundColor: "rgb(0, 132, 255)"
+          backgroundColor: "var(--user-message-background-color)"
         }
       },
       svg: {
@@ -280,6 +294,19 @@
       }
     }
   }}
+  auxiliaryStyle={`
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background-color: var(--border-off-color);
+      border-radius: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background-color: var(--chat-background-color);
+    }`
+  }
 />
 
 <style>

@@ -1,4 +1,5 @@
 <script>
+	import { onDestroy } from 'svelte';
 	import AssistantDeepChat from './AssistantDeepChat.svelte';
 
 	import { BIDARA_LOGO, BIDARA_LOGO_DESC, BIDARA_NAME, BIDARA_TAGLINE} from '../assistant/bidara';
@@ -10,6 +11,18 @@
 	let image_alt = BIDARA_LOGO_DESC;
 	let tagline = BIDARA_TAGLINE;
   let showLoginField = true; 
+
+	setLoginVars();
+	const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+	mediaQuery.addEventListener('change', setLoginVars);
+
+	onDestroy(() => {
+		mediaQuery.removeEventListener('change', setLoginVars);
+	});
+
+	function setLoginVars() {
+		document.documentElement.style.setProperty('--chat-background-color', 'var(--nav-color)')
+	}
 
   async function handleLogin(){
 		showLoginField = false;
@@ -41,16 +54,18 @@
 	</ul>
 
   {#if showLoginField}
-	<AssistantDeepChat
-     loginHandler={handleLogin}
-     loadedMessages={null}
-     height="100px"
-	 />
+		<AssistantDeepChat
+			loginHandler={handleLogin}
+			loadedMessages={null}
+			height="100px"
+		 />
   {/if}
 </div>
 
 <style>
 	#welcome {
+		background-color: var(--nav-color);
+		color: var(--text-primary-color);
 		z-index: 1;
 		line-height: 1.5em;
 		padding-left: 1em;
