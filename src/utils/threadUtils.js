@@ -125,7 +125,7 @@ export async function syncThreadFiles(threadId, messages) {
       fileInsert.name = file.name
     }
 
-    while (file.text && !equivalentMessages(file.text, messages[file.index].text)) {
+    while (file.text && !equivalentMessages(file?.text, messages[file.index]?.text)) {
       file.index += 1;
     }
 
@@ -147,10 +147,22 @@ function equivalentMessages(message, threadMessage) {
   const msgFileLinkRegEx = /\]\(data:[\S]+\)/igm;
   const threadFileLinkRegEx = /\]\(sandbox:[\S]+\)/igm;
 
-  const messagesMsg = findReplaceRegEx(message, msgFileLinkRegEx, ']()')
-  const threadsMsg = findReplaceRegEx(threadMessage, threadFileLinkRegEx, ']()')
+  const messagesMsg = findReplaceListRegEx(message, [msgFileLinkRegEx, threadFileLinkRegEx], [']()',']()'])
+  const threadsMsg = findReplaceListRegEx(threadMessage, [msgFileLinkRegEx, threadFileLinkRegEx], [']()',']()'])
 
   return messagesMsg === threadsMsg;
+}
+
+function findReplaceListRegEx(string, regexs, replacements) {
+  if (regexs.length != replacements.length) {
+    throw new Error("Number of replacements must match number of matches (findReplaceListRegEx)");
+  }
+
+  for (let i = 0; i < regexs.length; i++) {
+    string = findReplaceRegEx(string, regexs[i], replacements[i]);
+  }
+
+  return string;
 }
 
 function findReplaceRegEx(string, regex, replacement) {
