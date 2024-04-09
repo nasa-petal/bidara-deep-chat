@@ -22,12 +22,12 @@
 
   async function handleButtonClick(event) {
     event.target.style.transition = 'background-color 0.2s ease color 0.2s ease';
-    event.target.style.backgroundColor = 'rgb(209,209,214)';
+    event.target.style.backgroundColor = 'var(--nav-color)';
 
     handleChatNew();
 
     setTimeout(() => {
-      event.target.style.backgroundColor = 'rgb(242, 242, 247)';
+      event.target.style.backgroundColor = 'var(--nav-off-color)';
     }, 200);
 
     if (isSmallScreen()) {
@@ -52,7 +52,7 @@
 <div>
   <aside class="absolute shadow-lg flex flex-col" class:open>
     <button tabindex="0" class="focus:outline-none new-thread rounded-full m-2 text-base font-sans p-2" disabled={!open} on:click={handleButtonClick}>New Thread</button>
-    <nav class="w-full divide-y">
+    <nav class="w-full">
       {#if threads !== null}
         {#each threads as thread}
           <Chat handleSelect={() => handleChatClick(thread)} handleDelete={() => handleChatSwipe(thread)} selected={thread.id === selectedThreadId} bind:thread/>
@@ -72,8 +72,8 @@
     width: 20%;
     height: calc(100% - 3em);
     left: -20%;
-    background-color: rgb(229, 229, 234);
-    border-right: 1px solid rgb(180, 180, 180);
+    background-color: var(--nav-color);
+    border-right: 1px solid var(--border-color);
     transition: left ease 0.3s, width ease 0.3s, visibility 0.3s 0s;
     overflow-y: auto;
     visibility: hidden;
@@ -90,9 +90,9 @@
 
   .new-thread {
     line-height: 1em;
-    background-color: white;
-    border: 1px solid rgb(180, 180, 180);
-    color: rgb(0, 122, 255);
+    background-color: var(--nav-off-color);
+    border: 1px solid var(--border-color);
+    color: var(--text-important-color);
     font-weight: bold;
   }
 
@@ -116,19 +116,5 @@
       left: -100%;
       border-right: none;
     }
-  }
-
-  ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background-color: #d0d0d0;
-    border-radius: 5px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background-color: #f2f2f2;
   }
 </style>

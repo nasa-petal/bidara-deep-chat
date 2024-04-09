@@ -19,7 +19,7 @@
 
 	.item-container:hover,
 	.item-container:focus {
-		background-color: rgb(0,122,255);
+		background-color: var(--blue);
 		cursor: pointer;
 	}
 </style>

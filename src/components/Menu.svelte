@@ -48,7 +48,7 @@
 		border-radius: 0.5em;
 		color: white;
 		width: 15em;
-		box-shadow: 0 0 1rem 0 rgba(0, 0, 0, 0.3);
+		box-shadow: 0 0 1rem 0 var(--box-shadow-color);
 
 		position: absolute;
 		display: none;
@@ -72,7 +72,7 @@
 	}
 
 	menu {
-		border: 1px solid rgb(142, 142, 147);
+		border: 1px solid var(--gray);
 		border-radius: 0.5em;
 		margin: 0;
 	}

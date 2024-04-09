@@ -1,4 +1,73 @@
+:root {
+  --chat-background-color: var(--light-chat-background-color);
+  --ai-message-background-color: var(--light-ai-message-background-color);
+  --user-message-background-color: var(--light-user-message-background-color);
+  --border-color: var(--light-border-color);
+  --border-off-color: var(--light-border-off-color);
+  --nav-color: var(--light-nav-color);
+  --nav-off-color: var(--light-nav-off-color);
+  --text-primary-color: var(--light-text-primary-color);
+  --text-secondary-color: var(--light-text-secondary-color);
+  --text-important-color: var(--light-text-important-color);
+  --box-shadow-color: var(--light-box-shadow-color);
+  --translucent-nav-color: var(--light-translucent-nav-color);
+  --link-color: var(--light-link-color);
+  --link-visited-color: var(--light-link-visited-color);
+
+  --translucent-black: rgba(0, 0, 0, 0.35);
+  --black: black; 
+  --light-black: rgb(25,25,25);
+  --translucent-light-black: rgba(15,15,15, 0.7);
+  --dark-gray: rgb(51,51,51);
+  --gray: rgb(150,150,150);
+  --translucent-gray: rgba(150,150,150, 0.25);
+  --transparent-gray: rgba(150,150,150, 0); /* for transitions */
+  --light-gray: rgb(180, 180, 180);
+  --dark-white: rgb(229, 229, 234);
+  --translucent-dark-white: rgba(259, 259, 264, 0.7);
+  --white: white;
+  --translucent-white: rgba(242, 242, 242, 0.2);
+  --dark-blue: rgb(0,118,229);
+  --blue: rgb(0,132,255);
+  --red: rgb(255,59,48);
+
+  --light-blue: rgb(68, 147, 248);
+  --purple: rgb(85,26,139);
+  --light-purple: rgb(197,138,249);
+
+  --light-chat-background-color: var(--white);
+  --light-ai-message-background-color: var(--translucent-gray);
+  --light-user-message-background-color: var(--blue);
+  --light-border-color: var(--light-gray);
+  --light-border-off-color: var(--gray);
+  --light-nav-color: var(--dark-white);
+  --light-nav-off-color: var(--white);
+  --light-translucent-nav-color: var(--translucent-dark-white);
+  --light-text-primary-color: var(--black);
+  --light-text-secondary-color: var(--white);
+  --light-text-important-color: var(--blue);
+  --light-box-shadow-color: var(--translucent-black);
+  --light-link-color: blue;
+  --light-link-visited-color: var(--purple);
+
+  --dark-chat-background-color: var(--black);
+  --dark-ai-message-background-color: var(--translucent-gray);
+  --dark-user-message-background-color: var(--dark-blue);
+  --dark-border-color: var(--dark-gray);
+  --dark-border-off-color: var(--gray);
+  --dark-nav-color: var(--light-black);
+  --dark-nav-off-color: var(--black);
+  --dark-translucent-nav-color: var(--translucent-light-black);
+  --dark-text-primary-color: var(--white);
+  --dark-text-secondary-color: var(--black);
+  --dark-text-important-color: var(--dark-blue);
+  --dark-box-shadow-color: var(--translucent-white);;
+  --dark-link-color: var(--light-blue);
+  --dark-link-visited-color: var(--light-purple);
+}
+
 html {
+  background: var(--chat-background-color);
   text-size-adjust: 100%; /* Prevent font scaling in landscape while allowing user zoom */
   height: 100%;
 }
@@ -6,4 +75,25 @@ html {
 body {
   margin: 0;
   height: 100%;
+}
+
+a {
+  color: var(--link-color);
+}
+a:visited {
+  color: var(--link-visited-color);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--border-off-color);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: var(--chat-background-color);
 }
