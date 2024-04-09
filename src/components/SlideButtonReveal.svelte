@@ -9,11 +9,11 @@
     export let sliderId;
     export let sliderText;
     export let sliderImage;
-    export let slideBgColor = 'rgb(229, 229, 234)';
+    export let slideBgColor = 'var(--light-gray)';
 
     export let revealId;
     export let revealImage;
-    export let revealBgColor = 'rgb(255, 59, 48)';
+    export let revealBgColor = 'var(--red)';
 
     export let slideThresh = (1/3);
     export let maxSlide = (3/4);
@@ -165,7 +165,6 @@
         top: 0;
         padding: 1em;
         z-index: 25 !important;
-        border-bottom: 1px solid rgb(180, 180, 180);
         transition: background-color 0.3s ease;
     }
 
@@ -187,7 +186,6 @@
         left: 0;
         top: 0;
         transition: margin-right 0.3s ease;
-        border-bottom: 1px solid rgb(180, 180, 180);
     }
 
     .reveal-image {
@@ -219,7 +217,7 @@
 
     .selected {
         transition: background-color 0.3s ease;
-        background-color: rgb(0, 122, 255) !important;
-        color: rgb(242, 242, 247) !important;
+        background-color: var(--user-message-background-color) !important;
+        color: var(--white) !important;
     }
 </style>

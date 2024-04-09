@@ -157,8 +157,6 @@
 <style>
   #content-container {
     height: calc(100% - 3rem);
-    padding-right: env(safe-area-inset-right);
-    padding-left: env(safe-area-inset-left);
     overflow-y: hidden;
   }
 
@@ -192,8 +190,7 @@
     font-family: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     width: 100%;
     height: calc(100% + env(safe-area-inset-top));
-    padding-top: env(safe-area-inset-top);
-    padding-bottom: env(safe-area-inset-bottom);
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   }
 
   .loading {
