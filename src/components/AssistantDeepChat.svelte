@@ -1,6 +1,6 @@
 <script>
   import { DeepChat } from 'deep-chat';
-  import { setOpenAIKey } from '../utils/openaiUtils';
+  import { setOpenAIKey, cancelThreadRun } from '../utils/openaiUtils';
   import * as threadUtils from '../utils/threadUtils';
 
   export let key = null;
@@ -19,11 +19,17 @@
 
   let lastMessageId;
   let threadId = thread?.id; 
+  let currRunId = null;
 
   let deepChatRef;
 
-  function onError(error) {
-    console.log(error);
+  async function onError(error) {
+    console.error(error);
+
+    if (threadId && currRunId) {
+      console.log("Cancelling thread run due to error.");
+      await cancelThreadRun(threadId, currRunId);
+    }
   }
 
   async function loadMessages(threadToLoad) {
@@ -128,6 +134,13 @@
 
     return funcCalling(functionDetails, context)
   }
+
+  async function responseInterceptor(response) {
+    if (response.id && response.object === "thread.run") {
+        currRunId = response.id;
+    }
+    return response;
+  }
 </script>
 
 <deep-chat
@@ -151,6 +164,7 @@
   onError={onError}
   onNewMessage={onNewMessage}
   onComponentRender={onComponentRender}
+  responseInterceptor={responseInterceptor}
   _insertKeyViewStyles={{displayCautionText: false}}
   demo={false}
   speechToText={{
