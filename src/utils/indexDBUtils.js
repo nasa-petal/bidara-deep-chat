@@ -46,7 +46,7 @@ function createStore(event, db, name, primaryKey, indices) {
 		db.deleteObjectStore(name);
 	}
 
-	const objectStore = db.createObjectStore(name, { keyPath: primaryKey });
+	const objectStore = db.createObjectStore(name, { keyPath: primaryKey.key, autoIncrement: primaryKey.autoIncrement });
 
 	if (indices) {
 		indices.forEach((index) => {
@@ -177,11 +177,12 @@ export async function readByProperty(db, storeName, propertyKey, propertyValue, 
 			reject(error); 
 			return;
 		}
+
+		if (typeof callback === 'function') {
+			callback(transaction);
+		}
 	});
 
-	if (typeof callback === 'function') {
-		callback(transaction);
-	}
 }
 
 export async function readFirstByIndex(db, storeName, storeIndex, reversed, transaction = null, callback = null) {

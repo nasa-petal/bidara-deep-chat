@@ -1,4 +1,4 @@
-import { validThread, getNewThreadId, getThreadMessages } from "./openaiUtils";
+import { validThread, getNewThreadId, getThreadMessages, getFileSrc } from "./openaiUtils";
 import * as bidaraDB from "./bidaraDB";
 
 async function createNewThread() {
@@ -6,7 +6,7 @@ async function createNewThread() {
 
   if (new_id) {
     const new_name = "New Chat";
-    return {name: new_name, id: new_id, length: 0, files: [], active: true};
+    return {name: new_name, id: new_id, length: 0, active: true};
   }
 
   return null;
@@ -50,7 +50,7 @@ export async function getEmptyThread(emptyLength) {
 }
 
 export async function getThreadImages(id) {
-  let files = await bidaraDB.getThreadFiles(id);
+  let files = await getThreadFiles(id);
 
   let imageFiles = files.filter(file => file.type === "image")
 
@@ -59,10 +59,10 @@ export async function getThreadImages(id) {
   return imageSources 
 }
 
-export async function getThreadFiles() {
-  let thread = await bidaraDB.getActiveThread();
+export async function getThreadFiles(id) {
+  const files = await bidaraDB.getThreadFiles(id);
 
-  return thread.files;
+  return files;
 }
 
 export async function setActiveThread(threadId) {
@@ -99,9 +99,7 @@ export async function pushFiles(threadId, files) {
   })
 }
 
-export async function syncThreadFiles(threadId, messages) {
-  const files = await bidaraDB.getThreadFiles(threadId);
-
+export async function syncThreadFiles(threadId, messages, files) {
   if (files.length <= 0) {
     return messages;
   }
@@ -110,6 +108,10 @@ export async function syncThreadFiles(threadId, messages) {
   const insertedFiles = files.filter(file => !file.attached);
 
   insertedFiles.forEach(file => {
+    if (!file.index || file.index === -1) {
+      return;
+    }
+
     const fileInsert = { src: file.src, type: file.type, ref: {} }
     if (file.name) {
       fileInsert.name = file.name
@@ -120,17 +122,14 @@ export async function syncThreadFiles(threadId, messages) {
   })
 
   attachedFiles.forEach(file => {
+
     const fileInsert = { src: file.src, type: file.type, ref: {} }
     if (file.name) {
       fileInsert.name = file.name
     }
 
     while (file.text && !equivalentMessages(file?.text, messages[file.index]?.text)) {
-      file.index += 1;
-    }
-
-    if (file.text) {
-      messages[file.index].text = file.text;
+      file.index = file.index + 1;
     }
 
     if (messages[file.index].files) {
@@ -147,8 +146,11 @@ function equivalentMessages(message, threadMessage) {
   const msgFileLinkRegEx = /\]\(data:[\S]+\)/igm;
   const threadFileLinkRegEx = /\]\(sandbox:[\S]+\)/igm;
 
-  const messagesMsg = findReplaceListRegEx(message, [msgFileLinkRegEx, threadFileLinkRegEx], [']()',']()'])
-  const threadsMsg = findReplaceListRegEx(threadMessage, [msgFileLinkRegEx, threadFileLinkRegEx], [']()',']()'])
+  const regEx = [ msgFileLinkRegEx, threadFileLinkRegEx ];
+  const replacements = [ ']()', ']()'];
+
+  const messagesMsg = findReplaceListRegEx(message, regEx, replacements)
+  const threadsMsg = findReplaceListRegEx(threadMessage, regEx, replacements)
 
   return messagesMsg === threadsMsg;
 }
@@ -173,10 +175,22 @@ function findReplaceRegEx(string, regex, replacement) {
   const matches = (string.match(regex) || [])
 
   matches.forEach(match => {
-    string = string.replace(match, replacement)
+    string = string.replaceAll(match, replacement)
   })
 
   return string
+}
+
+function getFileNameFromLink(link) {
+  const regex = /^sandbox:\/mnt\/data\/(.*)$/;
+
+  const matches = (link.match(regex) || []);
+
+  if (matches.length >= 2) {
+    return matches[1];
+  }
+
+  return "";
 }
 
 function convertThreadMessagesToMessages(threadMessages) {
@@ -205,14 +219,85 @@ function clearNullChats(messages) {
   return messages.filter(msg => msg.text !== null || msg.files );
 }
 
+async function replaceThreadFiles(threadId, threadMessages, files) {
+  const replaceFiles = files.filter(file => file.thread_id === threadId && files.replaceText !== null);
+
+  const withFiles = await Promise.all(threadMessages.map(async (message) => {
+    const content = await Promise.all(message.content.map(async (content) => {
+      if (content.type !== "text") {
+        return content;
+      }
+
+      if (!content.text?.annotations || content.text?.annotations?.length < 1) {
+        return content;
+      }
+      const newFiles = [];
+
+      const replacements = await Promise.all(content.text.annotations.map(async (annotation) => {
+        if (annotation.type !== "file_path" || !annotation?.file_path?.file_id || annotation.text.substring(0,7) !== "sandbox") {
+          return {};
+        }
+
+        const existingReplacement = replaceFiles.filter(file => file.replaceText === annotation.text);
+
+        if (existingReplacement.length > 0 && existingReplacement[0].src) {
+          return { link: annotation.text, src: existingReplacement[0].src };
+        }
+
+        const fileSrc = await getFileSrc(annotation.file_path.file_id);
+
+        const fileName = getFileNameFromLink(annotation.text);
+
+        const newFile = {
+          thread_id: threadId,
+          type: "any",
+          name: fileName,
+          src: fileSrc,
+          index: null,
+          attached: false,
+          role: message.role,
+          text: null,
+          replaceText: annotation.text,
+        }
+
+        newFiles.push(newFile);
+
+        return { link: annotation.text, src: fileSrc };
+      }));
+
+      replacements.forEach((replacement) => {
+        content.text.value = content.text.value.replaceAll(replacement.link, replacement.src);
+      })
+
+      newFiles.forEach(async (newFile) => {
+        if (content.text.value) {
+          newFile.text = content.text.value;
+        }
+
+        await pushFile(threadId, newFile);
+      });
+
+      return content;
+    }));
+    message.content = content;
+    return message;
+  }));
+
+  return withFiles;
+}
+
 export async function syncMessages(threadId, initialMessages) {
   const rawThreadMessages = await getThreadMessages(threadId, 100);
-  const threadMessages = convertThreadMessagesToMessages(rawThreadMessages);
+  const files = await bidaraDB.getThreadFiles(threadId);
+
+  const threadMessagesWithFiles = await replaceThreadFiles(threadId, rawThreadMessages, files);
+
+  const threadMessages = convertThreadMessagesToMessages(threadMessagesWithFiles);
   const fullMessages = initialMessages.concat(threadMessages);
 
   const messages = clearNullChats(fullMessages);
 
-  const syncedMessages = await syncThreadFiles(threadId, messages);
+  const syncedMessages = await syncThreadFiles(threadId, messages, files);
 
   return syncedMessages;
 }
