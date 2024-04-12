@@ -124,14 +124,14 @@ function getFileTypeByName(fileName) {
   return type;
 }
 
-async function getFileType(params) {
+async function getFileType(params, threadId) {
   let fileTypeParams = JSON.parse(params);
 
   if ("parameters" in fileTypeParams) {
     fileTypeParams = fileTypeParams.parameters;
   }
 
-  let files = await getThreadFiles();
+  let files = await getThreadFiles(threadId);
 
   if (files.length < 1) {
     return "No files have been uploaded.";
@@ -166,7 +166,7 @@ export async function callFunc(functionDetails, context) {
     }
   }
   else if (functionDetails.name == "get_file_type") {
-    tmp = await getFileType(functionDetails.arguments);
+    tmp = await getFileType(functionDetails.arguments, context.lastMessageId);
   }
   else if (functionDetails.name == "image_to_text") {
     tmp = await imageToText(functionDetails.arguments, context.lastMessageId);

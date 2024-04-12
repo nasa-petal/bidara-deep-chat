@@ -1,16 +1,20 @@
 import * as dbUtils from "./indexDBUtils"
 
 const CHAT_STORE_NAME = "threads";
+const FILE_STORE_NAME = "files";
 const ACTIVE_STATUS = 1;
 const INACTIVE_STATUS = 0;
 
 const BIDARA_DB_CONFIG = { 
 	name: "bidara", 
-	version: 1,
+	version: 3,
 	stores: [ 
 		{ 
 			name: CHAT_STORE_NAME, 
-			primaryKey: "id",
+			primaryKey: {
+				key: "id",
+				autoIncrement: false
+			},
 			indices: [
 				{
 					name: "active",
@@ -41,7 +45,23 @@ const BIDARA_DB_CONFIG = {
 					}
 				}
 			]
-		} 
+		},
+		{
+			name: FILE_STORE_NAME,
+			primaryKey: {
+				key: "id",
+				autoIncrement: true
+			},
+			indices : [
+				{
+					name: "thread",
+					property: "thread_id",
+					options: {
+						unique: false
+					}
+				}
+			]
+		}
 	] 
 }
 
@@ -81,9 +101,8 @@ export async function getMostRecentlyUpdatedThread() {
 	return await dbUtils.readFirstByIndex(BIDARA_DB, CHAT_STORE_NAME, "updated_time", true);
 }
 
-export async function getThreadFiles(id) {
-	const thread = await getThreadById(id);
-	const files = thread?.files;
+export async function getThreadFiles(threadId) {
+	const files = await dbUtils.readByProperty(BIDARA_DB, FILE_STORE_NAME, "thread_id", threadId);
 
 	if (!files) {
 		return [];
@@ -129,7 +148,7 @@ export async function pushMessageToId(id, message) {
 
 export async function pushFileToId(id, file) {
 	// { index: int, file: b64Data }
-	await dbUtils.pushToListProperty(BIDARA_DB, CHAT_STORE_NAME, id, "files", file)
+	await dbUtils.write(BIDARA_DB, FILE_STORE_NAME, file);
 }
 
 export async function setThread(thread) {
