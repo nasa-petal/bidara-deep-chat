@@ -130,9 +130,6 @@ export async function syncThreadFiles(threadId, messages, files) {
 
     while (file.text && !equivalentMessages(file?.text, messages[file.index]?.text)) {
       file.index = file.index + 1;
-      console.log(file.index);
-      console.log(file.text);
-      console.log(messages[file.index]?.text);
     }
 
     if (messages[file.index].files) {
