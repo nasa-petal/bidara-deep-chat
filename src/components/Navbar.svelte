@@ -101,4 +101,10 @@
   input {
     background-color: var(--nav-off-color);
   }
+  a {
+    color: white !important;
+  }
+  a:visited {
+    color: white !important;
+  }
 </style>
