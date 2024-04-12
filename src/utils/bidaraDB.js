@@ -103,7 +103,6 @@ export async function getMostRecentlyUpdatedThread() {
 
 export async function getThreadFiles(threadId) {
 	const files = await dbUtils.readByProperty(BIDARA_DB, FILE_STORE_NAME, "thread_id", threadId);
-	console.log(files);
 
 	if (!files) {
 		return [];
