@@ -87,7 +87,7 @@ async function genImage(params, threadId, addMessageCallback) {
   return "The image has been inserted into the chat. Respond with a very short question bring this back into this process. DO NOT REPLY WITH AN IMAGE, MARKDOWN, OR ANYTHING OTHER THAN A SHORT QUESTION.";
 }
 
-async function imageToText(params) {
+async function imageToText(params, threadId) {
   let imageParams = JSON.parse(params);
 
   if ("parameters" in imageParams) {
@@ -96,7 +96,7 @@ async function imageToText(params) {
 
   let prompt = imageParams.prompt
 
-  let text = await getImageToText(prompt);
+  let text = await getImageToText(prompt, threadId);
 
   return text;
 }
@@ -124,14 +124,14 @@ function getFileTypeByName(fileName) {
   return type;
 }
 
-async function getFileType(params) {
+async function getFileType(params, threadId) {
   let fileTypeParams = JSON.parse(params);
 
   if ("parameters" in fileTypeParams) {
     fileTypeParams = fileTypeParams.parameters;
   }
 
-  let files = await getThreadFiles();
+  let files = await getThreadFiles(threadId);
 
   if (files.length < 1) {
     return "No files have been uploaded.";
@@ -166,10 +166,10 @@ export async function callFunc(functionDetails, context) {
     }
   }
   else if (functionDetails.name == "get_file_type") {
-    tmp = await getFileType(functionDetails.arguments);
+    tmp = await getFileType(functionDetails.arguments, context.lastMessageId);
   }
   else if (functionDetails.name == "image_to_text") {
-    tmp = await imageToText(functionDetails.arguments);
+    tmp = await imageToText(functionDetails.arguments, context.lastMessageId);
   }
   return tmp;
 }

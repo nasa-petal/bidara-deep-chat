@@ -7,11 +7,11 @@
     "@rollup/plugin-terser": "^0.4.4",
     "highlight.js": "^11.9.0",
     "npm-run-all": "^4.1.5",
-    "rollup": "^4.0.0",
+    "rollup": "^4.14.1",
     "rollup-plugin-css-only": "^4.5.2",
     "rollup-plugin-livereload": "^2.0.0",
-    "rollup-plugin-svelte": "^7.1.5",
-    "svelte": "^4.0.0"
+    "rollup-plugin-svelte": "^7.2.0",
+    "svelte": "^4.2.12"
   },
   "dependencies": {
     "deep-chat": "^1.4.11",
