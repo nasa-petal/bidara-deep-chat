@@ -34,7 +34,6 @@
       let colorTheme = "light";
 
       window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
-        console.log("change theme in index")
         colorTheme = event.matches ? "dark" : "light";
         setCssVars(colorTheme);
       });
