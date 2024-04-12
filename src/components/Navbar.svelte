@@ -3,6 +3,7 @@
     import Menu from './Menu.svelte';
     import MenuItem from './MenuItem.svelte';
     import ThemeSwitcher from './ThemeSwitcher.svelte';
+    import ExportMarkdown from './ExportMarkdown.svelte';
 	
     export let sidebar = false
     export let chat_name;
@@ -62,6 +63,7 @@
   {/if}
   <Menu>
     <div class="function-container">
+      <MenuItem><ExportMarkdown bind:chatName={chat_name}/></MenuItem>
       <MenuItem><ThemeSwitcher/></MenuItem>
     </div>
     <div class="info-container">
