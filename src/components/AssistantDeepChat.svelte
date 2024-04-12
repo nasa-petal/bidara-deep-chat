@@ -74,6 +74,7 @@
       let name = file?.name ? file.name : "";
 
       return {
+        thread_id: threadId,
         type,
         name,
         src,
@@ -81,6 +82,7 @@
         attached,
         role,
         text,
+        replaceText: null,
       }
     });
 
