@@ -37,11 +37,14 @@
 			"border-off-color",
 			"nav-color",
 			"nav-off-color",
+			"translucent-nav-color",
 			"text-primary-color",
 			"text-secondary-color",
 			"ai-message-background-color",
 			"user-message-background-color",
 			"box-shadow-color",
+			"link-color",
+			"link-visited-color",
 		]
 
 		if (colorTheme === lightMode) {
