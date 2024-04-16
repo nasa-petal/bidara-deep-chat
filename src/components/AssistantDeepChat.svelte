@@ -317,6 +317,9 @@
     a:visited {
     color: var(--link-visited-color);
     }
+    img {
+      max-width: 100%;
+    }
     ::-webkit-scrollbar {
       width: 8px;
       height: 8px;

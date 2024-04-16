@@ -10,31 +10,32 @@
     return messages;
   }
 
-	function findReplaceRegEx(string, regex, replacement) {
+  function findReplaceRegEx(string, regex, replacement) {
 
-		if (!string) {
-			return string;
-		}
+    if (!string) {
+      return string;
+    }
 
-		const matches = (string.match(regex) || [])
+    const matches = (string.match(regex) || [])
 
-		matches.forEach(match => {
-			string = string.replace(match, replacement)
-		})
+    matches.forEach(match => {
+      string = string.replace(match, replacement)
+    })
 
-		return string
-	}
+    return string
+  }
 
   function getMessageHtmlTree(chatName, messages) {
     const contents = messages.map((message) => {
-			const msgFileLinkRegEx = /\]\(data:[\S]+\)/igm;
-			message.text = findReplaceRegEx(message.text, msgFileLinkRegEx, '](Removed file source because it exceeded limit.)')
+      const msgFileLinkRegEx = /\]\(data:[\S]+\)/igm;
+      message.text = findReplaceRegEx(message.text, msgFileLinkRegEx, '](Removed file source because it exceeded limit.)')
 
+      const role = message.role === "ai" ? "Bidara:" : "User:";
 
       if (!message.files) {
         return {
-          h2: message.role,
-          p: message.text,
+          role: role,
+          text: message.text,
         }
       } else {
         const files = message.files.map(file => { 
@@ -45,13 +46,13 @@
 
         if (message.text) {
           return {
-            h2: message.role,
-            p: message.text,
+            role: role,
+            text: message.text,
             files: files
           }
         } else {
           return {
-            h2: message.role,
+            role: role,
             files: files
           }
         }
@@ -59,7 +60,8 @@
     })
 
     const title = {
-      h1: chatName,
+      name: chatName,
+      credits: "Bidara by NASA PeTaL"
     }
 
     return {
@@ -68,7 +70,7 @@
     }
   }
 
-  function getNode(type, text) {
+  function getNewNode(type, text) {
     const node = document.createElement(type);
     if (text) {
       const textNode = document.createTextNode(text);
@@ -78,42 +80,110 @@
     return node;
   }
 
-  function getH1Node(text) {
-    const node = getNode("h1", text);
-    node.style.fontSize = "3rem";
+  function getNewH1Node(text) {
+    const node = getNewNode("h1", text);
+    node.style.fontSize = "0.75em";
+    node.style.paddingBottom = "0.5em";
     return node;
   }
 
-  function getH2Node(text) {
-    const node = getNode("h2", text);
-    node.style.fontSize = "2rem";
+  function getNewH2Node(text) {
+    const node = getNewNode("h2", text);
+    node.style.fontSize = "0.4em";
     return node;
   }
 
-  function getPNode(text) {
-    const node = getNode("p", text);
-    node.style.fontSize = "1rem";
+  function getNewPNode(text) {
+    const node = getNewNode("p", text);
+    node.style.fontSize = "0.4em";
+    node.style.paddingBottom = "0.8em";
     return node;
   }
 
-  function getImgNode(src) {
-    const node = getNode("img");
-    node.src = src;
-    node.style.maxHeight = "500px";
+  function getNewBoldNode(text) {
+    const node = getNewNode("strong");
+    const textNode = getNewPNode(text);
+    node.appendChild(textNode);
     return node;
   }
 
-  function createTitleNode(title) {
-    const root = getNode("div");
+  function getNewImgNode(src) {
+    const node = getNewNode("div");
+    node.style.height = "500px";
+
+    const imgNode = getNewNode("img");
+    imgNode.src = src;
+    imgNode.style.maxHeight = "500px";
+    imgNode.style.maxWidth = "500px";
+    imgNode.style.margin = "auto";
+    node.appendChild(imgNode);
+
+    return node; 
+  }
+
+  function createTitleNode(name, credits) {
+    const root = getNewNode("div");
     root.style.display = "flex";
     root.style.justifyContent = "space-between";
-    root.style.alignItems = "center";
+    root.style.alignItems = "end";
+    root.style.borderBottom = "1px solid black";
 
-    const titleNode = getH1Node(title.h1);
+    const titleNode = getNewH1Node(name);
     root.appendChild(titleNode);
 
-    const creditsNode = getPNode("Bidara by NASA PeTaL");
+    const creditsNode = getNewPNode(credits);
     root.appendChild(creditsNode);
+
+    return root;
+  }
+
+  function createMessageNode(role, text, files) {
+    const root = getNewNode("div");
+    root.style.display = "flex";
+    root.style.justifyContent = "start";
+    root.style.paddingTop = "0.5em";
+    root.style.paddingBottom = "0.5em";
+    root.style.alignItems = "start";
+    root.style.borderBottom = "1px solid rgb(180,180,180)";
+
+    const roleNode = getNewNode("div");
+    roleNode.style.paddingRight = "1.75em";
+    roleNode.style.paddingTop = "0";
+    roleNode.style.paddingBottom= "0";
+    roleNode.style.marginTop = "0";
+    roleNode.style.marginBottom= "0";
+    roleNode.style.width = "1.75em";
+    roleNode.style.height = "0.6em";
+    roleNode.style.lineHeight = "0.6em";
+    const roleHeading = getNewBoldNode(role);
+    roleNode.appendChild(roleHeading);
+    root.appendChild(roleNode);
+
+    const contentNode = getNewNode("div");
+    contentNode.style.width = "100%";
+    const textNode = getNewPNode(text);
+    contentNode.appendChild(textNode)
+
+    if (files) {
+      files.forEach((file) => {
+        if (file.type === "image") {
+          console.log("adding image node");
+
+          const imgNode = getNewImgNode(file.src);
+          contentNode.appendChild(imgNode);
+
+        } else if (file.name) {
+          const fileNameNode = getNewPNode(`(file) : [${file.name}]`);
+          contentNode.appendChild(fileNameNode);
+
+        } else {
+          const fileNameNode = getNewPNode("(file) : [unnamed file]");
+          contentNode.appendChild(fileNameNode);
+        }
+      })
+    }
+
+    root.appendChild(contentNode);
 
     return root;
   }
@@ -122,46 +192,22 @@
     const title = tree.title;
     const contents = tree.contents;
 
-    const root = getNode("div");
+    const root = getNewNode("div");
     root.style.fontSize = "32px";
 
-    const titleNode = createTitleNode(title);
+    const titleNode = createTitleNode(title.name, title.credits);
     root.appendChild(titleNode);
 
-    const contentsNode = getNode("div");
+    const contentsNode = getNewNode("div");
 
     contents.forEach(content => {
-      const contentNode = getNode("div");
+      const role = content.role;
+      const text = content.text;
+      const files = content.files;
 
-      const roleNode = getH2Node(content.h2);
-      contentNode.appendChild(roleNode);
+      const messageNode = createMessageNode(role, text, files);
 
-      if (content.p) {
-        const textNode = getPNode(content.p);
-        contentNode.appendChild(textNode)
-      } 
-
-      if (content.files) {
-        content.files.forEach((file) => {
-          if (file.type === "image") {
-            const breakNode = getNode("br");
-            contentNode.appendChild(breakNode);
-
-            const imgNode = getImgNode(file.src);
-            contentNode.appendChild(imgNode);
-
-          } else if (file.name) {
-            const fileNameNode = getPNode(`(file) : [${file.name}]`);
-            contentNode.appendChild(fileNameNode);
-
-          } else {
-            const fileNameNode = getPNode("(file) : [unnamed file]");
-            contentNode.appendChild(fileNameNode);
-          }
-        })
-      }
-
-      contentsNode.appendChild(contentNode);
+      contentsNode.appendChild(messageNode);
     })
 
     root.appendChild(contentsNode);
@@ -193,7 +239,6 @@
 
     const messagesHtml = htmlTreeToHtml(messagesTree);
 
-    console.log(messagesHtml);
     htmlToPdf(title, messagesHtml);
   }
 
@@ -205,7 +250,7 @@
 </script>
 
 <button class="w-full h-full p-1 flex justify-between items-center focus:outline-none" on:click={handleExport}>
-	<p>Export to PDF</p>
+  <p>Export to PDF</p>
 </button>
 
 <style>
