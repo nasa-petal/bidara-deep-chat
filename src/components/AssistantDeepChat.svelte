@@ -105,6 +105,7 @@
 
   async function onComponentRender() {
     deepChatRef = document.getElementById("chat-element");
+    setDeepChatKeyboardSupport();
     // save key to localStorage.
     // The event occurs before key is set, and again, after key is set.
     if (!key && this._activeService.key) {
@@ -116,6 +117,7 @@
     if (!loadedMessages) {
       await loadMessages(thread)
     }
+
 
     setTimeout(()=> loading = false, 400);
   }
@@ -142,6 +144,22 @@
         currRunId = response.id;
     }
     return response;
+  }
+
+  function setDeepChatKeyboardSupport() {
+    const shadowRoot = deepChatRef.shadowRoot;
+    const input = shadowRoot.getElementById("input");
+    const inputButtons = input.getElementsByClassName("input-button");
+    inputButtons.forEach(button => {
+      const buttonClickEventListener = button.onclick;
+
+      if (!buttonClickEventListener) {
+        return
+      }
+
+      button.tabIndex = 0;
+      button.addEventListener('keydown', (e)=>{ if (e.key === 'Enter') buttonClickEventListener(e); });
+    });
   }
 </script>
 
@@ -319,6 +337,9 @@
     }
     img {
       max-width: 100%;
+    }
+    button:focus-visible {
+      outline: 5px auto -webkit-focus-ring-color; 
     }
     ::-webkit-scrollbar {
       width: 8px;
