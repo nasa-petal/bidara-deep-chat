@@ -3,7 +3,7 @@ const BIDARA_TEST_NAME = "BIDARA-TEST";
 
 export const BIDARA_NAME = BIDARA_PROD_NAME;
 
-export const BIDARA_VERSION = "1.41";
+export const BIDARA_VERSION = "1.5";
 
 export const BIDARA_LOGO = "bidara.png";
 export const BIDARA_LOGO_DESC = "girl with dark hair";
@@ -192,6 +192,21 @@ const GET_FILE_TYPE = {
   }
 }
 
+const GET_IMAGE_PATTERNS = {
+  "name": "get_patterns_in_image",
+  "description": "Get the basic pattern types found in an image.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "file_id": {
+        "type": "string",
+        "description": "The id of the file"
+      }
+    },
+  "required": []
+  }
+}
+
 const BIDARA_FUNCTIONS = [
   { type: "code_interpreter" },
   { type: "retrieval" },
@@ -199,6 +214,7 @@ const BIDARA_FUNCTIONS = [
   { type: "function", function: TEXT_TO_IMAGE },
   { type: "function", function: IMAGE_TO_TEXT },
   { type: "function", function: GET_FILE_TYPE },
+  { type: "function", function: GET_IMAGE_PATTERNS },
 ]
 
 export const BIDARA_INITIAL_MESSAGES = [

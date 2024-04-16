@@ -151,6 +151,59 @@ async function getFileType(params, threadId) {
   return "Unable to determine filetype";
 }
 
+async function getImagePatterns(params, threadId) {
+  const patterns =`
+      # Generic Patterns 
+
+      - Explosion: A central origin point from which multiple straight lines extend outward in all directions, suggesting radial expansion.
+      - Spiral: A curve that originates from a central point and progressively moves away, creating a coiling pattern that can be either tight or loose.
+      - Branch: A pattern that mimics the structure of branching in trees or veins, where a main line splits into multiple subsidiary lines.
+      - Meander: A continuous, serpentine line that creates a sequence of loops or turns, often symmetric and evenly spaced.
+      - Wave: A pattern consisting of smoothly undulating lines that create peaks and troughs akin to waves in water.
+      - Parallel: Multiple lines that run side by side at a uniform distance from each other, never converging or diverging.
+      - Tiling: Repeated geometric shapes fitted together without gaps or overlaps, covering a plane.
+      - Bubble: A cluster of rounded shapes, each resembling a bubble, which may vary in size and proximity to each other.
+
+      # Geometric Patterns
+
+      - 1 point: A singular position in space marked by a dot, representing the simplest geometric element.
+      - 2 points: Two distinct positions in space, typically marked by dots and can define a line segment when connected.
+      - Line: A one-dimensional figure extending infinitely in both directions, represented by a straight path.
+      - Triangle: A three-sided polygon with three corners and edges, with varying side lengths and angles.
+      - Square: A four-sided polygon with equal side lengths and right angles at each corner.
+      - Pentagon: A five-sided polygon with five corners and edges, with varying side lengths and angles.
+      - Hexagon: A six-sided polygon typically with equal side lengths and angles.
+      - Octagon: An eight-sided polygon with eight edges and corners, which can vary in the lengths of its sides and sizes of its angles.
+      - Circle: A shape consisting of all points in a plane that are at a constant distance from a center point.
+      - Ellipse: An elongated circle, also known as an oval, characterized by a closed curve in which the sum of the distances from two points (foci) to any point on the curve is constant.
+
+      # Symmetric and Asymmetric Patterns
+
+      Asymmetry: A pattern or shape lacking symmetry, with unequal distribution of parts or elements within the shape.
+      - Chirality: Objects that are non-superimposable on their mirror images, often referred to as ‘handedness’ in structures.
+      - Bilateral symmetry: A characteristic where a shape or pattern can be divided into two mirror-image sides along a central axis.
+      - Symmetry in 3: A shape that can be divided into three symmetrical sections typically around a central point.
+      - Symmetry in 4: A shape with four lines of symmetry, allowing it to be divided into four identical sections.
+      - Symmetry in 5: A shape with five lines of symmetry, segmenting the shape into five symmetrical parts.
+      - Symmetry in 6: A shape that exhibits six lines of symmetry, creating six equivalent sections.
+      - Symmetry in 7: A shape with seven lines of symmetry, each dividing the shape into congruent sections.
+      - Symmetry in 8: A shape that features eight lines of symmetry, segmenting the shape into eight identical pieces.
+
+      # Additional Patterns
+
+      - Angle: A geometric figure created by two lines originating from the same point, creating a space between them.
+      - Fraction: A numerical representation of a part of a whole, expressed with a numerator and a denominator.
+      - Curve: Any smooth, continuously bending line or shape that deviates from being straight.
+      - Parabola: A specific curved shape defined by a set of points equidistant from a focal point and a directrix.
+      - Infinity: A concept represented by a figure-eight lying on its side, symbolizing endlessness or boundlessness.
+    ` 
+  const prompt = `Describe which of the following patterns are found in the image. Only include patterns that are genuinely present, DO NOT mention any that are not present, and do not make up ones that aren't there.\n\n${patterns}`;
+
+  const text = await getImageToText(prompt, threadId);
+
+  return text;
+}
+
 export async function callFunc(functionDetails, context) {
   let tmp = '';
   if(functionDetails.name == "get_graph_paper_relevance_search") {
@@ -170,6 +223,9 @@ export async function callFunc(functionDetails, context) {
   }
   else if (functionDetails.name == "image_to_text") {
     tmp = await imageToText(functionDetails.arguments, context.lastMessageId);
+  }
+  else if (functionDetails.name == "get_patterns_in_image") {
+    tmp = await getImagePatterns(functionDetails.arguments, context.lastMessageId);
   }
   return tmp;
 }
