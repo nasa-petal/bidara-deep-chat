@@ -471,7 +471,7 @@ export async function getImageDescription(base64, prompt) {
     }
   ]
 
-  const tokenLimit = 300;
+  const tokenLimit = 500;
 
   const res = await getChatCompletion(model, messages, tokenLimit);
 
@@ -486,7 +486,8 @@ export async function getImageToText(prompt, id) {
 
   if (imageFiles.length > 0) {
     const imageSource = imageFiles[imageFiles.length - 1]
-    return getImageDescription(imageSource, prompt);
+    const description = await getImageDescription(imageSource, prompt);
+    return description;
   }
 
   return "No image has been uploaded, or the uploaded file was not an image.";

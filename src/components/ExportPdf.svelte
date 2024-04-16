@@ -163,7 +163,6 @@
     if (files) {
       files.forEach((file) => {
         if (file.type === "image") {
-          console.log("adding image node");
 
           const imgNode = getNewImgNode(file.src);
           contentNode.appendChild(imgNode);
