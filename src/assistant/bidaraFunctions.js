@@ -197,7 +197,7 @@ async function getImagePatterns(params, threadId) {
       - Parabola: A specific curved shape defined by a set of points equidistant from a focal point and a directrix.
       - Infinity: A concept represented by a figure-eight lying on its side, symbolizing endlessness or boundlessness.
     ` 
-  const prompt = `Describe which of the following patterns are found in the image. Only include patterns that are genuinely present, DO NOT mention that are not present, and do not make up ones that aren't there.\n\n${patterns}`;
+  const prompt = `Describe which of the following patterns are found in the image. Only include patterns that are genuinely present, DO NOT mention any that are not present, and do not make up ones that aren't there.\n\n${patterns}`;
 
   const text = await getImageToText(prompt, threadId);
 
