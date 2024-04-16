@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "deep-chat": "^1.4.11",
+    "jspdf": "^2.5.1",
     "sirv-cli": "^2.0.0",
     "svelte-agnostic-draggable": "^0.2.0",
     "svelte-touch-to-mouse": "^1.0.0"
