@@ -108,15 +108,11 @@
   }
 
   function getNewImgNode(src) {
-    const node = getNewNode("div");
-    node.style.height = "500px";
-
-    const imgNode = getNewNode("img");
-    imgNode.src = src;
-    imgNode.style.maxHeight = "500px";
-    imgNode.style.maxWidth = "500px";
-    imgNode.style.margin = "auto";
-    node.appendChild(imgNode);
+    const node = getNewNode("img");
+    node.src = src;
+    node.style.maxHeight = "500px";
+    node.style.maxWidth = "500px";
+    node.style.margin = "auto";
 
     return node; 
   }
