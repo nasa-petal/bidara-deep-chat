@@ -153,11 +153,11 @@ async function getFileType(params, threadId) {
 
 async function getImagePatterns(params, threadId) {
   const patterns =`
-      # Generic Patterns 
+      # Growth Patterns 
 
       - Explosion: A central origin point from which multiple straight lines extend outward in all directions, suggesting radial expansion.
       - Spiral: A curve that originates from a central point and progressively moves away, creating a coiling pattern that can be either tight or loose.
-      - Branch: A pattern that mimics the structure of branching in trees or veins, where a main line splits into multiple subsidiary lines.
+      - Branching: A pattern that mimics the structure of branching in trees or veins, where a main line splits into multiple subsidiary lines.
       - Meander: A continuous, serpentine line that creates a sequence of loops or turns, often symmetric and evenly spaced.
       - Wave: A pattern consisting of smoothly undulating lines that create peaks and troughs akin to waves in water.
       - Parallel: Multiple lines that run side by side at a uniform distance from each other, never converging or diverging.
@@ -166,9 +166,6 @@ async function getImagePatterns(params, threadId) {
 
       # Geometric Patterns
 
-      - 1 point: A singular position in space marked by a dot, representing the simplest geometric element.
-      - 2 points: Two distinct positions in space, typically marked by dots and can define a line segment when connected.
-      - Line: A one-dimensional figure extending infinitely in both directions, represented by a straight path.
       - Triangle: A three-sided polygon with three corners and edges, with varying side lengths and angles.
       - Square: A four-sided polygon with equal side lengths and right angles at each corner.
       - Pentagon: A five-sided polygon with five corners and edges, with varying side lengths and angles.
@@ -179,7 +176,7 @@ async function getImagePatterns(params, threadId) {
 
       # Symmetric and Asymmetric Patterns
 
-      Asymmetry: A pattern or shape lacking symmetry, with unequal distribution of parts or elements within the shape.
+      - Asymmetry: A pattern or shape lacking symmetry, with unequal distribution of parts or elements within the shape.
       - Chirality: Objects that are non-superimposable on their mirror images, often referred to as ‘handedness’ in structures.
       - Bilateral symmetry: A characteristic where a shape or pattern can be divided into two mirror-image sides along a central axis.
       - Symmetry in 3: A shape that can be divided into three symmetrical sections typically around a central point.
@@ -189,8 +186,11 @@ async function getImagePatterns(params, threadId) {
       - Symmetry in 7: A shape with seven lines of symmetry, each dividing the shape into congruent sections.
       - Symmetry in 8: A shape that features eight lines of symmetry, segmenting the shape into eight identical pieces.
 
-      # Additional Patterns
+      # Pattern Building Blocks
 
+      - 1 point: A singular position in space marked by a dot, representing the simplest geometric element.
+      - 2 points: Two distinct positions in space, typically marked by dots and can define a line segment when connected.
+      - Line: A one-dimensional figure extending infinitely in both directions, represented by a straight path.
       - Angle: A geometric figure created by two lines originating from the same point, creating a space between them.
       - Fraction: A numerical representation of a part of a whole, expressed with a numerator and a denominator.
       - Curve: Any smooth, continuously bending line or shape that deviates from being straight.
