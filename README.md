@@ -17,7 +17,8 @@ BIDARA can guide users through the Biomimicry Institute’s [Design Process](htt
 &nbsp;&nbsp;&nbsp;&nbsp; :white_check_mark: **Function Calling**    
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; :ballot_box_with_check: *Retrieve academic literature with Semantic Scholar*    
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; :ballot_box_with_check: *Generate images with DALL-E*    
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; :ballot_box_with_check: *Analyze images with GPT-4V(ision)*
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; :ballot_box_with_check: *Analyze images with GPT-4V(ision)*    
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; :ballot_box_with_check: *Detect patterns from the [Pattern Alphabet](https://na2ure.org/patternabc/) in images with GPT-4V(ision)*
 
 ## :computer: For developers
 
