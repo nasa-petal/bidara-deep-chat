@@ -1,5 +1,5 @@
-import { getDalleImageGeneration, getImageToText } from "../utils/openaiUtils";
-import { getFileByFileId, getFileTypeByName } from "../utils/threadUtils";
+import { getDalleImageGeneration, getImageToText, uploadFile } from "../utils/openaiUtils";
+import { getFileByFileId, getFileTypeByName, pushFile } from "../utils/threadUtils";
 
 export function getCurrentWeather(location) {
   location = location.toLowerCase();
@@ -52,7 +52,7 @@ export async function ssSearch(params) {
   }
 }
 
-async function genImage(params, threadId, addMessageCallback) {
+async function genImage(params, threadId, processImageCallback) {
   let imageParams = JSON.parse(params);
 
   if ("parameters" in imageParams) {
@@ -60,6 +60,8 @@ async function genImage(params, threadId, addMessageCallback) {
   }
 
   let imagePrompt = JSON.stringify(imageParams.prompt) + " Realistic depiction of the object and its environment. Stay true to science, engineering, and biology. DO NOT INCLUDE ANY WORDS OR BRANDING."
+  let fileName = imageParams.file_name;
+
 
   const res = await getDalleImageGeneration(imagePrompt);
 
@@ -69,12 +71,15 @@ async function genImage(params, threadId, addMessageCallback) {
 
   const imageData = res.data[0].b64_json;
   const imageSrc = "data:image/png;base64," + imageData;
+  const fileRes = await uploadFile(imageSrc, fileName, "image/png");
+  const fileId = fileRes.id;
+  const annotation = "sandbox:/mnt/data/" + fileName;
+  const fileObj = { fileId, threadId, src: imageSrc, type: "image", name: fileName, annotation };
 
-  const message = {role: "ai", files: [ { ref: {}, src: imageSrc, type: "image" } ], _sessionId: threadId};
+  await pushFile(fileObj);
+  processImageCallback(fileObj);
 
-  await addMessageCallback(message);
-
-  return "The image has been inserted into the chat. Respond with a very short question bring this back into this process. DO NOT REPLY WITH AN IMAGE, MARKDOWN, OR ANYTHING OTHER THAN A SHORT QUESTION.";
+  return `{ file_id: ${fileId}, file_name: ${fileName} }`;
 }
 
 async function imageToText(params) {
@@ -181,15 +186,13 @@ async function getImagePatterns(params) {
 }
 
 export async function callFunc(functionDetails, context) {
-  console.log(functionDetails);
-
   let tmp = '';
   if(functionDetails.name == "get_graph_paper_relevance_search") {
     tmp = await ssSearch(functionDetails.arguments);
   }
   else if(functionDetails.name == "text_to_image") {
-    if (context?.addMessageCallback && context?.lastMessageId) {
-      tmp = await genImage(functionDetails.arguments, context.lastMessageId, context.addMessageCallback);
+    if (context?.processImageCallback && context?.lastMessageId) {
+      tmp = await genImage(functionDetails.arguments, context.lastMessageId, context.processImageCallback);
 
     } else {
       tmp = "There was an error in retrieving `text_to_image`."
