@@ -1,5 +1,5 @@
 import { getDalleImageGeneration, getImageToText } from "../utils/openaiUtils";
-import { getFileByFileId, getThreadFiles } from "../utils/threadUtils";
+import { getFileByFileId, getFileTypeByName } from "../utils/threadUtils";
 
 export function getCurrentWeather(location) {
   location = location.toLowerCase();
@@ -112,7 +112,7 @@ async function getFileType(params) {
   }
 
   if (file.name !== null) {
-    const type = threadUtils.getFileTypeByName(file.name);
+    const type = getFileTypeByName(file.name);
     return type;
   }
 
