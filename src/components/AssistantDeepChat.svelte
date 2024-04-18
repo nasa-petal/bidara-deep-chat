@@ -22,6 +22,8 @@
   let currRunId = null;
   let newFileUploads = [];
   let newFileIds = [];
+  let shouldProcessImage = false;
+  let imageToProcess = null;
 
   let deepChatRef;
 
@@ -55,7 +57,6 @@
   }
 
   async function onNewMessage(message) { 
-    console.log("new message happend");
     if (!deepChatRef || message.isInitial) {
       return
     }
@@ -77,8 +78,6 @@
     } else if (message.message.role === "ai") {
       if (newFileIds.length > 0) {
         newFileUploads = message.message.files;
-        console.log(newFileIds);
-        console.log(newFileUploads);
 
         handleFileUploads(newFileIds, newFileUploads);
       }
@@ -104,6 +103,10 @@
     setTimeout(()=> loading = false, 400);
   }
 
+  async function processImageCallback(imageFile) {
+    shouldProcessImage = true;
+    imageToProcess = imageFile;
+  }
 
   async function addMessageCallback(message) {
     deepChatRef._addMessage(message);
@@ -114,10 +117,11 @@
   async function handleFuncCalling(functionDetails) {
     let context = {
       lastMessageId,
-      addMessageCallback
+      addMessageCallback,
+      processImageCallback
     }
 
-    return funcCalling(functionDetails, context)
+    return await funcCalling(functionDetails, context);
   }
 
   async function handleFileUploads(fileIds, fileUploads) {
@@ -146,22 +150,31 @@
         currRunId = response.id;
     }
     if (response.object === "list") {
-      console.log("response");
-      console.log(response);
       if (response.data[0].file_ids.length > 0) {
         newFileIds = response.data[0].file_ids;
       }
+
+      if (shouldProcessImage) {
+        response.data[0].file_ids.push(imageToProcess.file_id);
+        const updatedContent = response.data[0].content.map((content) => {
+          if (content.type === "text") {
+            content.text.value = content.text.value.replaceAll(imageToProcess.annotation, imageToProcess.src);
+          }
+          return content;
+        })
+
+        shouldProcessImage = false;
+        imageToProcess = null;
+        response.data[0].content = updatedContent;
+      }
     }
+    
     return response;
   }
 
   async function requestInterceptor(request) {
-    console.log("request happend");
-    console.log(request);
     if (newFileUploads.length > 0) {
       newFileIds = request.body.file_ids;
-      console.log(newFileIds);
-      console.log(newFileUploads);
 
       handleFileUploads(newFileIds, newFileUploads);
     }

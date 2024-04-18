@@ -112,7 +112,7 @@ async function retrieveStoredFiles(threadId) {
     filesMap.set(file.fileId, file);
   })
 
-  return filesMap;
+  return [files, filesMap];
 }
 
 async function retrieveNewFiles(threadId, messages, storedFiles) {
@@ -142,7 +142,7 @@ async function retrieveNewFiles(threadId, messages, storedFiles) {
   const newFiles = await Promise.all(promises);
   await pushFiles(newFiles);
 
-  return newFilesMap;
+  return [newFiles, newFilesMap];
 }
 
 export function getFileTypeByName(fileName) {
@@ -179,8 +179,13 @@ export function getFileTypeByName(fileName) {
 }
 
 async function convertThreadMessagesToMessages(threadId, threadMessages) {
-  const storedFiles = await retrieveStoredFiles(threadId);
-  const newFiles = await retrieveNewFiles(threadId, threadMessages, storedFiles);
+  const storedFilesTuple = await retrieveStoredFiles(threadId);
+  const storedFiles = storedFilesTuple[1];
+
+  const newFilesTuple = await retrieveNewFiles(threadId, threadMessages, storedFiles);
+  const newFiles = newFilesTuple[1];
+
+  const annotatedFiles = storedFilesTuple[0].filter((file) => file.annotation !== null);
 
   const messages = threadMessages.map(message => {
     const role = message.role === "assistant" ? "ai" : message.role;
@@ -208,32 +213,28 @@ async function convertThreadMessagesToMessages(threadId, threadMessages) {
         const annotations = msg.text.annotations;
 
         if (annotations.length > 0) {
-          console.log("replacing annotations");
           annotations.forEach((annotation) => {
             const fileId = annotation.file_path.file_id;
             const replacement = annotation.text;
             const storedFile = storedFiles.get(fileId);
-            console.log("replacement: ", replacement);
 
-            console.log("stored file")
-            console.log(storedFile);
             if (storedFile) {
-              console.log("using stored file");
               msgText = msgText.replaceAll(replacement, storedFile.src);
               return;
             } 
 
             const newFile = newFiles.get(fileId);
-            console.log("new file");
-            console.log(newFile);
             if (newFile) {
-              console.log("using new file");
               newFile.replacement = replacement;
               newFiles.set(fileId, newFile);
               msgText = msgText.replaceAll(replacement, newFile.src);
             }
           })
         }
+
+        annotatedFiles.forEach((file) => {
+          msgText = msgText.replaceAll(file.annotation, file.src);
+        })
 
         return msgText;
       }

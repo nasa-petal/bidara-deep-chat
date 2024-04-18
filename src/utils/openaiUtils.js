@@ -471,6 +471,44 @@ export async function getChatCompletion(model, messages, tokenLimit) {
   return r;
 }
 
+export async function uploadFile(b64Data, fileName, type) {
+  if (!openaiKey) {
+    throw new Error('openai key not set. cannot validate thread.');
+  }
+
+  const fileRes = await fetch(b64Data);
+  const blob = await fileRes.blob();
+  const file = new File([blob], fileName, {type: type});
+
+  const form = new FormData();
+  form.append('purpose', 'assistants');
+  form.append('file', file);
+
+  const url = `https://api.openai.com/v1/files`;
+  const method = 'POST';
+  const headers = {
+    'Authorization': 'Bearer ' + openaiKey,
+  };
+  const body = form;
+
+  const request = {
+    method,
+    headers,
+    body
+  }
+
+  const response = await fetch(url, request);
+
+  const r = await response.json();
+
+  if (r.error && r.error.type === 'invalid_request_error') {
+    console.error(r.error);
+    return null;
+  }
+
+  return r;
+}
+
 export async function getImageDescription(base64, prompt) {
 
   if (!openaiKey) {

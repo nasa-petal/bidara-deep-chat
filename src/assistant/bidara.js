@@ -3,7 +3,7 @@ const BIDARA_TEST_NAME = "BIDARA-TEST";
 
 export const BIDARA_NAME = BIDARA_PROD_NAME;
 
-export const BIDARA_VERSION = "1.53";
+export const BIDARA_VERSION = "1.54";
 
 export const BIDARA_LOGO = "bidara.png";
 export const BIDARA_LOGO_DESC = "girl with dark hair";
@@ -156,7 +156,11 @@ const TEXT_TO_IMAGE = {
         "prompt": {
           "type": "string",
           "description": "The description of the image to generate."
-        }
+        },
+      "file_name": {
+        "type": "string",
+        "description": "The name for the PNG image file."
+      }
     },
     "required": []
   }
