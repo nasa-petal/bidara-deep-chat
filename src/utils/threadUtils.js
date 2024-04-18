@@ -185,7 +185,7 @@ async function convertThreadMessagesToMessages(threadId, threadMessages) {
   const newFilesTuple = await retrieveNewFiles(threadId, threadMessages, storedFiles);
   const newFiles = newFilesTuple[1];
 
-  const annotatedFiles = storedFilesTuple[0].filter((file) => file.annotation !== null);
+  const annotatedFiles = storedFilesTuple[0].filter((file) => !!file?.annotation);
 
   const messages = threadMessages.map(message => {
     const role = message.role === "assistant" ? "ai" : message.role;
