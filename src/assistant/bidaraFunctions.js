@@ -79,7 +79,7 @@ async function genImage(params, threadId, processImageCallback) {
   await pushFile(fileObj);
   processImageCallback(fileObj);
 
-  return `{ file_id: ${fileId}, file_name: ${fileName} }`;
+  return `Use the following file information to display the file and provide a download link in Markdown:\n{ file_id: "${fileId}," file_name: "${fileName}," file_path: "${annotation}" }`;
 }
 
 async function imageToText(params) {
