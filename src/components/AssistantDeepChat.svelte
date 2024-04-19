@@ -22,8 +22,8 @@
   let currRunId = null;
   let newFileUploads = [];
   let newFileIds = [];
-  let shouldProcessImage = false;
-  let imageToProcess = null;
+  let shouldProcessImages = false;
+  let imagesToProcess = [];
 
   let deepChatRef;
 
@@ -98,8 +98,8 @@
   }
 
   async function processImageCallback(imageFile) {
-    shouldProcessImage = true;
-    imageToProcess = imageFile;
+    shouldProcessImages = true;
+    imagesToProcess.push(imageFile);
   }
 
   async function handleFuncCalling(functionDetails) {
@@ -141,18 +141,20 @@
         newFileIds = response.data[0].file_ids;
       }
 
-      if (shouldProcessImage) {
-        response.data[0].file_ids.push(imageToProcess.file_id);
-        const updatedContent = response.data[0].content.map((content) => {
-          if (content.type === "text") {
-            content.text.value = content.text.value.replaceAll(imageToProcess.annotation, imageToProcess.src);
-          }
-          return content;
-        })
+      if (shouldProcessImages) {
+        imagesToProcess.forEach((imageToProcess) => {
+          const updatedContent = response.data[0].content.map((content) => {
+            if (content.type === "text") {
+              content.text.value = content.text.value.replaceAll(imageToProcess.annotation, imageToProcess.src);
+            }
+            return content;
+          })
 
-        shouldProcessImage = false;
-        imageToProcess = null;
-        response.data[0].content = updatedContent;
+          response.data[0].content = updatedContent;
+        });
+
+        shouldProcessImages = false;
+        imagesToProcess = [];
       }
     }
     
