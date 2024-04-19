@@ -130,8 +130,16 @@ async function retrieveNewFiles(threadId, messages, storedFiles) {
   const newFilesMap = new Map();
 
   const promises = newFileIds.map(async (fileId) => {
-    const fileSrc = await getFileSrc(fileId);
     const fileInfo = await getFileInfo(fileId);
+    if (!fileInfo) {
+      return { fileId, threadId, src: "", name: "[ Deleted File ]", type: "any" };
+    }
+
+    const fileSrc = await getFileSrc(fileId);
+    if (!fileSrc) {
+      return { fileId, threadId, src: "", name: "[ Deleted File ]", type: "any" };
+    }
+
     const fileName = fileInfo.filename.substring(10);
 
     const fileType = getFileTypeByName(fileName) === "image" ? "image" : "any";
@@ -143,6 +151,7 @@ async function retrieveNewFiles(threadId, messages, storedFiles) {
   });
 
   const newFiles = await Promise.all(promises);
+
   await pushFiles(newFiles);
 
   return {
@@ -184,13 +193,12 @@ export function getFileTypeByName(fileName) {
   return type;
 }
 
-export async function syncMessages(threadId, initialMessages) {
+export async function loadMessages(threadId) {
   const rawThreadMessages = await getThreadMessages(threadId, 100);
 
   const messages = await convertThreadMessagesToMessages(threadId, rawThreadMessages);
-  const fullMessages = initialMessages.concat(messages);
 
-  return fullMessages;
+  return messages;
 }
 
 async function convertThreadMessagesToMessages(threadId, threadMessages) {
@@ -225,15 +233,18 @@ async function convertThreadMessagesToMessages(threadId, threadMessages) {
 
 function handleAttachments(fileIds, storedFiles, newFiles) {
   return fileIds.map((fileId) => {
-      const storedFile = storedFiles.get(fileId);
-      if (storedFile) {
-        return { src: storedFile.src, type: storedFile.type, name: storedFile.name };
-      }
+    const storedFile = storedFiles.get(fileId);
 
-      const newFile = newFiles.get(fileId);
-      if (newFile) {
-        return { src: newFile.src, type: "any", name: "" };
-      }
+    if (storedFile) {
+      return { src: storedFile.src, type: storedFile.type, name: storedFile.name };
+    }
+
+    const newFile = newFiles.get(fileId);
+    if (newFile) {
+      return { src: newFile.src, type: "any", name: "" };
+    }
+
+    return { src: "", type: "any", name: "[ Deleted File ]" }
   });
 }
 
@@ -248,16 +259,19 @@ function handleAnnotations(content, storedFiles, newFiles, annotatedFiles) {
       const fileId = annotation.file_path.file_id;
       const replacement = annotation.text;
       const storedFile = storedFiles.get(fileId);
+      const newFile = newFiles.get(fileId);
 
       if (storedFile) {
         msgText = msgText.replaceAll(replacement, storedFile.src);
-        return;
-      } 
 
-      const newFile = newFiles.get(fileId);
-      if (newFile) {
+      } else if (newFile) {
         msgText = msgText.replaceAll(replacement, newFile.src);
+
+      } else {
+        msgText = msgText.replaceAll(replacement, "[ Deleted File ]")
       }
+
+      
     })
 
     annotatedFiles.forEach((file) => {
