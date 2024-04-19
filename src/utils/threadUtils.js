@@ -112,7 +112,10 @@ async function retrieveStoredFiles(threadId) {
     filesMap.set(file.fileId, file);
   })
 
-  return [files, filesMap];
+  return {
+    list: files,
+    map: filesMap
+  };
 }
 
 async function retrieveNewFiles(threadId, messages, storedFiles) {
@@ -142,7 +145,10 @@ async function retrieveNewFiles(threadId, messages, storedFiles) {
   const newFiles = await Promise.all(promises);
   await pushFiles(newFiles);
 
-  return [newFiles, newFilesMap];
+  return {
+    list: newFiles,
+    map: newFilesMap
+  };
 }
 
 export function getFileTypeByName(fileName) {
@@ -178,14 +184,21 @@ export function getFileTypeByName(fileName) {
   return type;
 }
 
+export async function syncMessages(threadId, initialMessages) {
+  const rawThreadMessages = await getThreadMessages(threadId, 100);
+
+  const messages = await convertThreadMessagesToMessages(threadId, rawThreadMessages);
+  const fullMessages = initialMessages.concat(messages);
+
+  return fullMessages;
+}
+
 async function convertThreadMessagesToMessages(threadId, threadMessages) {
-  const storedFilesTuple = await retrieveStoredFiles(threadId);
-  const storedFiles = storedFilesTuple[1];
+  const storedFiles = await retrieveStoredFiles(threadId);
 
-  const newFilesTuple = await retrieveNewFiles(threadId, threadMessages, storedFiles);
-  const newFiles = newFilesTuple[1];
+  const newFiles = await retrieveNewFiles(threadId, threadMessages, storedFiles.map);
 
-  const annotatedFiles = storedFilesTuple[0].filter((file) => !!file?.annotation);
+  const annotatedFiles = storedFiles.list.filter((file) => !!file?.annotation);
 
   const messages = threadMessages.map(message => {
     const role = message.role === "assistant" ? "ai" : message.role;
@@ -193,57 +206,9 @@ async function convertThreadMessagesToMessages(threadId, threadMessages) {
     const content = message.content;
     const fileIds = message.file_ids;
 
-    // handle file only messages
-    const files = fileIds.map((fileId) => {
-      const storedFile = storedFiles.get(fileId);
-      if (storedFile) {
-        return { src: storedFile.src, type: storedFile.type, name: storedFile.name };
-      }
+    const files = handleAttachments(fileIds, storedFiles.map, newFiles.map);
 
-      const newFile = newFiles.get(fileId);
-      if (newFile) {
-        return { src: newFile.src, type: "any", name: "" };
-      }
-    })
-
-
-    const texts = content.map(msg => {
-      if (msg.type === 'text') {
-        let msgText = msg.text.value;
-        const annotations = msg.text.annotations;
-
-        if (annotations.length > 0) {
-          annotations.forEach((annotation) => {
-            const fileId = annotation.file_path.file_id;
-            const replacement = annotation.text;
-            const storedFile = storedFiles.get(fileId);
-
-            if (storedFile) {
-              msgText = msgText.replaceAll(replacement, storedFile.src);
-              return;
-            } 
-
-            const newFile = newFiles.get(fileId);
-            if (newFile) {
-              newFile.replacement = replacement;
-              newFiles.set(fileId, newFile);
-              msgText = msgText.replaceAll(replacement, newFile.src);
-            }
-          })
-        }
-
-        annotatedFiles.forEach((file) => {
-          msgText = msgText.replaceAll(file.annotation, file.src);
-        })
-
-        return msgText;
-      }
-    });
-
-    let text = "";
-    if (texts.length > 0) {
-      text = texts[0];
-    }
+    const text = handleAnnotations(content, storedFiles.map, newFiles.map, annotatedFiles)
 
     return {
       role,
@@ -258,11 +223,54 @@ async function convertThreadMessagesToMessages(threadId, threadMessages) {
   return messages;
 }
 
-export async function syncMessages(threadId, initialMessages) {
-  const rawThreadMessages = await getThreadMessages(threadId, 100);
+function handleAttachments(fileIds, storedFiles, newFiles) {
+  return fileIds.map((fileId) => {
+      const storedFile = storedFiles.get(fileId);
+      if (storedFile) {
+        return { src: storedFile.src, type: storedFile.type, name: storedFile.name };
+      }
 
-  const messages = await convertThreadMessagesToMessages(threadId, rawThreadMessages);
-  const fullMessages = initialMessages.concat(messages);
-
-  return fullMessages;
+      const newFile = newFiles.get(fileId);
+      if (newFile) {
+        return { src: newFile.src, type: "any", name: "" };
+      }
+  });
 }
+
+function handleAnnotations(content, storedFiles, newFiles, annotatedFiles) {
+  const textContents = content.filter((msg) => msg.type === 'text');
+
+  const texts = textContents.map(msg => {
+    let msgText = msg.text.value;
+    const annotations = msg.text.annotations;
+
+    annotations.forEach((annotation) => {
+      const fileId = annotation.file_path.file_id;
+      const replacement = annotation.text;
+      const storedFile = storedFiles.get(fileId);
+
+      if (storedFile) {
+        msgText = msgText.replaceAll(replacement, storedFile.src);
+        return;
+      } 
+
+      const newFile = newFiles.get(fileId);
+      if (newFile) {
+        msgText = msgText.replaceAll(replacement, newFile.src);
+      }
+    })
+
+    annotatedFiles.forEach((file) => {
+      msgText = msgText.replaceAll(file.annotation, file.src);
+    })
+
+    return msgText;
+  });
+
+  if (texts.length > 0) {
+    return texts[0];
+  }
+
+  return "";
+}
+
