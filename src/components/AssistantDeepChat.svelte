@@ -43,9 +43,8 @@
       return;
     }
 
-    const updatedMessages = await threadUtils.syncMessages(threadToLoad.id, initialMessages);
-    const messagesToLoad = updatedMessages.slice(initialMessages.length);
-    messagesToLoad.forEach(msg => deepChatRef._addMessage(msg));
+    const messagesToLoad = await threadUtils.loadMessages(threadToLoad.id);
+    messagesToLoad.forEach(( msg ) => { deepChatRef._addMessage(msg)});
   }
 
   async function updateMessages() {

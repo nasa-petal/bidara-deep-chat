@@ -386,7 +386,7 @@ export async function getFileContent(fileId) {
   if (!response.ok) {
     console.error("Error with response: ");
     console.error(response);
-    return "";
+    return null;
   }
 
   return response.blob();
@@ -394,6 +394,10 @@ export async function getFileContent(fileId) {
 
 export async function getFileSrc(fileId) {
   const blob = await getFileContent(fileId);
+  if (!blob) {
+    return null;
+  }
+
   const src = await new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(blob);
@@ -430,7 +434,7 @@ export async function getFileInfo(fileId) {
   const r = await response.json();
   if (r.error && r.error.type === 'invalid_request_error') {
     console.error(r.error);
-    return [];
+    return null;
   }
 
   return r
