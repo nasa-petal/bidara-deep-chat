@@ -63,11 +63,6 @@
 
     updateMessages();
 
-
-    if (message.message.text === "log") {
-      console.log(deepChatRef.getMessages());
-    }
-
     // for funcCalling context
     if (message.message.role === "user") {
       lastMessageId = message.message._sessionId;
@@ -108,16 +103,9 @@
     imageToProcess = imageFile;
   }
 
-  async function addMessageCallback(message) {
-    deepChatRef._addMessage(message);
-
-    await updateMessages();
-  }
-
   async function handleFuncCalling(functionDetails) {
     let context = {
       lastMessageId,
-      addMessageCallback,
       processImageCallback
     }
 
