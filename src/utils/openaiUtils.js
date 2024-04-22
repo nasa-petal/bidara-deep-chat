@@ -1,7 +1,7 @@
 import * as bidara from "../assistant/bidara";
 
 import { getStoredAPIKey, getStoredAsstId, setStoredAPIKey, setStoredAsstId } from "./storageUtils";
-import { getActiveThread, getThreadImages } from "./threadUtils";
+import { getActiveThread, getFileByFileId, getThreadImages } from "./threadUtils";
 
 let openaiKey = null;
 let openaiAsst = null;
@@ -386,7 +386,7 @@ export async function getFileContent(fileId) {
   if (!response.ok) {
     console.error("Error with response: ");
     console.error(response);
-    return "";
+    return null;
   }
 
   return response.blob();
@@ -394,6 +394,10 @@ export async function getFileContent(fileId) {
 
 export async function getFileSrc(fileId) {
   const blob = await getFileContent(fileId);
+  if (!blob) {
+    return null;
+  }
+
   const src = await new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(blob);
@@ -406,6 +410,35 @@ export async function getFileSrc(fileId) {
   })
 
   return src;
+}
+
+export async function getFileInfo(fileId) {
+  const url = `https://api.openai.com/v1/files/${fileId}`;
+
+  if (!openaiKey) {
+    throw new Error('openai key not set. cannot validate thread.');
+  }
+
+  const method = 'GET';
+  const headers = {
+    'Authorization': 'Bearer ' + openaiKey,
+  };
+
+  const request = {
+    method,
+    headers
+  }
+
+  const response = await fetch(url, request);
+
+  const r = await response.json();
+  if (r.error && r.error.type === 'invalid_request_error') {
+    console.error(r.error);
+    return null;
+  }
+
+  return r
+
 }
 
 export async function getChatCompletion(model, messages, tokenLimit) {
@@ -434,6 +467,44 @@ export async function getChatCompletion(model, messages, tokenLimit) {
   const response = await fetch(url, request);
 
   const r = await response.json();
+  if (r.error && r.error.type === 'invalid_request_error') {
+    console.error(r.error);
+    return null;
+  }
+
+  return r;
+}
+
+export async function uploadFile(b64Data, fileName, type) {
+  if (!openaiKey) {
+    throw new Error('openai key not set. cannot validate thread.');
+  }
+
+  const fileRes = await fetch(b64Data);
+  const blob = await fileRes.blob();
+  const file = new File([blob], fileName, {type: type});
+
+  const form = new FormData();
+  form.append('purpose', 'assistants');
+  form.append('file', file);
+
+  const url = `https://api.openai.com/v1/files`;
+  const method = 'POST';
+  const headers = {
+    'Authorization': 'Bearer ' + openaiKey,
+  };
+  const body = form;
+
+  const request = {
+    method,
+    headers,
+    body
+  }
+
+  const response = await fetch(url, request);
+
+  const r = await response.json();
+
   if (r.error && r.error.type === 'invalid_request_error') {
     console.error(r.error);
     return null;
@@ -480,15 +551,22 @@ export async function getImageDescription(base64, prompt) {
   return imageDescription;
 }
 
-export async function getImageToText(prompt, id) {
+export async function getImageToText(prompt, fileId) {
 
-  let imageFiles = await getThreadImages(id)
+  let imageFile = await getFileByFileId(fileId)
 
-  if (imageFiles.length > 0) {
-    const imageSource = imageFiles[imageFiles.length - 1]
-    const description = await getImageDescription(imageSource, prompt);
-    return description;
+  if (!imageFile) {
+    return "There is no file by the id: " + fileId;
   }
 
-  return "No image has been uploaded, or the uploaded file was not an image.";
+  if (imageFile.type !== "image") {
+    return "The file is not an image";
+  }
+
+  if (!imageFile.src) {
+    return "The image does not contain any source byte data.";
+  }
+
+  const description = await getImageDescription(imageFile.src, prompt);
+  return description;
 }

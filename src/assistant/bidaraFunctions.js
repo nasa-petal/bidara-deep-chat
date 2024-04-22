@@ -1,15 +1,5 @@
-import { getDalleImageGeneration, getImageToText } from "../utils/openaiUtils";
-import { getThreadFiles } from "../utils/threadUtils";
-
-const fileTypes = {
-  "csv": "csv",
-  "xlsx": "excel",
-  "pdf": "pdf",
-  "txt": "txt",
-  "png": "image",
-  "jpg": "image",
-  "jpeg": "image",
-}
+import { getDalleImageGeneration, getImageToText, uploadFile } from "../utils/openaiUtils";
+import { getFileByFileId, getFileTypeByName, pushFile } from "../utils/threadUtils";
 
 export function getCurrentWeather(location) {
   location = location.toLowerCase();
@@ -62,7 +52,7 @@ export async function ssSearch(params) {
   }
 }
 
-async function genImage(params, threadId, addMessageCallback) {
+async function genImage(params, threadId, processImageCallback) {
   let imageParams = JSON.parse(params);
 
   if ("parameters" in imageParams) {
@@ -70,6 +60,8 @@ async function genImage(params, threadId, addMessageCallback) {
   }
 
   let imagePrompt = JSON.stringify(imageParams.prompt) + " Realistic depiction of the object and its environment. Stay true to science, engineering, and biology. DO NOT INCLUDE ANY WORDS OR BRANDING."
+  let fileName = imageParams.file_name;
+
 
   const res = await getDalleImageGeneration(imagePrompt);
 
@@ -79,79 +71,60 @@ async function genImage(params, threadId, addMessageCallback) {
 
   const imageData = res.data[0].b64_json;
   const imageSrc = "data:image/png;base64," + imageData;
+  const fileRes = await uploadFile(imageSrc, fileName, "image/png");
+  const fileId = fileRes.id;
+  const annotation = "sandbox:/mnt/data/" + fileName;
+  const fileObj = { fileId, threadId, src: imageSrc, type: "image", name: fileName, annotation };
 
-  const message = {role: "ai", files: [ { ref: {}, src: imageSrc, type: "image" } ], _sessionId: threadId};
+  await pushFile(fileObj);
+  processImageCallback(fileObj);
 
-  await addMessageCallback(message);
-
-  return "The image has been inserted into the chat. Respond with a very short question bring this back into this process. DO NOT REPLY WITH AN IMAGE, MARKDOWN, OR ANYTHING OTHER THAN A SHORT QUESTION.";
+  return `Use the following file information to display the file and provide a download link in Markdown:\n{ file_id: "${fileId}," file_name: "${fileName}," file_path: "${annotation}" }`;
 }
 
-async function imageToText(params, threadId) {
+async function imageToText(params) {
   let imageParams = JSON.parse(params);
 
   if ("parameters" in imageParams) {
     imageParams = imageParams.parameters;
   }
 
-  let prompt = imageParams.prompt
+  let fileId = imageParams.file_id;
+  let prompt = imageParams.prompt;
 
-  let text = await getImageToText(prompt, threadId);
+  let text = await getImageToText(prompt, fileId);
 
   return text;
 }
 
-function getFileTypeByName(fileName) {
-  if (!fileName) {
-    return "";
-  }
-
-  const extensionMatches = /^.*\.(csv|xlsx|pdf|txt|png|jpg|jpeg)$/gm.exec(fileName);
-
-  // first is whole match, second is capture group. Only one capture group can appear.
-  if (!extensionMatches || extensionMatches.length !== 2) {
-    return "none";
-  }
-
-  const extension = extensionMatches[1];
-
-  const type = fileTypes[extension];
-
-  if (!type) {
-    return "none";
-  }
-
-  return type;
-}
-
-async function getFileType(params, threadId) {
+async function getFileType(params) {
   let fileTypeParams = JSON.parse(params);
 
   if ("parameters" in fileTypeParams) {
     fileTypeParams = fileTypeParams.parameters;
   }
 
-  let files = await getThreadFiles(threadId);
+  let fileId = fileTypeParams.file_id;
 
-  if (files.length < 1) {
+  let file = await getFileByFileId(fileId);
+
+  if (!file) {
     return "No files have been uploaded.";
   }
 
-  let recentFile = files[files.length - 1];
-
-  if (recentFile.type === "image") {
+  if (file.type === "image") {
     return "The file is an image. Analyze the image before responding to determine its contents."
   }
 
-  if (recentFile.name !== null) {
-    const type = getFileTypeByName(recentFile.name);
+  if (file.name !== null) {
+    const type = getFileTypeByName(file.name);
     return type;
   }
 
   return "Unable to determine filetype";
 }
 
-async function getImagePatterns(params, threadId) {
+async function getImagePatterns(params) {
   const patterns =`
       # Growth Patterns 
 
@@ -199,7 +172,15 @@ async function getImagePatterns(params, threadId) {
     ` 
   const prompt = `Describe which of the following patterns are found in the image. Only include patterns that are genuinely present, DO NOT mention any that are not present, and do not make up ones that aren't there.\n\n${patterns}`;
 
-  const text = await getImageToText(prompt, threadId);
+  let imagePatternParams = JSON.parse(params);
+
+  if ("parameters" in imagePatternParams) {
+    imagePatternParams = imagePatternParams.parameters;
+  }
+
+  let fileId = imagePatternParams.file_id;
+
+  const text = await getImageToText(prompt, fileId);
 
   return text;
 }
@@ -210,8 +191,8 @@ export async function callFunc(functionDetails, context) {
     tmp = await ssSearch(functionDetails.arguments);
   }
   else if(functionDetails.name == "text_to_image") {
-    if (context?.addMessageCallback && context?.lastMessageId) {
-      tmp = await genImage(functionDetails.arguments, context.lastMessageId, context.addMessageCallback);
+    if (context?.processImageCallback && context?.lastMessageId) {
+      tmp = await genImage(functionDetails.arguments, context.lastMessageId, context.processImageCallback);
 
     } else {
       tmp = "There was an error in retrieving `text_to_image`."
