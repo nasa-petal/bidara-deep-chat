@@ -7,7 +7,7 @@ const INACTIVE_STATUS = 0;
 
 const BIDARA_DB_CONFIG = { 
 	name: "bidara", 
-	version: 3,
+	version: 4,
 	stores: [ 
 		{ 
 			name: CHAT_STORE_NAME, 
@@ -49,13 +49,13 @@ const BIDARA_DB_CONFIG = {
 		{
 			name: FILE_STORE_NAME,
 			primaryKey: {
-				key: "id",
+				key: "fileId",
 				autoIncrement: true
 			},
 			indices : [
 				{
 					name: "thread",
-					property: "thread_id",
+					property: "threadId",
 					options: {
 						unique: false
 					}
@@ -102,13 +102,18 @@ export async function getMostRecentlyUpdatedThread() {
 }
 
 export async function getThreadFiles(threadId) {
-	const files = await dbUtils.readByProperty(BIDARA_DB, FILE_STORE_NAME, "thread_id", threadId);
+	const files = await dbUtils.readByProperty(BIDARA_DB, FILE_STORE_NAME, "threadId", threadId);
 
 	if (!files) {
 		return [];
 	}
 
 	return files;
+}
+
+export async function getFileById(fileId) {
+	const file = await dbUtils.readByKey(BIDARA_DB, FILE_STORE_NAME, fileId);
+	return file;
 }
 
 export async function getEmptyThread(emptyLength) {
@@ -146,7 +151,7 @@ export async function pushMessageToId(id, message) {
 	await updateTimeById(id);
 }
 
-export async function pushFileToId(id, file) {
+export async function pushFile(file) {
 	// { index: int, file: b64Data }
 	await dbUtils.write(BIDARA_DB, FILE_STORE_NAME, file);
 }

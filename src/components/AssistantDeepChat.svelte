@@ -20,6 +20,10 @@
   let lastMessageId;
   let threadId = thread?.id; 
   let currRunId = null;
+  let newFileUploads = [];
+  let newFileIds = [];
+  let shouldProcessImages = false;
+  let imagesToProcess = [];
 
   let deepChatRef;
 
@@ -39,9 +43,8 @@
       return;
     }
 
-    const updatedMessages = await threadUtils.syncMessages(threadToLoad.id, initialMessages);
-    const messagesToLoad = updatedMessages.slice(initialMessages.length);
-    messagesToLoad.forEach(msg => deepChatRef._addMessage(msg));
+    const messagesToLoad = await threadUtils.loadMessages(threadToLoad.id);
+    messagesToLoad.forEach(( msg ) => { deepChatRef._addMessage(msg)});
   }
 
   async function updateMessages() {
@@ -52,54 +55,26 @@
     }
   }
 
-  async function updateFiles(message) {
-    const files = message?.files;
-    if (!files || files.length <= 0) {
-      return;
-    }
-
-    const index = thread.length - 1;
-    let attached = false;
-    if (message?.text?.length > 0) {
-      attached = true;
-    }
-    
-    const role = message.role;
-
-    const text = message.text;
-
-    const formattedFiles = files.map(file => {
-      let type = file.type;
-      let src = file.src;
-      let name = file?.name ? file.name : "";
-
-      return {
-        thread_id: threadId,
-        type,
-        name,
-        src,
-        index,
-        attached,
-        role,
-        text,
-        replaceText: null,
-      }
-    });
-
-    await threadUtils.pushFiles(threadId, formattedFiles);
-  }
-
   async function onNewMessage(message) { 
     if (!deepChatRef || message.isInitial) {
       return
     }
 
     updateMessages();
-    updateFiles(message.message);
 
     // for funcCalling context
     if (message.message.role === "user") {
       lastMessageId = message.message._sessionId;
+
+      if (message.message?.files?.length > 0) {
+        newFileUploads = message.message.files;
+      }
+    } else if (message.message.role === "ai") {
+      if (newFileIds.length > 0) {
+        newFileUploads = message.message.files;
+
+        handleFileUploads(newFileIds, newFileUploads);
+      }
     }
   }
 
@@ -122,28 +97,78 @@
     setTimeout(()=> loading = false, 400);
   }
 
-
-  async function addMessageCallback(message) {
-    deepChatRef._addMessage(message);
-
-    await updateMessages();
-    await updateFiles(message);
+  async function processImageCallback(imageFile) {
+    shouldProcessImages = true;
+    imagesToProcess.push(imageFile);
   }
 
   async function handleFuncCalling(functionDetails) {
     let context = {
       lastMessageId,
-      addMessageCallback
+      processImageCallback
     }
 
-    return funcCalling(functionDetails, context)
+    return await funcCalling(functionDetails, context);
+  }
+
+  async function handleFileUploads(fileIds, fileUploads) {
+    const formattedFiles = fileUploads.map((file, i) => {
+      const fileId = fileIds[i];
+      const name = file.ref?.name ? file.ref.name : file.name;
+      const newFile = {
+        fileId: fileId,
+        threadId: lastMessageId, 
+        name,
+        type: file.type,
+        src: file.src
+      }
+
+      return newFile;
+    })
+
+    await threadUtils.pushFiles(formattedFiles);
+
+    newFileUploads = [];
+    newFileIds = [];
   }
 
   async function responseInterceptor(response) {
     if (response.id && response.object === "thread.run") {
         currRunId = response.id;
     }
+    if (response.object === "list") {
+      if (response.data[0].file_ids.length > 0) {
+        newFileIds = response.data[0].file_ids;
+      }
+
+      if (shouldProcessImages) {
+        imagesToProcess.forEach((imageToProcess) => {
+          const updatedContent = response.data[0].content.map((content) => {
+            if (content.type === "text") {
+              content.text.value = content.text.value.replaceAll(imageToProcess.annotation, imageToProcess.src);
+            }
+            return content;
+          })
+
+          response.data[0].content = updatedContent;
+        });
+
+        shouldProcessImages = false;
+        imagesToProcess = [];
+      }
+    }
+    
     return response;
+  }
+
+  async function requestInterceptor(request) {
+    if (newFileUploads.length > 0) {
+      newFileIds = request.body.file_ids;
+
+      handleFileUploads(newFileIds, newFileUploads);
+    }
+
+    return request;
   }
 
   function setDeepChatKeyboardSupport() {
@@ -185,6 +210,7 @@
   onNewMessage={onNewMessage}
   onComponentRender={onComponentRender}
   responseInterceptor={responseInterceptor}
+  requestInterceptor={requestInterceptor}
   _insertKeyViewStyles={{displayCautionText: false}}
   demo={false}
   speechToText={{
