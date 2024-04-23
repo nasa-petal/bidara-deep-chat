@@ -1,12 +1,13 @@
 import { validThread, getNewThreadId, getThreadMessages, getFileSrc, getFileInfo } from "./openaiUtils";
 import * as bidaraDB from "./bidaraDB";
 
-async function createNewThread() {
+async function createNewThread(asstId) {
   const new_id = await getNewThreadId();
 
   if (new_id) {
     const new_name = "New Chat";
-    return {name: new_name, id: new_id, length: 0, active: true};
+
+    return {name: new_name, id: new_id, asst_id: asstId, length: 0, active: true};
   }
 
   return null;
@@ -28,8 +29,8 @@ export async function getActiveThread() {
   return thread;
 }
 
-export async function getNewThread() {
-  const thread = await createNewThread();
+export async function getNewThread(asstId) {
+  const thread = await createNewThread(asstId);
   await bidaraDB.setThread(thread);
 
   return thread;
@@ -88,6 +89,16 @@ export async function updateThread(thread) {
 
 export async function setThreadLength(id, length) {
   await bidaraDB.setLengthById(id, length);
+}
+
+export async function setThreadAsstId(thread, asstId) {
+  if (!thread.hasOwnProperty("asst_id")) {
+    thread.asst_id = asstId;
+    await bidaraDB.setThread(thread);
+
+  } else {
+    await bidaraDB.setAsstIdById(thread.id, asstId);
+  }
 }
 
 export async function deleteThread(threadId) {

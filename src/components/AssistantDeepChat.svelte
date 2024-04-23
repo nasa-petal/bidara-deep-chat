@@ -4,7 +4,6 @@
   import * as threadUtils from '../utils/threadUtils';
 
   export let key = null;
-  export let asstId = null;
   export let asstConfig = null;
   export let thread = null;
   export let initialMessages = null;
@@ -19,6 +18,7 @@
 
   let lastMessageId;
   let threadId = thread?.id; 
+  let asstId = thread?.asst_id;
   let currRunId = null;
   let newFileUploads = [];
   let newFileIds = [];
@@ -92,7 +92,6 @@
     if (!loadedMessages) {
       await loadMessages(thread)
     }
-
 
     setTimeout(()=> loading = false, 400);
   }
