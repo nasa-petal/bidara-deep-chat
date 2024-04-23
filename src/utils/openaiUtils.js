@@ -1,10 +1,9 @@
 import * as bidara from "../assistant/bidara";
 
 import { getStoredAPIKey, getStoredAsstId, setStoredAPIKey, setStoredAsstId } from "./storageUtils";
-import { getActiveThread, getFileByFileId, getThreadImages } from "./threadUtils";
+import { getActiveThread, setThreadAsstId, getFileByFileId, getThreadImages } from "./threadUtils";
 
 let openaiKey = null;
-let openaiAsst = null;
 
 export async function validAssistant(id) {
   if (!openaiKey) {
@@ -147,29 +146,17 @@ export async function getAsst() {
   if (!openaiKey) {
     throw new Error('openai key not set. cannot get assistant.');
   }
-  if (openaiAsst) {
-    return openaiAsst;
-  }
 
-  openaiAsst = getStoredAsstId();
-
-  let isValidAsstId = false;
-  if (openaiAsst !== null) {
-    isValidAsstId = await validAssistant(openaiAsst);
-  }
-
-  if (!isValidAsstId) {
-    openaiAsst = getBidaraAssistant(); // returns asst_id or null.
-  }
+  const openaiAsst = getBidaraAssistant(); // returns asst_id or null.
 
   return openaiAsst;
 }
 
-export function setAsst(id) {
+export async function setAsst(thread, asstId) {
   // assistant id must have already been validated
-  if (id) {
-    openaiAsst = id;
-    setStoredAsstId(openaiAsst);
+
+  if (thread && asstId) {
+    await setThreadAsstId(thread, asstId);
   }
 }
 
@@ -241,17 +228,22 @@ export async function getNewThreadId() {
 }
 
 
-export async function getKeyAsstAndThread() {
+export async function getKeyAndThread() {
   let key = await getOpenAIKey();
   if (key === null) {
     return [null, null, null]
   }
 
-  let asst = await getAsst();
-
   let thread = await getActiveThread();
 
-  return [key, asst, thread]
+  if (!thread.asst_id) {
+    const asstId = await getBidaraAssistant();
+    await setAsst(thread, asstId);
+
+    thread.asst_id = asstId;
+  }
+
+  return [key, thread]
 }
 
 export async function getDalleImageGeneration(prompt, image_size = null, image_quality = null, num_images = null, response_format = null) {

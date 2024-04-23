@@ -4,14 +4,13 @@
   import { BIDARA_CONFIG, BIDARA_INITIAL_MESSAGES } from './assistant/bidara';
   import { funcCalling } from './assistant/bidaraFunctions';
   import * as threadUtils from './utils/threadUtils';
-  import { getKeyAsstAndThread } from './utils/openaiUtils';
+  import { getKeyAndThread, getAsst, setAsst } from './utils/openaiUtils';
   import { createBidaraDB, closeBidaraDB } from "./utils/bidaraDB";
   import hljs from "highlight.js";
   window.hljs = hljs;
 
   let activeKey = null;
   let activeThread = null;
-  let activeAsstId = null;
   let activeAsstConfig = null;
   let activeFuncCalling = null;
   let activeInitialMessages = null;
@@ -24,15 +23,14 @@
   let loadedMessages = false;
 
   async function initKeyAsstAndThreads() {
-    const keyAsstAndThread = await getKeyAsstAndThread();
+    const keyAsstAndThread = await getKeyAndThread();
 
     if (!keyAsstAndThread[0]) {
       return;
     }
 
     activeKey = keyAsstAndThread[0];
-    activeAsstId = keyAsstAndThread[1];
-    activeThread = keyAsstAndThread[2];
+    activeThread = keyAsstAndThread[1];
 
     activeInitialMessages = BIDARA_INITIAL_MESSAGES;
     activeAsstConfig = BIDARA_CONFIG;
@@ -67,9 +65,9 @@
       return;
     }
 
-    const thread = await threadUtils.getNewThread();
-    await switchActiveThread(thread);
+    const thread = await threadUtils.getNewThread(activeThread.asst_id);
     threads = await threadUtils.getThreads();
+    await switchActiveThread(thread);
   }
 
   async function deleteThreadAndSwitch(thread) {
@@ -95,6 +93,10 @@
 
 
   async function switchActiveThread(thread) {
+    if (!thread?.asst_id) {
+      const asstId = await getAsst();
+      await setAsst(thread, asstId);
+    }
     if (activeThread && thread.id === activeThread.id) {
       return;
     }
@@ -133,7 +135,6 @@
         <div id="chat-container" class="w-full" class:loading>
           <AssistantDeepChat
             key={activeKey}
-            asstId={activeAsstId}
             asstConfig={activeAsstConfig}
             thread={activeThread}
             funcCalling={activeFuncCalling}
