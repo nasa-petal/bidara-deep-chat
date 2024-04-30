@@ -4,7 +4,7 @@
   import { BIDARA_CONFIG, BIDARA_INITIAL_MESSAGES } from './assistant/bidara';
   import { funcCalling } from './assistant/bidaraFunctions';
   import * as threadUtils from './utils/threadUtils';
-  import { getKeyAndThread, getAsst, setAsst } from './utils/openaiUtils';
+  import { getKeyAndThread } from './utils/openaiUtils';
   import { createBidaraDB, closeBidaraDB } from "./utils/bidaraDB";
   import hljs from "highlight.js";
   window.hljs = hljs;
@@ -23,7 +23,11 @@
   let loadedMessages = false;
 
   async function initKeyAsstAndThreads() {
-    const keyAsstAndThread = await getKeyAndThread();
+    activeInitialMessages = BIDARA_INITIAL_MESSAGES;
+    activeAsstConfig = BIDARA_CONFIG;
+    activeFuncCalling = funcCalling;
+
+    const keyAsstAndThread = await getKeyAndThread(activeAsstConfig);
 
     if (!keyAsstAndThread[0]) {
       return;
@@ -31,10 +35,6 @@
 
     activeKey = keyAsstAndThread[0];
     activeThread = keyAsstAndThread[1];
-
-    activeInitialMessages = BIDARA_INITIAL_MESSAGES;
-    activeAsstConfig = BIDARA_CONFIG;
-    activeFuncCalling = funcCalling;
 
     threads = await threadUtils.getThreads();
     loggedIn = true;
@@ -65,7 +65,7 @@
       return;
     }
 
-    const thread = await threadUtils.getNewThread(activeThread.asst_id);
+    const thread = await threadUtils.getNewThread(activeThread.asst);
     threads = await threadUtils.getThreads();
     await switchActiveThread(thread);
   }
@@ -93,10 +93,6 @@
 
 
   async function switchActiveThread(thread) {
-    if (!thread?.asst_id) {
-      const asstId = await getAsst();
-      await setAsst(thread, asstId);
-    }
     if (activeThread && thread.id === activeThread.id) {
       return;
     }
@@ -106,7 +102,7 @@
 
     await threadUtils.setActiveThread(thread.id);
 
-    activeThread = await threadUtils.getActiveThread();
+    activeThread = await threadUtils.getActiveThread(activeAsstConfig);
   }
 
   async function renameActiveThread(name) {
