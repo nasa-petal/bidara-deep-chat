@@ -1,7 +1,7 @@
 <script>
   import { onMount, onDestroy } from 'svelte';
   import { Navbar, Sidebar, AssistantDeepChat, Login } from './components';
-  import { BIDARA_CONFIG, BIDARA_INITIAL_MESSAGES } from './assistant/bidara';
+  import { CONFIG as bidaraConfig, INITIAL_MESSAGES as bidaraInitialMessages } from './assistant/bidara';
   import { funcCalling } from './assistant/bidaraFunctions';
   import * as threadUtils from './utils/threadUtils';
   import { getKeyAndThread } from './utils/openaiUtils';
@@ -23,8 +23,8 @@
   let loadedMessages = false;
 
   async function initKeyAsstAndThreads() {
-    activeInitialMessages = BIDARA_INITIAL_MESSAGES;
-    activeAsstConfig = BIDARA_CONFIG;
+    activeInitialMessages = bidaraInitialMessages;
+    activeAsstConfig = bidaraConfig;
     activeFuncCalling = funcCalling;
 
     const keyAsstAndThread = await getKeyAndThread(activeAsstConfig);
@@ -120,7 +120,7 @@
       <Login loginHandler={initKeyAsstAndThreads} />
 
     {:else}
-      <Navbar bind:chat_name={activeThread.name} bind:sidebar={open} handleRename={renameActiveThread}/>   
+      <Navbar bind:chatName={activeThread.name} bind:sidebar={open} handleRename={renameActiveThread}/>   
 
       <div id="content-container" class="flex justify-between w-full h-full flex-1" class:open>
         <div>
