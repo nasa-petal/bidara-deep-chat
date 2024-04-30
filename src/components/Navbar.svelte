@@ -1,28 +1,26 @@
 <script>
     import Hamburger from './Hamburger.svelte'
-    import Menu from './Menu.svelte';
-    import MenuItem from './MenuItem.svelte';
-    import ThemeSwitcher from './ThemeSwitcher.svelte';
-    import ExportMarkdown from './ExportMarkdown.svelte';
-    import ExportPdf from './ExportPdf.svelte';
+    import NavMenu from './NavMenu.svelte';
+    import AssistantSelectModal from './AssistantSelectModal.svelte'
 	
     export let sidebar = false
-    export let chat_name;
+    export let chatName;
     export let handleRename;
     
-    let editing_name = false;
-    let editing_input;
+    let editingName = false;
+    let editingInput;
+    let navMenuOpen = false;
 
-    if (!chat_name) {
-      chat_name = "";
+    if (!chatName) {
+      chatName = "";
     }
 
     function handleButtonClick() {
-      editing_name = true;
+      editingName = true;
     }
 
     function handleInputLeave() {
-      editing_name = false;
+      editingName = false;
     }
 
     async function handleInputKeyDown(event) {
@@ -30,13 +28,13 @@
         const new_chat_name = event.target.value;
 
         if (new_chat_name) {
-          chat_name = new_chat_name;
-          await handleRename(chat_name);
+          chatName = new_chat_name;
+          await handleRename(chatName);
         }
 
-        editing_name = false;
+        editingName = false;
       } else if (event.key === 'Escape') { 
-        editing_input.blur()
+        editingInput.blur()
 
       } else if (event.key === ' '){
         event.preventDefault();
@@ -46,9 +44,20 @@
     }
 
     $: {
-      if (editing_name && editing_input) {
-        editing_input.focus();
+      if (editingName && editingInput) {
+        editingInput.focus();
       }
+    }
+
+    let assistantModalOpen = false;
+
+    function handleModalOpen(modalId) {
+      navMenuOpen = false;
+      assistantModalOpen = true;
+    }
+
+    function handleModalClose(modalId) {
+      assistantModalOpen = false;
     }
 </script>
 
@@ -57,29 +66,17 @@
     <Hamburger bind:open={sidebar}/>
   </nav>
 
-  {#if editing_name}
-    <input type="text" bind:this={editing_input} class="px-3 py-1 rounded-full" on:blur={handleInputLeave} on:keydown={handleInputKeyDown}/>
+  {#if editingName}
+    <input type="text" bind:this={editingInput} class="px-3 py-1 rounded-full" on:blur={handleInputLeave} on:keydown={handleInputKeyDown}/>
   {:else}
-    <button tabindex="0" class="focus:no-outline px-3 py-1 rounded-full" on:click={handleButtonClick}>{chat_name}</button>
+    <button tabindex="0" class="focus:no-outline px-3 py-1 rounded-full" on:click={handleButtonClick}>{chatName}</button>
   {/if}
-  <Menu>
-    <div class="function-container">
-      <MenuItem><ExportPdf bind:chatName={chat_name}/></MenuItem>
-      <MenuItem><ExportMarkdown bind:chatName={chat_name}/></MenuItem>
-      <MenuItem><ThemeSwitcher/></MenuItem>
-    </div>
-    <div class="info-container">
-      <MenuItem><a class="w-full h-full p-1" tabindex="0" href="https://forms.gle/xDEixG5UJrFBwDKv5" target="_blank" rel="noopener">Send Feedback</a></MenuItem>
-      <MenuItem><a class="w-full h-full p-1" tabindex="0" href="https://www1.grc.nasa.gov/research-and-engineering/vine/petal/" target="_blank" rel="noopener">Visit PeTaL</a></MenuItem>
-    </div>
-  </Menu>
+  <NavMenu bind:chatName={chatName} bind:open={navMenuOpen} handleModalOpen={handleModalOpen}/>
 </header>
 
-<style>
-  .function-container {
-    border-bottom: 1px solid var(--light-border-color);
-  }
+<AssistantSelectModal bind:open={assistantModalOpen} handleClose={handleModalClose}/>
 
+<style>
   header {
     background-color: var(--nav-color);
     z-index: 30;
@@ -100,11 +97,5 @@
   }
   input {
     background-color: var(--nav-off-color);
-  }
-  a {
-    color: white !important;
-  }
-  a:visited {
-    color: white !important;
   }
 </style>
