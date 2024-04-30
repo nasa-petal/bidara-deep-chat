@@ -28,6 +28,7 @@
 
     setTimeout(() => {
       event.target.style.backgroundColor = 'var(--nav-off-color)';
+      event.target.style.transition = 'none';
     }, 200);
 
     if (isSmallScreen()) {

@@ -2,14 +2,15 @@
 	import { onDestroy } from 'svelte';
 	import AssistantDeepChat from './AssistantDeepChat.svelte';
 
-	import { BIDARA_LOGO, BIDARA_LOGO_DESC, BIDARA_NAME, BIDARA_TAGLINE} from '../assistant/bidara';
+	import * as bidara from '../assistant/bidara';
 
 	export let loginHandler;
 
-	let title = BIDARA_NAME;
-	let image = BIDARA_LOGO;
-	let image_alt = BIDARA_LOGO_DESC;
-	let tagline = BIDARA_TAGLINE;
+	let title = bidara.NAME;
+	let image = bidara.LOGO;
+	let image_alt = bidara.LOGO_DESC;
+	let tagline = bidara.TAGLINE;
+	let name = bidara.NAME;
   let showLoginField = true; 
 
   async function handleLogin(){
@@ -38,7 +39,7 @@
 	</ol>
 	<ul class="list-disc mt-4">
 		<li>With OpenAI API you only pay for what you use. Track your usage and costs on the <a href="https://platform.openai.com/usage" class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600">Usage page</a>.</li>
-		<li>After you send your first message to {BIDARA_NAME}, it will also be available to interact with through the <a href="https://platform.openai.com/assistants" class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600">OpenAI Assistants Playground</a>. This interface is more complex, but also provides more customizability. Just select {BIDARA_NAME}, then click the 'Test' button.</li>
+		<li>After you send your first message to {name}, it will also be available to interact with through the <a href="https://platform.openai.com/assistants" class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600">OpenAI Assistants Playground</a>. This interface is more complex, but also provides more customizability. Just select {name}, then click the 'Test' button.</li>
 	</ul>
 
   {#if showLoginField}
