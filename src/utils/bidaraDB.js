@@ -172,8 +172,8 @@ export async function setLengthById(id, length) {
 	await dbUtils.updateProperty(BIDARA_DB, CHAT_STORE_NAME, id, "length", length);
 }
 
-export async function setAsstIdById(id, asstId) {
-	await dbUtils.updateProperty(BIDARA_DB, CHAT_STORE_NAME, id, "asst_id", asstId);
+export async function setAsstById(id, asst) {
+	await dbUtils.updateProperty(BIDARA_DB, CHAT_STORE_NAME, id, "asst", asst);
 }
 
 export async function setActiveStatusById(id, status) {

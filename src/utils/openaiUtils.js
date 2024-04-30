@@ -1,11 +1,16 @@
-import * as bidara from "../assistant/bidara";
-
-import { getStoredAPIKey, getStoredAsstId, setStoredAPIKey, setStoredAsstId } from "./storageUtils";
-import { getActiveThread, setThreadAsstId, getFileByFileId, getThreadImages } from "./threadUtils";
+import { getStoredAPIKey, setStoredAPIKey } from "./storageUtils";
+import { getActiveThread, getFileByFileId } from "./threadUtils";
+import { BIDARA_CONFIG } from "../assistant/bidara";
 
 let openaiKey = null;
 
-export async function validAssistant(id) {
+function getAssistantConfigFromName(asstName) {
+  if (asstName === "BIDARA") {
+    return BIDARA_CONFIG;
+  }
+}
+
+export async function validAssistant(id, asstName) {
   if (!openaiKey) {
     throw new Error('openai key not set. cannot validate assistant.');
   }
@@ -24,13 +29,13 @@ export async function validAssistant(id) {
     return false;
   }
 
-  if (r.hasOwnProperty('name') && r.name == bidara.BIDARA_NAME+"v"+bidara.BIDARA_VERSION) {
+  if (r.hasOwnProperty('name') && r.name == asstName) {
     return true;
   }
   return false;
 }
 
-export async function updateAssistant(id) {
+export async function updateAssistant(id, config) {
   // returns id on successful update, null otherwise.
   if (!openaiKey) {
     throw new Error('openai key not set. cannot update assistant.');
@@ -42,7 +47,7 @@ export async function updateAssistant(id) {
       'Content-Type': 'application/json',
       'OpenAI-Beta': 'assistants=v1'
     },
-    body: JSON.stringify(bidara.BIDARA_CONFIG)
+    body: JSON.stringify(config)
   });
 
   const r = await response.json();
@@ -52,7 +57,7 @@ export async function updateAssistant(id) {
   return null;
 }
 
-export async function getBidaraAssistant() {
+export async function getAssistantId(asstName, asstConfig) {
   if (!openaiKey) {
     throw new Error('openai key not set. cannot search for bidara assistant.');
   }
@@ -72,19 +77,19 @@ export async function getBidaraAssistant() {
   if (r.hasOwnProperty('data')) {
     // find assistant with name == BIDARAvX.X
     
-    const bidaraRegex = new RegExp(`^${bidara.BIDARA_NAME}v[0-9]+\.[0-9]+$`)
-    let bidaraAsst = r.data.find(item => bidaraRegex.test(item.name));
-    if(bidaraAsst && bidaraAsst.hasOwnProperty('id')) {
+    const asstRegexp = new RegExp(`^${asstName}v[0-9]+\.[0-9]+$`)
+    let foundAsst = r.data.find(item => asstRegexp.test(item.name));
+    if(foundAsst && foundAsst.hasOwnProperty('id')) {
       // get version of assistant.
-      let bidaraVersion = bidaraAsst.name.substring(7);
+      const version = /^.*v([0-9]+\.[0-9]+)$/.exec(foundAsst.name)[1];
       // if assistant version is up to date, use it.
-      if (bidaraVersion == bidara.BIDARA_VERSION) {
-        return bidaraAsst.id;
+      if (version == asstConfig.version) {
+        return foundAsst.id;
       }
       else {
         // otherwise update it.
-        bidaraAsst.id = await updateAssistant(bidaraAsst.id);
-        return bidaraAsst.id;
+        foundAsst.id = await updateAssistant(foundAsst.id, asstConfig);
+        return foundAsst.id;
       }
     }
   }
@@ -142,22 +147,31 @@ export function setOpenAIKey(key) {
   setStoredAPIKey(openaiKey);
 }
 
-export async function getAsst() {
-  if (!openaiKey) {
-    throw new Error('openai key not set. cannot get assistant.');
+export async function getNewAsst(asst, defaultConfig) {
+  let asstConfig;
+  let name;
+  let version;
+  if (asst) {
+    asstConfig = getAssistantConfigFromName(asst.name);
+    name = asst.name;
+    version = asst.version;
+
+  } else {
+    asstConfig = defaultConfig;
+    name = /^(.*)v[0-9]+\.[0-9]+$/.exec(asstConfig.name)[1];
+    version = /^.*v([0-9]+\.[0-9]+)$/.exec(asstConfig.name)[1];
   }
 
-  const openaiAsst = getBidaraAssistant(); // returns asst_id or null.
 
-  return openaiAsst;
-}
+  const asstId = await getAssistantId(name, asstConfig);
 
-export async function setAsst(thread, asstId) {
-  // assistant id must have already been validated
-
-  if (thread && asstId) {
-    await setThreadAsstId(thread, asstId);
+  const newAsst = {
+    name: name,
+    version: version,
+    id: asstId
   }
+
+  return newAsst
 }
 
 export async function validThread(thread_id) {
@@ -228,20 +242,13 @@ export async function getNewThreadId() {
 }
 
 
-export async function getKeyAndThread() {
+export async function getKeyAndThread(asstConfig) {
   let key = await getOpenAIKey();
   if (key === null) {
-    return [null, null, null]
+    return [null, null]
   }
 
-  let thread = await getActiveThread();
-
-  if (!thread.asst_id) {
-    const asstId = await getBidaraAssistant();
-    await setAsst(thread, asstId);
-
-    thread.asst_id = asstId;
-  }
+  let thread = await getActiveThread(asstConfig);
 
   return [key, thread]
 }
