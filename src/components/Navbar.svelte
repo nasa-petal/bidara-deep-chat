@@ -49,7 +49,7 @@
       }
     }
 
-    let assistantModalOpen = false;
+    let assistantModalOpen = true;
 
     function handleModalOpen(modalId) {
       navMenuOpen = false;
