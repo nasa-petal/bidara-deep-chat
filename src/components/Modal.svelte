@@ -1,7 +1,7 @@
 <script>
 </script>
 
-<div class="centeredModal">
+<div class="centeredModal w-full h-full p-4 md:p-8">
 	<slot/>
 </div>
 
@@ -11,10 +11,7 @@
 		border: 1px solid var(--border-color);
 		box-shadow: 0 0 1rem 0 var(--box-shadow-color);
 		color: var(--text-primary-color);
-		width: 100%;
-		height: 100%;
 
 		border-radius: 1em;
-		padding: 2em;
 	}
 </style>
