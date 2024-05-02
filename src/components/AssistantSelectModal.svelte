@@ -1,40 +1,47 @@
 <script>
 	import Modal from "./Modal.svelte";
 	import BackdropClose from "./BackdropClose.svelte"
+	import ContactCard from "./ContactCard.svelte";
+	import Hamburger from "./Hamburger.svelte";
+
 	import * as bidara from "../assistant/bidara"
 	import * as knowah from "../assistant/knowah"
 
 	export let open;
 	export let handleClose;
+	let openModal
 
-	let options = [
-		{
-			name: bidara.NAME,
-			tagline: bidara.TAGLINE,
-			description: bidara.TEXT_DESCRIPTION,
-			logo: bidara.LOGO
-		}, 
-		{
-			name: knowah.NAME,
-			tagline: knowah.TAGLINE,
-			description: knowah.TEXT_DESCRIPTION,
-			logo: knowah.LOGO
+	$: openModal = open;
+
+	let assistants = [ bidara, knowah ]
+
+	let options = assistants.map((asst) => {
+		return {
+			name: asst.NAME,
+			tagline: asst.TAGLINE,
+			description: asst.TEXT_DESCRIPTION,
+			logo: asst.LOGO,
+			model: asst.MODEL,
+			builtInFunctions: asst.FUNCTIONS.filter((func) => func.type !== "function"),
+			customFunctions: asst.FUNCTIONS.filter((func) => func.type === "function"),
 		}
-	]
+	});
 
-	let selected = options[0].name;
-	let prevSelected;
+	let selectedDetails = options[0];
+	let selected = selectedDetails.name;
 
 	function closeAssistantSelect() {
 		handleClose("assistant-select")
 	}
 
 	function handleAssistantSelect() {
+		closeAssistantSelect();
 		console.log("selected: ", selected);
 	}
 
 	function onChangeSelect(e) {
 		selected = e.currentTarget.value;
+		selectedDetails = options.find((opt) => opt.name === selected);
 	}
 
 	// close modal with escape
@@ -42,58 +49,79 @@
 </script>
 
 <div class="select-container flex w-full h-full" class:open>
-	<div id="assistant-modal" class="modal" class:openModal={open}>
+	<div id="assistant-modal" class="modal m-auto" class:open>
 		<Modal>
-			<div class="w-full h-full flex flex-col">
-				<div id="options" class="options h-full flex flex-col">
-					{#each options as asst}
-						<label id={`option-${asst.name}`} class="option mb-4 flex flex-col w-full h-12 md:h-18 p-2 px-4" class:selected={asst.name === selected}>
-							<div class="mb-4 mx-auto">
-								<input class="opacity-0 w-0 p-0 m-0 h-0" type="radio" name="assistant" id={asst.name} value={asst.name} on:change={onChangeSelect} checked={asst.name === selected}/>
-								<label class="mx-auto md:mx-0" for={asst.name}><strong>{asst.name}</strong></label>
-							</div>
+			<div class="buttons flex justify-between">
+				<button tabindex="0" class="close-button focus:outline-none" on:click={closeAssistantSelect}>
+					<img class="close-image" src="chevron-right-blue.svg" alt="close"/>
+				</button>
+				<button tabindex="0" class="compose-button focus:outline-none" on:click={handleAssistantSelect}>
+					<img class="compose-image" src="compose-blue.svg" alt="close"/>
+				</button>
+			</div>
 
-							<div>
-								<h1 class="mb-2 mx-auto">{asst.tagline}</h1>
-								<p>{asst.description}</p>
-							</div>
-						</label>
-					{/each}
+			<form on:submit|preventDefault={handleAssistantSelect} class="w-full h-full flex flex-col focus:outline-none">
+				<div>
+				{#key selected}
+					{#if selectedDetails.logo !== ""}
+						<img class="contact-img w-20 h-20 mx-auto p-0" src={selectedDetails.logo} alt="" />
+					{:else}
+						<div class="backup-img w-20 h-20 flex justify-center items-center mx-auto">
+							<p class="w-fit h-fit">{selectedDetails.name[0]}</p>
+						</div>
+					{/if}
+				{/key}
+				<div>
+
+				<div class="flex justify-center items-center">
+					<select bind:value={selected} class="selecter my-3 text-center w-fit focus:outline-none" on:change={onChangeSelect}>
+						{#each options as asst}
+							<option class="option focus:outline-none" value={asst.name}>
+							{asst.name}
+							</option>
+						{/each}
+					</select>
+					<img class="dropdown-image ml-2 mr-0" src="chevron-right-blue.svg" alt="close"/>
 				</div>
 
-				<button class="submit w-fit h-10 px-16 mx-auto focus:outline-none" on:click={handleAssistantSelect}><strong>Confirm</strong></button>
-			<div>
+				<ContactCard bind:tagline={selectedDetails.tagline} bind:description={selectedDetails.description} bind:model={selectedDetails.model} bind:builtInFunctions={selectedDetails.builtInFunctions} bind:customFunctions={selectedDetails.customFunctions} />
+			</form>
 		</Modal>
 	</div>
 	<BackdropClose bind:blur={open} bind:open handleClick={closeAssistantSelect}/>
 </div>
 
 <style>
-  button:focus-visible {
+	button:focus-visible,
+	select:focus-visible {
     outline: 5px auto -webkit-focus-ring-color; 
   }
 
-	button:active {
-		background-color: var(--translucent-nav-color);
+	form {
+		overflow-y: scroll;
 	}
 
-	button {
+	.backup-img {
+		border-radius: 50%;
+		background-color: var(--nav-color);
+		font-size: 2em;
+	}
+
+	.contact-img {
+		border-radius: 50%;
+	}
+
+	.selecter {
+		background-color: transparent;
 		color: var(--text-important-color);
+		cursor: pointer;
+		-webkit-appearance: none;
+		appearance: none;
 	}
 
 	.option {
-		background-color: var(--translucent-nav-color);
-		border: 1px solid var(--border-color);
-		border-radius: 1em;
-		transition: height ease 0.7s, background-color ease 0.7s;
-
-		overflow: hidden;
-	}
-
-	.submit {
-		background-color: var(--chat-background-color);
-		border: 1px solid var(--border-color);
-		border-radius: 0.75em;
+		color: var(--text-important-color);
+		cursor: pointer;
 	}
 
 	.select-container {
@@ -106,26 +134,35 @@
 		z-index: 1000;
 	}
 
-	.selected {
-		height: 100%;
-	}
-
 	.modal {
 		opacity: 0;
-		transition: opacity ease 0.3s, width ease 0.3s, height ease 0.3s;
+		transition: opacity ease 0.3s, width ease 0.3s, height ease 0.3s, left ease 0.3s, visibility 0.3s 0s;
 		display: block;
 		width: 900px;
-		height: 600px;
-		margin: auto;
+		height: 700px;
 		z-index: 100;
 	}
 
-	.openModal {
+	.open {
 		opacity: 1;
+		visibility: visible;
 	}
 
-	.open {
-		visibility: visible;
+	.close-image {
+		width: 15px;
+		height: 15px;
+		transform: rotate(180deg);
+	}
+	
+	.compose-image {
+		width: 15px;
+		height: 15px;
+	}
+
+	.dropdown-image {
+		width: 10px;
+		height: 10px;
+		transform: rotate(90deg);
 	}
 
   @media only screen and (max-width: 1000px) {
@@ -137,22 +174,22 @@
 
   @media only screen and (max-width: 768px) {
     .modal {
-      width: 80%;
-			height: calc(90% - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+      width: 100%;
+			height: calc(100% - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+
+			position: fixed;
+			opacity: 1;
+			left: 100%;
+			top: env(safe-area-inset-top);
     }
+
+		.close-image {
+			transform: none;
+		}
+
+		.open {
+			opacity: 1;
+			left: 0;
+		}
   }
-
-	.options::-webkit-scrollbar {
-		width: 8px;
-		height: 8px;
-	}
-
-	.options::-webkit-scrollbar-thumb {
-		background-color: var(--border-off-color);
-		border-radius: 5px;
-	}
-
-	.options::-webkit-scrollbar-track {
-		background-color: var(--nav-color);
-	}
 </style>

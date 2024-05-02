@@ -216,7 +216,7 @@ const GET_IMAGE_PATTERNS = {
   }
 }
 
-const FUNCTIONS = [
+export const FUNCTIONS = [
   { type: "code_interpreter" },
   { type: "retrieval" },
   { type: "function", function: PAPER_SEARCH_FUNC },
