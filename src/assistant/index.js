@@ -16,4 +16,6 @@ const BIDARA = {
 	customFunctions: bidaraAsst.FUNCTIONS.filter((func) => func.type === "function"),
 }
 
-export { BIDARA }
+export const assistantOptions = [
+	BIDARA,
+]
