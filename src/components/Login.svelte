@@ -45,6 +45,7 @@
   {#if showLoginField}
 		<AssistantDeepChat
 			loginHandler={handleLogin}
+			onLoadComplete={null}
 			height="100px"
 		 />
   {/if}
