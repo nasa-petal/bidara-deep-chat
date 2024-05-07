@@ -108,7 +108,7 @@
       processImageCallback
     }
 
-    return await activeAsst.funcCalling(functionDetails, context);
+    return await asst.funcCalling(functionDetails, context);
   }
 
   async function handleFileUploads(fileIds, fileUploads) {
