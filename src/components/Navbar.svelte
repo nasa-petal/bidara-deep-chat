@@ -6,10 +6,15 @@
     export let sidebar = false
     export let chatName;
     export let handleRename;
+    export let changeAssistant;
+    export let currAsst;
+    export let assistantOptions;
     
     let editingName = false;
     let editingInput;
     let navMenuOpen = false;
+
+    let assistantModalOpen = false;
 
     if (!chatName) {
       chatName = "";
@@ -49,8 +54,6 @@
       }
     }
 
-    let assistantModalOpen = true;
-
     function handleModalOpen(modalId) {
       navMenuOpen = false;
       assistantModalOpen = true;
@@ -59,6 +62,16 @@
     function handleModalClose(modalId) {
       assistantModalOpen = false;
     }
+
+    async function handleAssistantChange(asst) {
+      console.log(asst)
+      await changeAssistant(asst);
+      currAsst = asst;
+      console.log("changing to asst: ", asst.name);
+
+    }
+
+    $: console.log("currAsst: ", currAsst.name);
 </script>
 
 <header class="flex py-2 justify-between items-center text-gray-600">
@@ -74,7 +87,7 @@
   <NavMenu bind:chatName={chatName} bind:open={navMenuOpen} handleModalOpen={handleModalOpen}/>
 </header>
 
-<AssistantSelectModal bind:open={assistantModalOpen} handleClose={handleModalClose}/>
+<AssistantSelectModal bind:open={assistantModalOpen} handleClose={handleModalClose} handleAssistantChange={handleAssistantChange} bind:currAsst options={assistantOptions} />
 
 <style>
   header {
