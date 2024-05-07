@@ -64,14 +64,9 @@
     }
 
     async function handleAssistantChange(asst) {
-      console.log(asst)
       await changeAssistant(asst);
       currAsst = asst;
-      console.log("changing to asst: ", asst.name);
-
     }
-
-    $: console.log("currAsst: ", currAsst.name);
 </script>
 
 <header class="flex py-2 justify-between items-center text-gray-600">

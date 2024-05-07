@@ -82,7 +82,10 @@
 
   async function onComponentRender() {
     deepChatRef = document.getElementById("chat-element");
-    setDeepChatKeyboardSupport();
+
+    if (deepChatRef) {
+      setDeepChatKeyboardSupport();
+    }
     // save key to localStorage.
     // The event occurs before key is set, and again, after key is set.
     if (!key && this._activeService.key) {
@@ -171,6 +174,11 @@
   function setDeepChatKeyboardSupport() {
     const shadowRoot = deepChatRef.shadowRoot;
     const input = shadowRoot.getElementById("input");
+
+    if (!input) {
+      return;
+    }
+
     const inputButtons = input.getElementsByClassName("input-button");
     inputButtons.forEach(button => {
       const buttonClickEventListener = button.onclick;
