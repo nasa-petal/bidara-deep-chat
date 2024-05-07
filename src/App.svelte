@@ -1,7 +1,7 @@
 <script>
   import { onMount, onDestroy } from 'svelte';
   import { Navbar, Sidebar, AssistantDeepChat, Login } from './components';
-  import { BIDARA, KNOWAH } from "./assistant";
+  import { BIDARA } from "./assistant";
   import { getKeyAndThread, getNewAsst } from './utils/openaiUtils';
   import { createBidaraDB, closeBidaraDB } from "./utils/bidaraDB";
   import * as threadUtils from './utils/threadUtils';
@@ -112,9 +112,6 @@
   function getAssistant(asstName) {
     if (asstName === BIDARA.name) {
       return BIDARA;
-
-    } else if (asstName === KNOWAH.name) {
-      return KNOWAH;
     }
   }
 
@@ -145,7 +142,7 @@
         bind:chatName={activeThread.name} 
         bind:sidebar={open} 
         bind:currAsst={activeAsst}
-        assistantOptions={[BIDARA, KNOWAH]}
+        assistantOptions={[BIDARA]}
         handleRename={renameActiveThread} 
         changeAssistant={changeAssistants}
         />   

@@ -1,15 +1,13 @@
 import { getStoredAPIKey, setStoredAPIKey } from "./storageUtils";
 import { getActiveThread, getFileByFileId } from "./threadUtils";
-import { BIDARA, KNOWAH } from "../assistant";
+import { BIDARA } from "../assistant";
 
 let openaiKey = null;
 
 function getAssistantConfigFromName(asstName) {
   if (asstName === BIDARA.name) {
     return BIDARA.config;
-  } else if (asstName === KNOWAH.name) {
-    return KNOWAH.config;
-  }
+  } 
 }
 
 export async function validAssistant(id, asstName) {
