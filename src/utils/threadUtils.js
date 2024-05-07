@@ -19,11 +19,11 @@ async function createNewThread(asst) {
   return null;
 }
 
-export async function getActiveThread(asstConfig) {
+export async function getActiveThread(defaultAsst) {
  
   const thread = await bidaraDB.getActiveThread();
   if (thread === null) { // thread doesn't exist, so everything new
-    const asst = await getNewAsst(null, asstConfig);
+    const asst = await getNewAsst(null, defaultAsst);
     const newThread = await createNewThread(asst);
     await bidaraDB.setThread(newThread);
     return newThread;
@@ -31,19 +31,22 @@ export async function getActiveThread(asstConfig) {
   
   let asst = thread.asst;
   if (!asst) { 
-    asst = await getNewAsst(null, asstConfig);
+    asst = await getNewAsst(null, defaultAsst);
     await setThreadAsst(thread, asst);
     thread.asst = asst;
 
   } else if  (asst && !(await validAssistant(asst.id, asst.name))) { // asst doesn't exist, or is invalid
-    asst = await getNewAsst(asst, asstConfig);
+    asst = await getNewAsst(asst, defaultAsst);
     await setThreadAsst(thread, asst);
     thread.asst = asst;
   }
 
   const isValidThreadId = await validThread(thread.id);
   if (!isValidThreadId) { // thread is invalid, so new thread with same asst
-    thread = await createNewThread(asst);
+    const asst = await getNewAsst(null, defaultAsst);
+    const newThread = await createNewThread(asst);
+    await bidaraDB.setThread(newThread);
+    return newThread;
   }
 
   return thread;

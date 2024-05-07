@@ -4,39 +4,27 @@
 	import ContactCard from "./ContactCard.svelte";
 	import Hamburger from "./Hamburger.svelte";
 
-	import * as bidara from "../assistant/bidara"
-	import * as knowah from "../assistant/knowah"
-
 	export let open;
 	export let handleClose;
-	let openModal
+	export let handleAssistantChange;
+	export let currAsst;
+	export let options;
 
-	$: openModal = open;
 
-	let assistants = [ bidara, knowah ]
+	let selectedDetails = currAsst;
+	let selected = currAsst.name;
 
-	let options = assistants.map((asst) => {
-		return {
-			name: asst.NAME,
-			tagline: asst.TAGLINE,
-			description: asst.TEXT_DESCRIPTION,
-			logo: asst.LOGO,
-			model: asst.MODEL,
-			builtInFunctions: asst.FUNCTIONS.filter((func) => func.type !== "function"),
-			customFunctions: asst.FUNCTIONS.filter((func) => func.type === "function"),
-		}
-	});
-
-	let selectedDetails = options[0];
-	let selected = selectedDetails.name;
 
 	function closeAssistantSelect() {
 		handleClose("assistant-select")
 	}
 
-	function handleAssistantSelect() {
+	async function handleAssistantSelect() {
 		closeAssistantSelect();
-		console.log("selected: ", selected);
+
+		if (selected !== currAsst.name) {
+			await handleAssistantChange(selectedDetails);
+		}
 	}
 
 	function onChangeSelect(e) {
@@ -62,7 +50,7 @@
 
 			<form on:submit|preventDefault={handleAssistantSelect} class="w-full h-full flex flex-col focus:outline-none">
 				<div>
-				{#key selected}
+					{#key selected}
 					{#if selectedDetails.logo !== ""}
 						<img class="contact-img w-20 h-20 mx-auto p-0" src={selectedDetails.logo} alt="" />
 					{:else}
@@ -70,21 +58,26 @@
 							<p class="w-fit h-fit">{selectedDetails.name[0]}</p>
 						</div>
 					{/if}
-				{/key}
-				<div>
+					{/key}
+					<div>
 
-				<div class="flex justify-center items-center">
-					<select bind:value={selected} class="selecter my-3 text-center w-fit focus:outline-none" on:change={onChangeSelect}>
-						{#each options as asst}
-							<option class="option focus:outline-none" value={asst.name}>
-							{asst.name}
-							</option>
-						{/each}
-					</select>
-					<img class="dropdown-image ml-2 mr-0" src="chevron-right-blue.svg" alt="close"/>
-				</div>
+						<div class="flex justify-center items-center">
+							<select bind:value={selected} class="selecter my-3 text-center w-fit focus:outline-none" on:change={onChangeSelect}>
+								{#each options as asst}
+									<option class="option focus:outline-none" value={asst.name}>
+									{asst.name}
+									</option>
+								{/each}
+							</select>
+							<img class="dropdown-image ml-2 mr-0" src="chevron-right-blue.svg" alt="close"/>
+						</div>
 
-				<ContactCard bind:tagline={selectedDetails.tagline} bind:description={selectedDetails.description} bind:model={selectedDetails.model} bind:builtInFunctions={selectedDetails.builtInFunctions} bind:customFunctions={selectedDetails.customFunctions} />
+						<ContactCard 
+						      bind:tagline={selectedDetails.tagline}
+						      bind:description={selectedDetails.description}
+						      bind:model={selectedDetails.model}
+						      bind:builtInFunctions={selectedDetails.builtInFunctions}
+						      bind:customFunctions={selectedDetails.customFunctions} />
 			</form>
 		</Modal>
 	</div>
@@ -94,8 +87,8 @@
 <style>
 	button:focus-visible,
 	select:focus-visible {
-    outline: 5px auto -webkit-focus-ring-color; 
-  }
+		outline: 5px auto -webkit-focus-ring-color; 
+	}
 
 	form {
 		overflow-y: scroll;
@@ -165,23 +158,23 @@
 		transform: rotate(90deg);
 	}
 
-  @media only screen and (max-width: 1000px) {
-    .modal {
-      width: 700px;
+	@media only screen and (max-width: 1000px) {
+		.modal {
+			width: 700px;
 			height: 700px;
-    }
-  }
+		}
+	}
 
-  @media only screen and (max-width: 768px) {
-    .modal {
-      width: 100%;
+	@media only screen and (max-width: 768px) {
+		.modal {
+			width: 100%;
 			height: calc(100% - env(safe-area-inset-top) - env(safe-area-inset-bottom));
 
 			position: fixed;
 			opacity: 1;
 			left: 100%;
 			top: env(safe-area-inset-top);
-    }
+		}
 
 		.close-image {
 			transform: none;
@@ -191,5 +184,5 @@
 			opacity: 1;
 			left: 0;
 		}
-  }
+	}
 </style>

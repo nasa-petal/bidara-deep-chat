@@ -4,21 +4,21 @@
   import * as threadUtils from '../utils/threadUtils';
 
   export let key = null;
-  export let asstConfig = null;
   export let thread = null;
-  export let initialMessages = null;
-  export let funcCalling = null;
+  export let asst = null;
 
   export let loginHandler;
-  export let loadedMessages;
 
-  export let loading = true;
+  export let onLoadComplete;
+
   export let width = "100%";
   export let height = "100%";
 
+  const threadId = thread?.id;
+  const asstId = thread?.asst?.id;
+  const asstConfig = asst?.config;
+
   let lastMessageId;
-  let threadId = thread?.id; 
-  let asstId = thread?.asst_id;
   let currRunId = null;
   let newFileUploads = [];
   let newFileIds = [];
@@ -26,25 +26,27 @@
   let imagesToProcess = [];
 
   let deepChatRef;
+  let loadedMessages = false;
 
   async function onError(error) {
     console.error(error);
 
-    if (threadId && currRunId) {
+    if (thread.id && currRunId) {
       console.log("Cancelling thread run due to error.");
-      await cancelThreadRun(threadId, currRunId);
+      await cancelThreadRun(thread.id, currRunId);
     }
   }
 
   async function loadMessages(threadToLoad) {
-    loadedMessages = true;
-
-    if (!threadToLoad || !threadToLoad?.id) {
+    if (loadedMessages || !threadToLoad || !threadToLoad?.id) {
       return;
     }
+    loadedMessages = true;
 
     const messagesToLoad = await threadUtils.loadMessages(threadToLoad.id);
     messagesToLoad.forEach(( msg ) => { deepChatRef._addMessage(msg)});
+
+    onLoadComplete();
   }
 
   async function updateMessages() {
@@ -60,7 +62,7 @@
       return
     }
 
-    updateMessages();
+    await updateMessages();
 
     // for funcCalling context
     if (message.message.role === "user") {
@@ -89,11 +91,7 @@
       await loginHandler();
     }
 
-    if (!loadedMessages) {
-      await loadMessages(thread)
-    }
-
-    setTimeout(()=> loading = false, 400);
+    await loadMessages(thread)
   }
 
   async function processImageCallback(imageFile) {
@@ -107,7 +105,7 @@
       processImageCallback
     }
 
-    return await funcCalling(functionDetails, context);
+    return await activeAsst.funcCalling(functionDetails, context);
   }
 
   async function handleFileUploads(fileIds, fileUploads) {
@@ -193,13 +191,13 @@
     openAI: {
       key: key,
       validateKeyProperty: key ? false : true, // if apiKey is not null it has already been validated.
-      assistant: {
+      assistant: key ? {
         assistant_id: asstId,
         new_assistant: asstConfig,
         thread_id: threadId,
         load_thread_history: false,
         function_handler: handleFuncCalling
-      }
+      } : null
     }
   }}
   errorMessages={{
@@ -295,7 +293,7 @@
     },
     placeholder:{text: "How might we..."}
   }}
-  initialMessages={initialMessages}
+  initialMessages={asst?.initialMessages}
   chatStyle={{
     display: "block",
     width: width,

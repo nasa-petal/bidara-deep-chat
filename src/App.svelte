@@ -1,33 +1,26 @@
 <script>
   import { onMount, onDestroy } from 'svelte';
   import { Navbar, Sidebar, AssistantDeepChat, Login } from './components';
-  import { CONFIG as bidaraConfig, INITIAL_MESSAGES as bidaraInitialMessages } from './assistant/bidara';
-  import { funcCalling } from './assistant/bidaraFunctions';
-  import * as threadUtils from './utils/threadUtils';
-  import { getKeyAndThread } from './utils/openaiUtils';
+  import { BIDARA, KNOWAH } from "./assistant";
+  import { getKeyAndThread, getNewAsst } from './utils/openaiUtils';
   import { createBidaraDB, closeBidaraDB } from "./utils/bidaraDB";
+  import * as threadUtils from './utils/threadUtils';
   import hljs from "highlight.js";
   window.hljs = hljs;
 
   let activeKey = null;
   let activeThread = null;
-  let activeAsstConfig = null;
-  let activeFuncCalling = null;
-  let activeInitialMessages = null;
+  const defaultAsst = BIDARA;
+  let activeAsst = defaultAsst;
   let threads = null;
 
   let loading = true;
   let loggedIn = false;
   let open = false;
 
-  let loadedMessages = false;
-
   async function initKeyAsstAndThreads() {
-    activeInitialMessages = bidaraInitialMessages;
-    activeAsstConfig = bidaraConfig;
-    activeFuncCalling = funcCalling;
 
-    const keyAsstAndThread = await getKeyAndThread(activeAsstConfig);
+    const keyAsstAndThread = await getKeyAndThread(defaultAsst);
 
     if (!keyAsstAndThread[0]) {
       return;
@@ -35,6 +28,8 @@
 
     activeKey = keyAsstAndThread[0];
     activeThread = keyAsstAndThread[1];
+
+    activeAsst = getAssistant(activeThread.asst.name);
 
     threads = await threadUtils.getThreads();
     loggedIn = true;
@@ -58,7 +53,7 @@
     } 
 
     // If an empty thead is already created, prevents creating a new one
-    const emptyThread = await threadUtils.getEmptyThread(activeInitialMessages.length);
+    const emptyThread = await threadUtils.getEmptyThread(activeAsst.initialMessages.length);
     if (emptyThread) {
       await switchActiveThread(emptyThread);
 
@@ -91,18 +86,20 @@
     }
   }
 
-
   async function switchActiveThread(thread) {
     if (activeThread && thread.id === activeThread.id) {
       return;
     }
 
-    loadedMessages = false;
     loading = true;
 
     await threadUtils.setActiveThread(thread.id);
 
-    activeThread = await threadUtils.getActiveThread(activeAsstConfig);
+
+    const asst = getAssistant(thread.asst.name);
+
+    activeThread = await threadUtils.getActiveThread(asst);
+    activeAsst = asst;
   }
 
   async function renameActiveThread(name) {
@@ -111,6 +108,30 @@
     threads = await threadUtils.getThreads();
     activeThread.name = name;
   }
+
+  function getAssistant(asstName) {
+    if (asstName === BIDARA.name) {
+      return BIDARA;
+
+    } else if (asstName === KNOWAH.name) {
+      return KNOWAH;
+    }
+  }
+
+  async function changeAssistants(newAsst) {
+
+    const threadAsst = await getNewAsst(null, newAsst);
+
+    const thread = await threadUtils.getNewThread(threadAsst);
+    threads = await threadUtils.getThreads();
+
+    await switchActiveThread(thread);
+  }
+
+  function onLoadComplete() {
+    loading = false;
+  }
+
 </script>
 
 <main class="flex">
@@ -120,30 +141,34 @@
       <Login loginHandler={initKeyAsstAndThreads} />
 
     {:else}
-      <Navbar bind:chatName={activeThread.name} bind:sidebar={open} handleRename={renameActiveThread}/>   
+      <Navbar 
+        bind:chatName={activeThread.name} 
+        bind:sidebar={open} 
+        bind:currAsst={activeAsst}
+        assistantOptions={[BIDARA, KNOWAH]}
+        handleRename={renameActiveThread} 
+        changeAssistant={changeAssistants}
+        />   
 
       <div id="content-container" class="flex justify-between w-full h-full flex-1" class:open>
         <div>
           <Sidebar handleChatSelect={switchActiveThread} handleChatDelete={deleteThreadAndSwitch} handleChatNew={newThreadAndSwitch} bind:threads bind:open bind:selectedThreadId={activeThread.id}/>
         </div>
 
-        {#key activeThread.id}
         <div id="chat-container" class="w-full" class:loading>
+          {#key activeThread.id}
           <AssistantDeepChat
             key={activeKey}
-            asstConfig={activeAsstConfig}
+            asst={activeAsst}
             thread={activeThread}
-            funcCalling={activeFuncCalling}
-            initialMessages={activeInitialMessages}
             loginHandler={null}
-            bind:loading
-            bind:loadedMessages
+            onLoadComplete={onLoadComplete}
 
             width="100%"
             height="100%"
             />
+            {/key}
         </div>
-        {/key}
       </div>
     {/if}
     {/await}

@@ -1,16 +1,22 @@
 import { getStoredAPIKey, setStoredAPIKey } from "./storageUtils";
 import { getActiveThread, getFileByFileId } from "./threadUtils";
-import { BIDARA_CONFIG } from "../assistant/bidara";
+import { BIDARA, KNOWAH } from "../assistant";
 
 let openaiKey = null;
 
 function getAssistantConfigFromName(asstName) {
-  if (asstName === "BIDARA") {
-    return BIDARA_CONFIG;
+  if (asstName === BIDARA.name) {
+    return BIDARA.config;
+  } else if (asstName === KNOWAH.name) {
+    return KNOWAH.config;
   }
 }
 
 export async function validAssistant(id, asstName) {
+  if (!id) {
+    return false;
+  }
+
   if (!openaiKey) {
     throw new Error('openai key not set. cannot validate assistant.');
   }
@@ -25,6 +31,7 @@ export async function validAssistant(id, asstName) {
   });
 
   const r = await response.json();
+
   if (r.hasOwnProperty('error') && r.error.type === 'invalid_request_error') {
     return false;
   }
@@ -57,7 +64,29 @@ export async function updateAssistant(id, config) {
   return null;
 }
 
-export async function getAssistantId(asstName, asstConfig) {
+export async function createAssistant(config) {
+  // returns id on successful update, null otherwise.
+  if (!openaiKey) {
+    throw new Error('openai key not set. cannot update assistant.');
+  }
+  const response = await fetch("https://api.openai.com/v1/assistants", {
+    method: "POST",
+    headers: {
+      Authorization: 'Bearer ' + openaiKey,
+      'Content-Type': 'application/json',
+      'OpenAI-Beta': 'assistants=v1'
+    },
+    body: JSON.stringify(config)
+  });
+
+  const r = await response.json();
+  if (r.hasOwnProperty('id')) {
+    return r.id;
+  }
+  return null;
+}
+
+export async function getAssistantId(asstName, asstVersion, asstConfig) {
   if (!openaiKey) {
     throw new Error('openai key not set. cannot search for bidara assistant.');
   }
@@ -83,7 +112,7 @@ export async function getAssistantId(asstName, asstConfig) {
       // get version of assistant.
       const version = /^.*v([0-9]+\.[0-9]+)$/.exec(foundAsst.name)[1];
       // if assistant version is up to date, use it.
-      if (version == asstConfig.version) {
+      if (version == asstVersion) {
         return foundAsst.id;
       }
       else {
@@ -91,6 +120,9 @@ export async function getAssistantId(asstName, asstConfig) {
         foundAsst.id = await updateAssistant(foundAsst.id, asstConfig);
         return foundAsst.id;
       }
+    } else {
+      const newId = await createAssistant(asstConfig);
+      return newId;
     }
   }
   return null;
@@ -147,23 +179,22 @@ export function setOpenAIKey(key) {
   setStoredAPIKey(openaiKey);
 }
 
-export async function getNewAsst(asst, defaultConfig) {
+export async function getNewAsst(asst, defaultAsst) {
   let asstConfig;
   let name;
   let version;
   if (asst) {
-    asstConfig = getAssistantConfigFromName(asst.name);
     name = asst.name;
-    version = asst.version;
+    asstConfig = getAssistantConfigFromName(name);
+    version = /^.*v([0-9]+\.[0-9]+)$/.exec(asstConfig.name)[1];
 
   } else {
-    asstConfig = defaultConfig;
-    name = /^(.*)v[0-9]+\.[0-9]+$/.exec(asstConfig.name)[1];
-    version = /^.*v([0-9]+\.[0-9]+)$/.exec(asstConfig.name)[1];
+    asstConfig = defaultAsst.config;
+    name = defaultAsst.name;
+    version = defaultAsst.version;
   }
 
-
-  const asstId = await getAssistantId(name, asstConfig);
+  const asstId = await getAssistantId(name, version, asstConfig);
 
   const newAsst = {
     name: name,
@@ -242,13 +273,13 @@ export async function getNewThreadId() {
 }
 
 
-export async function getKeyAndThread(asstConfig) {
+export async function getKeyAndThread(defaultAsst) {
   let key = await getOpenAIKey();
   if (key === null) {
     return [null, null]
   }
 
-  let thread = await getActiveThread(asstConfig);
+  let thread = await getActiveThread(defaultAsst);
 
   return [key, thread]
 }
