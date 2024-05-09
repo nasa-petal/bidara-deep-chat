@@ -147,7 +147,14 @@
 
       <div id="content-container" class="flex justify-between w-full h-full flex-1" class:open>
         <div>
-          <Sidebar handleChatSelect={switchActiveThread} handleChatDelete={deleteThreadAndSwitch} handleChatNew={newThreadAndSwitch} bind:threads bind:open bind:selectedThreadId={activeThread.id}/>
+          <Sidebar 
+            bind:threads
+            bind:open
+            bind:selectedThreadId={activeThread.id}
+            handleChatSelect={switchActiveThread}
+            handleChatDelete={deleteThreadAndSwitch}
+            handleChatNew={newThreadAndSwitch}
+            />
         </div>
 
         <div id="chat-container" class="w-full" class:loading>
@@ -162,7 +169,7 @@
             width="100%"
             height="100%"
             />
-            {/key}
+          {/key}
         </div>
       </div>
     {/if}
