@@ -18,6 +18,7 @@
   const asstId = thread?.asst?.id;
   const asstConfig = asst?.config;
 
+  // vars for callbacks
   let lastMessageId;
   let currRunId = null;
   let newFileUploads = [];
@@ -31,9 +32,9 @@
   async function onError(error) {
     console.error(error);
 
-    if (thread.id && currRunId) {
+    if (threadId && currRunId) {
       console.log("Cancelling thread run due to error.");
-      await cancelThreadRun(thread.id, currRunId);
+      await cancelThreadRun(threadId, currRunId);
     }
   }
 
@@ -53,7 +54,7 @@
     const messages = deepChatRef.getMessages();
     if (messages.length > 0) {
       thread.length = messages.length;
-      await threadUtils.setThreadLength(thread.id, thread.length);
+      await threadUtils.setThreadLength(threadId, thread.length);
     }
   }
 
