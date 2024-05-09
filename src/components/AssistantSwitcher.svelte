@@ -7,7 +7,7 @@
 </script>
 
 <button class="w-full h-full p-1 flex justify-between items-center focus:outline-none" on:click={handleClick}>
-	<p>Change Assistants</p>
+	<p>View Assistants</p>
 </button>
 
 <style>
