@@ -1,13 +1,3 @@
-import { ssSearch, genImage, imageToText, getFileType, getImagePatterns } from "./commonFunctions";
-
-export const FUNCTION_MAP = {
-  "get_graph_paper_relevance_search": ssSearch,
-  "text_to_image": genImage,
-  "image_to_text": imageToText,
-  "get_file_type": getFileType,
-  "get_image_patterns": getImagePatterns
-}
-
 export const PAPER_SEARCH_FUNC = {
   "name": "get_graph_paper_relevance_search",
   "description": "Search for academic papers.",
