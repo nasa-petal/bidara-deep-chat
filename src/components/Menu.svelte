@@ -1,21 +1,22 @@
 <script>
-	let openMenu = false;
+	import BackdropClose from "./BackdropClose.svelte";
+	export let open = false;
+	let blur = false;
 
 	function handleClose(event) {
 		event.preventDefault();
-		openMenu = false;
+		open = false;
 	}
 </script>
 
 <div class="container p-2">
-		<button tabindex="0" class="focus:outline-none menu-button" class:open on:click={() => {openMenu = !openMenu;}}>
-			<img class="menu-image" src="ellipsis-vertical-blue.svg" alt="menu"/>
-    </button>
-		<div class="menu-container bg-gray-600 focus:no-outline" class:openMenu>
-			<menu class="p-1"><slot /></menu>
-		</div>
-		<button tabindex="0" class="clickoff w-full h-full" class:openMenu on:click={handleClose}>
-		</button>
+	<button tabindex="0" class="focus:outline-none menu-button" class:open on:click={() => {open = !open;}}>
+		<img class="menu-image" src="ellipsis-vertical-blue.svg" alt="menu"/>
+	</button>
+	<div class="menu-container bg-gray-600 focus:no-outline" class:open>
+		<menu class="p-1"><slot /></menu>
+	</div>
+	<BackdropClose bind:blur bind:open handleClick={handleClose}/>
 </div>
 
 <style>
@@ -26,7 +27,7 @@
 	button:focus-visible {
 		outline: 5px auto -webkit-focus-ring-color;
 	}
-	
+
 	.container {
 		width: 2em;
 		height: 2em;
@@ -51,24 +52,11 @@
 		box-shadow: 0 0 1rem 0 var(--box-shadow-color);
 
 		position: absolute;
-		display: none;
 		visibility: hidden;
 		right: 1%;
 		overflow: hidden;
 
 		z-index: 39;
-	}
-
-	.clickoff {
-		outline: none !important;
-		background-color: transparent !important;
-		display: none;
-		visibility: hidden;
-		position: fixed;
-		left: 0;
-		top: 0;
-
-		z-index: 38;
 	}
 
 	menu {
@@ -77,8 +65,7 @@
 		margin: 0;
 	}
 
-	.openMenu {
-		display: block;
+	.open {
 		visibility: visible;
 	}
 </style>

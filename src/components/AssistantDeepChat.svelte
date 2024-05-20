@@ -4,21 +4,22 @@
   import * as threadUtils from '../utils/threadUtils';
 
   export let key = null;
-  export let asstConfig = null;
   export let thread = null;
-  export let initialMessages = null;
-  export let funcCalling = null;
+  export let asst = null;
 
   export let loginHandler;
-  export let loadedMessages;
 
-  export let loading = true;
+  export let onLoadComplete;
+
   export let width = "100%";
   export let height = "100%";
 
+  const threadId = thread?.id;
+  const asstId = thread?.asst?.id;
+  const asstConfig = asst?.config;
+
+  // vars for callbacks
   let lastMessageId;
-  let threadId = thread?.id; 
-  let asstId = thread?.asst_id;
   let currRunId = null;
   let newFileUploads = [];
   let newFileIds = [];
@@ -26,6 +27,7 @@
   let imagesToProcess = [];
 
   let deepChatRef;
+  let loadedMessages = false;
 
   async function onError(error) {
     console.error(error);
@@ -37,21 +39,22 @@
   }
 
   async function loadMessages(threadToLoad) {
-    loadedMessages = true;
-
-    if (!threadToLoad || !threadToLoad?.id) {
+    if (loadedMessages || !threadToLoad || !threadToLoad?.id) {
       return;
     }
+    loadedMessages = true;
 
     const messagesToLoad = await threadUtils.loadMessages(threadToLoad.id);
     messagesToLoad.forEach(( msg ) => { deepChatRef._addMessage(msg)});
+
+    onLoadComplete();
   }
 
   async function updateMessages() {
     const messages = deepChatRef.getMessages();
     if (messages.length > 0) {
       thread.length = messages.length;
-      await threadUtils.setThreadLength(thread.id, thread.length);
+      await threadUtils.setThreadLength(threadId, thread.length);
     }
   }
 
@@ -60,7 +63,7 @@
       return
     }
 
-    updateMessages();
+    await updateMessages();
 
     // for funcCalling context
     if (message.message.role === "user") {
@@ -80,7 +83,10 @@
 
   async function onComponentRender() {
     deepChatRef = document.getElementById("chat-element");
-    setDeepChatKeyboardSupport();
+
+    if (deepChatRef) {
+      setDeepChatKeyboardSupport();
+    }
     // save key to localStorage.
     // The event occurs before key is set, and again, after key is set.
     if (!key && this._activeService.key) {
@@ -89,11 +95,7 @@
       await loginHandler();
     }
 
-    if (!loadedMessages) {
-      await loadMessages(thread)
-    }
-
-    setTimeout(()=> loading = false, 400);
+    await loadMessages(thread)
   }
 
   async function processImageCallback(imageFile) {
@@ -107,7 +109,7 @@
       processImageCallback
     }
 
-    return await funcCalling(functionDetails, context);
+    return await asst.funcCalling(functionDetails, context);
   }
 
   async function handleFileUploads(fileIds, fileUploads) {
@@ -173,6 +175,11 @@
   function setDeepChatKeyboardSupport() {
     const shadowRoot = deepChatRef.shadowRoot;
     const input = shadowRoot.getElementById("input");
+
+    if (!input) {
+      return;
+    }
+
     const inputButtons = input.getElementsByClassName("input-button");
     inputButtons.forEach(button => {
       const buttonClickEventListener = button.onclick;
@@ -193,13 +200,13 @@
     openAI: {
       key: key,
       validateKeyProperty: key ? false : true, // if apiKey is not null it has already been validated.
-      assistant: {
+      assistant: key ? {
         assistant_id: asstId,
         new_assistant: asstConfig,
         thread_id: threadId,
         load_thread_history: false,
         function_handler: handleFuncCalling
-      }
+      } : null
     }
   }}
   errorMessages={{
@@ -295,7 +302,7 @@
     },
     placeholder:{text: "How might we..."}
   }}
-  initialMessages={initialMessages}
+  initialMessages={asst?.initialMessages}
   chatStyle={{
     display: "block",
     width: width,
