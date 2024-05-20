@@ -17,7 +17,7 @@
   --translucent-black: rgba(0, 0, 0, 0.35);
   --black: black; 
   --light-black: rgb(25,25,25);
-  --translucent-light-black: rgba(15,15,15, 0.7);
+  --translucent-light-black: rgba(18,18,18, 0.7);
   --dark-gray: rgb(51,51,51);
   --gray: rgb(150,150,150);
   --translucent-gray: rgba(150,150,150, 0.25);
@@ -70,6 +70,8 @@ html {
   background: var(--chat-background-color);
   text-size-adjust: 100%; /* Prevent font scaling in landscape while allowing user zoom */
   height: 100%;
+  overscroll-behavior-y: none;
+  -webkit-overscroll-behavior-y: none;
 }
 
 body {
