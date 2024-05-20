@@ -1,36 +1,59 @@
-import { validThread, getNewThreadId, getThreadMessages, getFileSrc, getFileInfo } from "./openaiUtils";
+import { validThread, getNewThreadId, getThreadMessages, getFileSrc, getFileInfo, validAssistant, getNewAsst } from "./openaiUtils";
 import * as bidaraDB from "./bidaraDB";
 
-async function createNewThread(asstId) {
+async function createNewThread(asst) {
   const new_id = await getNewThreadId();
 
   if (new_id) {
     const new_name = "New Chat";
 
-    return {name: new_name, id: new_id, asst_id: asstId, length: 0, active: true};
+    return {
+      name: new_name,
+      id: new_id,
+      asst: asst,
+      length: 0,
+      active: 1
+    };
   }
 
   return null;
 }
 
-export async function getActiveThread() {
-  let thread = await bidaraDB.getActiveThread();
+export async function getActiveThread(defaultAsst) {
+ 
+  const thread = await bidaraDB.getActiveThread();
+  if (thread === null) { // thread doesn't exist, so everything new
+    const asst = await getNewAsst(null, defaultAsst);
+    const newThread = await createNewThread(asst);
+    await bidaraDB.setThread(newThread);
+    return newThread;
+  }
+  
+  let asst = thread.asst;
+  if (!asst) { 
+    asst = await getNewAsst(null, defaultAsst);
+    await setThreadAsst(thread, asst);
+    thread.asst = asst;
 
-  let isValidThreadId = false;
-  if (thread !== null) {
-    isValidThreadId = await validThread(thread.id);
+  } else if  (asst && !(await validAssistant(asst.id, asst.name))) { // asst doesn't exist, or is invalid
+    asst = await getNewAsst(asst, defaultAsst);
+    await setThreadAsst(thread, asst);
+    thread.asst = asst;
   }
 
-  if (thread === null || !isValidThreadId) {
-    thread = await getNewThread();
-    await setActiveThread(thread.id);
+  const isValidThreadId = await validThread(thread.id);
+  if (!isValidThreadId) { // thread is invalid, so new thread with same asst
+    const asst = await getNewAsst(null, defaultAsst);
+    const newThread = await createNewThread(asst);
+    await bidaraDB.setThread(newThread);
+    return newThread;
   }
 
   return thread;
 }
 
-export async function getNewThread(asstId) {
-  const thread = await createNewThread(asstId);
+export async function getNewThread(asst) {
+  const thread = await createNewThread(asst);
   await bidaraDB.setThread(thread);
 
   return thread;
@@ -91,13 +114,13 @@ export async function setThreadLength(id, length) {
   await bidaraDB.setLengthById(id, length);
 }
 
-export async function setThreadAsstId(thread, asstId) {
-  if (!thread.hasOwnProperty("asst_id")) {
-    thread.asst_id = asstId;
+export async function setThreadAsst(thread, asst) {
+  if (!thread.hasOwnProperty("asst")) {
+    thread.asst = asst;
     await bidaraDB.setThread(thread);
 
   } else {
-    await bidaraDB.setAsstIdById(thread.id, asstId);
+    await bidaraDB.setAsstById(thread.id, asst);
   }
 }
 
