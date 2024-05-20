@@ -10,7 +10,7 @@ export const VERSION = "1.54";
 export const LOGO = "bidara.png";
 export const LOGO_DESC = "girl with dark hair";
 
-export const TAGLINE = "Bio-Inspired Design and Research Assisant";
+export const TAGLINE = "Bio-Inspired Design and Research Assistant";
 export const TEXT_DESCRIPTION = "I'm an OpenAI GPT-4 assistant, that was instructed by NASA's PeTaL initiative to help others understand, learn from, and emulate the strategies used by living things to create sustainable designs and technologies using the Biomimicry Institute's design process.";
 
 export const DESCRIPTION = "I'm an OpenAI [GPT-4](https://openai.com/research/gpt-4) [assistant](https://platform.openai.com/docs/assistants/how-it-works), that was instructed by [NASA's PeTaL initiative](https://www1.grc.nasa.gov/research-and-engineering/vine/petal/) to help others understand, learn from, and emulate the strategies used by living things to create sustainable designs and technologies using the [Biomimicry Institute's design process](https://toolbox.biomimicry.org/methods/process/). I can summarize and answer questions from files you upload, search for papers on Semantic Scholar, generate images, and detect [nature's building block patterns](https://na2ure.org/patternabc/) in images you upload."
