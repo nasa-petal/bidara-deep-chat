@@ -59,7 +59,7 @@ export async function genImage(params, context) {
   await pushFile(fileObj);
   processImageCallback(fileObj);
 
-  return `Use the following file information to display the file and provide a download link in Markdown:\n{ file_id: "${fileId}," file_name: "${fileName}," file_path: "${annotation}" }`;
+  return `Use the following file information to display the file:\n{ file_id: "${fileId}," file_name: "${fileName}," file_path: "${annotation}" }\nLet them know they can right-click or tap and hold the image to share or save it to a PNG file. Do not provide a download link or mention one.`;
 }
 
 export async function imageToText(params, context) {
