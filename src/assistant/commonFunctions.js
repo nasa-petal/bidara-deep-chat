@@ -1,5 +1,9 @@
 import { getDalleImageGeneration, getImageToText, uploadFile } from "../utils/openaiUtils";
 import { getFileByFileId, getFileTypeByName, pushFile } from "../utils/threadUtils";
+//production
+import { INPUT_SS_KEY } from 'process.env';
+//local dev
+//const INPUT_SS_KEY = "insert-ss-key-here";
 
 export async function ssSearch(params, context) {
   //call api and return results
@@ -17,7 +21,11 @@ export async function ssSearch(params, context) {
   searchParams = new URLSearchParams(searchParams);
 
   try {
-    const response = await fetch("https://api.semanticscholar.org/graph/v1/paper/search?" + searchParams);
+    let url = "https://api.semanticscholar.org/graph/v1/paper/search?" + searchParams;
+    let options = { headers: {
+      "x-api-key": INPUT_SS_KEY
+    }};
+    const response = await fetch(url, options);
 
     if (response.status === 429 || response.code === 429 || response.statusCode === 429) {
       return "Semantic Scholar is currently having issues with their servers. So, for now, searching for academic papers will not work."
