@@ -164,3 +164,7 @@ export async function getImagePatterns(params, context) {
 
   return text;
 }
+
+export async function patentSearch(params, context) {
+  return "patent text";
+}
