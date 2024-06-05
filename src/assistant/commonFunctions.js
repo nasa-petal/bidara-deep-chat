@@ -1,9 +1,11 @@
 import { getDalleImageGeneration, getImageToText, uploadFile } from "../utils/openaiUtils";
 import { getFileByFileId, getFileTypeByName, pushFile } from "../utils/threadUtils";
-//production
-import { INPUT_SS_KEY } from 'process.env';
-//local dev
-//const INPUT_SS_KEY = "insert-ss-key-here";
+
+// ```bash
+// export INPUT_SS_KEY="insert-ss-key-here"
+// ```
+// Defaults to empty string ""
+import { INPUT_SS_KEY } from 'process.env'; 
 
 export async function ssSearch(params, context) {
   //call api and return results
