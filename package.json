@@ -23,7 +23,7 @@
   },
   "scripts": {
     "build": "rollup -c --bundleConfigAsCjs",
-    "dev": "rollup -c -w --bundleConfigAsCjs",
+    "dev": "[[ -z \"${INPUT_SS_KEY}\" ]] && echo \"WARN: INPUT_SS_KEY not set. Defaulting to ''\" && export INPUT_SS_KEY=\"\" || set INPUT_SS_KEY=\"\"; rollup -c -w --bundleConfigAsCjs",
     "start": "sirv public"
   },
   "keywords": [],
