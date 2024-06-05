@@ -27,7 +27,10 @@ export async function ssSearch(params, context) {
     let options = { headers: {
       "x-api-key": INPUT_SS_KEY
     }};
-    const response = await fetch(url, options);
+
+    const response = await callWithBackoff(async () => {
+      return await fetch(url, options);
+    });
 
     if (response.status === 429 || response.code === 429 || response.statusCode === 429) {
       return "Semantic Scholar is currently having issues with their servers. So, for now, searching for academic papers will not work."
@@ -173,4 +176,37 @@ export async function getImagePatterns(params, context) {
   const text = await getImageToText(prompt, fileId);
 
   return text;
+}
+
+async function callWithBackoff(callback) {
+  const maxRetries = 4;
+  const retryOffset = 2;
+  const numRetries = 0;
+
+  return await backoffExponential(callback, maxRetries, numRetries, retryOffset);
+}
+
+async function backoffExponential(callback, maxRetries, retries, retryOffset) {
+  try {
+    if (retries > 0) {
+      const timeToWait = (2 ** (retries + retryOffset)) * 100;
+      console.warn(`(${retries}) Retries. Waiting for ${timeToWait} ms.`)
+      await waitFor(timeToWait);
+    }
+
+    const res = await callback();
+
+    return res;
+  } catch (e) {
+    if (retries >= maxRetries) {
+      console.warn(`Max retries reached in backoff (${maxRetries}).`)
+      throw e;
+    }
+
+    return await backoffExponential(callback, maxRetries, retries + 1);
+  }
+}
+
+function waitFor(milliseconds) {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
