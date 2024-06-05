@@ -1,4 +1,4 @@
-import { ssSearch, genImage, imageToText, getFileType, getImagePatterns } from "./commonFunctions";
+import { ssSearch, genImage, imageToText, getFileType, getImagePatterns, patentSearch } from "./commonFunctions";
 
 export async function callFunc(functionDetails, context) {
   let tmp = '';
