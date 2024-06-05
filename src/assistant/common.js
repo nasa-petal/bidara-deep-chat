@@ -136,7 +136,7 @@ export const PATENT_SEARCH_FUNC = {
          "type": "string",
           "description": "Query for the patent search engine",
        }
-    }
+    },
     "required": ["query"],
   }
 }
