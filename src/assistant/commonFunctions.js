@@ -30,7 +30,7 @@ export async function ssSearch(params, context) {
 
     const response = await callWithBackoff(async () => {
       return await fetch(url, options);
-    });
+    }, backoffExponential);
 
     if (response.status === 429 || response.code === 429 || response.statusCode === 429) {
       return "Semantic Scholar is currently having issues with their servers. So, for now, searching for academic papers will not work."
@@ -178,12 +178,12 @@ export async function getImagePatterns(params, context) {
   return text;
 }
 
-async function callWithBackoff(callback) {
+async function callWithBackoff(callback, backoffFunction) {
   const maxRetries = 4;
   const retryOffset = 2;
   const numRetries = 0;
 
-  return await backoffExponential(callback, maxRetries, numRetries, retryOffset);
+  return await backoffFunction(callback, maxRetries, numRetries, retryOffset);
 }
 
 async function backoffExponential(callback, maxRetries, retries, retryOffset) {
