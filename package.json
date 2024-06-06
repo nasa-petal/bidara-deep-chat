@@ -22,7 +22,7 @@
     "svelte-touch-to-mouse": "^1.0.0"
   },
   "scripts": {
-    "build": "rollup -c --bundleConfigAsCjs",
+    "build": "[[ -z \"${SS_KEY}\" ]] && echo \"WARN: SS_KEY not set. Defaulting to ''\" && export SS_KEY=\"\" || set SS_KEY=\"\"; rollup -c --bundleConfigAsCjs",
     "dev": "[[ -z \"${SS_KEY}\" ]] && echo \"WARN: SS_KEY not set. Defaulting to ''\" && export SS_KEY=\"\" || set SS_KEY=\"\"; rollup -c -w --bundleConfigAsCjs",
     "start": "sirv public"
   },
