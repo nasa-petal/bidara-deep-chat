@@ -2,10 +2,10 @@ import { getDalleImageGeneration, getImageToText, uploadFile } from "../utils/op
 import { getFileByFileId, getFileTypeByName, pushFile } from "../utils/threadUtils";
 
 // ```bash
-// export INPUT_SS_KEY="insert-ss-key-here"
+// export SS_KEY="insert-ss-key-here"
 // ```
 // Defaults to empty string ""
-import { INPUT_SS_KEY } from 'process.env'; 
+import { SS_KEY } from 'process.env'; 
 
 export async function ssSearch(params, context) {
   //call api and return results
@@ -26,7 +26,7 @@ export async function ssSearch(params, context) {
   try {
     let url = "https://api.semanticscholar.org/graph/v1/paper/search?" + searchParams;
     let options = { headers: {
-      "x-api-key": INPUT_SS_KEY
+      "x-api-key": SS_KEY
     }};
 
     const response = await callWithBackoff(async () => {
@@ -89,7 +89,7 @@ export async function genImage(params, context) {
   await pushFile(fileObj);
   processImageCallback(fileObj);
 
-  return `Use the following file information to display the file and provide a download link in Markdown:\n{ file_id: "${fileId}," file_name: "${fileName}," file_path: "${annotation}" }`;
+  return `Use the following file information to display the file:\n{ file_id: "${fileId}," file_name: "${fileName}," file_path: "${annotation}" }\nLet them know they can right-click or tap and hold the image to share or save it to a PNG file. Do not provide a download link or mention one.`;
 }
 
 export async function imageToText(params, context) {
@@ -197,7 +197,7 @@ export async function getImagePatterns(params, context) {
 
 async function callWithBackoff(callback, backoffFunction) {
   const maxRetries = 4;
-  const retryOffset = 2;
+  const retryOffset = 1;
   const numRetries = 0;
 
   return await backoffFunction(callback, maxRetries, numRetries, retryOffset);
@@ -220,7 +220,7 @@ async function backoffExponential(callback, maxRetries, retries, retryOffset) {
       throw e;
     }
 
-    return await backoffExponential(callback, maxRetries, retries + 1);
+    return await backoffExponential(callback, maxRetries, retries + 1, retryOffset);
   }
 }
 
