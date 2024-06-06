@@ -2,10 +2,10 @@ import { getDalleImageGeneration, getImageToText, uploadFile } from "../utils/op
 import { getFileByFileId, getFileTypeByName, pushFile } from "../utils/threadUtils";
 
 // ```bash
-// export INPUT_SS_KEY="insert-ss-key-here"
+// export SS_KEY="insert-ss-key-here"
 // ```
 // Defaults to empty string ""
-import { INPUT_SS_KEY } from 'process.env'; 
+import { SS_KEY } from 'process.env'; 
 
 export async function ssSearch(params, context) {
   //call api and return results
@@ -25,7 +25,7 @@ export async function ssSearch(params, context) {
   try {
     let url = "https://api.semanticscholar.org/graph/v1/paper/search?" + searchParams;
     let options = { headers: {
-      "x-api-key": INPUT_SS_KEY
+      "x-api-key": SS_KEY
     }};
 
     const response = await callWithBackoff(async () => {
