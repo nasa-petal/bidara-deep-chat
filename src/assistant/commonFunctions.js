@@ -1,6 +1,12 @@
 import { getDalleImageGeneration, getImageToText, uploadFile } from "../utils/openaiUtils";
 import { getFileByFileId, getFileTypeByName, pushFile } from "../utils/threadUtils";
 
+// ```bash
+// export SS_KEY="insert-ss-key-here"
+// ```
+// Defaults to empty string ""
+import { SS_KEY } from 'process.env'; 
+
 export async function ssSearch(params, context) {
   //call api and return results
   let searchParams = JSON.parse(params);
@@ -17,7 +23,14 @@ export async function ssSearch(params, context) {
   searchParams = new URLSearchParams(searchParams);
 
   try {
-    const response = await fetch("https://api.semanticscholar.org/graph/v1/paper/search?" + searchParams);
+    let url = "https://api.semanticscholar.org/graph/v1/paper/search?" + searchParams;
+    let options = { headers: {
+      "x-api-key": SS_KEY
+    }};
+
+    const response = await callWithBackoff(async () => {
+      return await fetch(url, options);
+    }, backoffExponential);
 
     if (response.status === 429 || response.code === 429 || response.statusCode === 429) {
       return "Semantic Scholar is currently having issues with their servers. So, for now, searching for academic papers will not work."
@@ -163,4 +176,37 @@ export async function getImagePatterns(params, context) {
   const text = await getImageToText(prompt, fileId);
 
   return text;
+}
+
+async function callWithBackoff(callback, backoffFunction) {
+  const maxRetries = 4;
+  const retryOffset = 1;
+  const numRetries = 0;
+
+  return await backoffFunction(callback, maxRetries, numRetries, retryOffset);
+}
+
+async function backoffExponential(callback, maxRetries, retries, retryOffset) {
+  try {
+    if (retries > 0) {
+      const timeToWait = (2 ** (retries + retryOffset)) * 100;
+      console.warn(`(${retries}) Retries. Waiting for ${timeToWait} ms.`)
+      await waitFor(timeToWait);
+    }
+
+    const res = await callback();
+
+    return res;
+  } catch (e) {
+    if (retries >= maxRetries) {
+      console.warn(`Max retries reached in backoff (${maxRetries}).`)
+      throw e;
+    }
+
+    return await backoffExponential(callback, maxRetries, retries + 1, retryOffset);
+  }
+}
+
+function waitFor(milliseconds) {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
