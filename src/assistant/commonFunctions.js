@@ -49,7 +49,7 @@ export async function ssSearch(params, context) {
         ${papers}
       </results>
 
-      The results MUST be related to the question AND Biological in nature. Otherwise, an additional search must be performed.
+      The results MUST be related to the question AND Biological in nature. Otherwise, you MUST search again without asking for confirmation.
     `
 
     return resMsg;
