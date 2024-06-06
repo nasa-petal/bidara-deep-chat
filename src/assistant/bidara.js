@@ -5,7 +5,7 @@ const TEST_NAME = "BIDARA-TEST";
 
 export const NAME = PROD_NAME;
 
-export const VERSION = "1.54";
+export const VERSION = "1.55";
 
 export const LOGO = "bidara.png";
 export const LOGO_DESC = "girl with dark hair";
