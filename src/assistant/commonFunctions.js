@@ -13,6 +13,7 @@ export async function ssSearch(params, context) {
   if ("parameters" in searchParams) {
     searchParams = searchParams.parameters;
   }
+
   let fields = [];
   if (typeof searchParams.fields === 'string' || searchParams.fields instanceof String) {
     fields = searchParams.fields.split(",");
@@ -35,8 +36,24 @@ export async function ssSearch(params, context) {
     if (response.status === 429 || response.code === 429 || response.statusCode === 429) {
       return "Semantic Scholar is currently having issues with their servers. So, for now, searching for academic papers will not work."
     }
-    const papers = await response.json();
-    return JSON.stringify(papers);
+
+    const papersJson = await response.json();
+    const papers = JSON.stringify(papersJson);
+
+
+    const resMsg = `Verify the following results to be relevant to the question asked, and related to Biology.
+      If the results do not match these criteria, or if better results could be achieved through updated terms,
+      an additional search should be performed with updated terms.
+      
+      <results> 
+        ${papers}
+      </results>
+
+      The results MUST be related to the question AND Biological in nature. Otherwise, an additional search must be performed.
+    `
+
+    return resMsg;
+
   } catch (e) {
     console.error('error: ' + e);
     return "Semantic Scholar is currently having issues with their servers. So, for now, searching for academic papers will not work."
