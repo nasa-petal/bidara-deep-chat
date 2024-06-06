@@ -180,7 +180,7 @@ export async function getImagePatterns(params, context) {
 
 async function callWithBackoff(callback, backoffFunction) {
   const maxRetries = 4;
-  const retryOffset = 2;
+  const retryOffset = 1;
   const numRetries = 0;
 
   return await backoffFunction(callback, maxRetries, numRetries, retryOffset);
@@ -203,7 +203,7 @@ async function backoffExponential(callback, maxRetries, retries, retryOffset) {
       throw e;
     }
 
-    return await backoffExponential(callback, maxRetries, retries + 1);
+    return await backoffExponential(callback, maxRetries, retries + 1, retryOffset);
   }
 }
 
