@@ -3,9 +3,9 @@ import { PAPER_SEARCH_FUNC, TEXT_TO_IMAGE, IMAGE_TO_TEXT, GET_FILE_TYPE, GET_IMA
 const PROD_NAME = "BIDARA";
 const TEST_NAME = "BIDARA-TEST";
 
-export const NAME = PROD_NAME;
+export const NAME = TEST_NAME;
 
-export const VERSION = "1.55";
+export const VERSION = "1.61";
 
 export const LOGO = "bidara.png";
 export const LOGO_DESC = "girl with dark hair";
@@ -100,7 +100,7 @@ export const FUNCTIONS = [
   { type: "function", function: GET_IMAGE_PATTERNS },
 ]
 
-export const INITIAL_MESSAGES = [
+export const HISTORY = [
   { role: "ai", text: `Hi, I'm **${NAME}**, ${TAGLINE}. ${DESCRIPTION}` },
   { role: "ai", text: `Before we begin, please be advised:\n\n‣ ${ADVISORY}` },
   { role: "ai", text: `${GREETING}` }

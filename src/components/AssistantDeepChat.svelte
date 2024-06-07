@@ -1,5 +1,5 @@
 <script>
-  import { DeepChat } from 'deep-chat';
+  import { DeepChat } from 'deep-chat-dev';
   import { setOpenAIKey, cancelThreadRun } from '../utils/openaiUtils';
   import * as threadUtils from '../utils/threadUtils';
 
@@ -45,7 +45,7 @@
     loadedMessages = true;
 
     const messagesToLoad = await threadUtils.loadMessages(threadToLoad.id);
-    messagesToLoad.forEach(( msg ) => { deepChatRef._addMessage(msg)});
+    messagesToLoad.forEach(( msg ) => { deepChatRef.addMessage(msg)});
 
     onLoadComplete();
   }
@@ -58,7 +58,7 @@
     }
   }
 
-  async function onNewMessage(message) { 
+  async function onMessage(message) { 
     if (!deepChatRef || message.isInitial) {
       return
     }
@@ -138,8 +138,8 @@
         currRunId = response.id;
     }
     if (response.object === "list") {
-      if (response.data[0].file_ids.length > 0) {
-        newFileIds = response.data[0].file_ids;
+      if (response.data[0].attachments.length > 0) {
+        newFileIds = response.data[0].attachments.map(attachment => attachment.file_id);
       }
 
       if (shouldProcessImages) {
@@ -164,7 +164,7 @@
 
   async function requestInterceptor(request) {
     if (newFileUploads.length > 0) {
-      newFileIds = request.body.file_ids;
+      newFileIds = request.body.attachments.map(attachment => attachment.file_id);
 
       handleFileUploads(newFileIds, newFileUploads);
     }
@@ -209,11 +209,12 @@
       } : null
     }
   }}
+  history={asst?.history}
   errorMessages={{
     displayServiceErrorMessages: true
   }}
   onError={onError}
-  onNewMessage={onNewMessage}
+  onMessage={onMessage}
   onComponentRender={onComponentRender}
   responseInterceptor={responseInterceptor}
   requestInterceptor={requestInterceptor}
@@ -302,7 +303,6 @@
     },
     placeholder:{text: "How might we..."}
   }}
-  initialMessages={asst?.initialMessages}
   chatStyle={{
     display: "block",
     width: width,
