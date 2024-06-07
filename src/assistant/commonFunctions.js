@@ -13,6 +13,7 @@ export async function ssSearch(params, context) {
   if ("parameters" in searchParams) {
     searchParams = searchParams.parameters;
   }
+
   let fields = [];
   if (typeof searchParams.fields === 'string' || searchParams.fields instanceof String) {
     fields = searchParams.fields.split(",");
@@ -35,8 +36,12 @@ export async function ssSearch(params, context) {
     if (response.status === 429 || response.code === 429 || response.statusCode === 429) {
       return "Semantic Scholar is currently having issues with their servers. So, for now, searching for academic papers will not work."
     }
-    const papers = await response.json();
-    return JSON.stringify(papers);
+
+    const papersJson = await response.json();
+    const papers = JSON.stringify(papersJson);
+
+    return papers;
+
   } catch (e) {
     console.error('error: ' + e);
     return "Semantic Scholar is currently having issues with their servers. So, for now, searching for academic papers will not work."
