@@ -40,19 +40,7 @@ export async function ssSearch(params, context) {
     const papersJson = await response.json();
     const papers = JSON.stringify(papersJson);
 
-
-    const resMsg = `Verify the following results to be relevant to the question asked, and related to Biology.
-      If the results do not match these criteria, or if better results could be achieved through updated terms,
-      an additional search should be performed with updated terms.
-      
-      <results> 
-        ${papers}
-      </results>
-
-      The results MUST be related to the question AND Biological in nature. Otherwise, you MUST search again without asking for confirmation.
-    `
-
-    return resMsg;
+    return papers;
 
   } catch (e) {
     console.error('error: ' + e);
