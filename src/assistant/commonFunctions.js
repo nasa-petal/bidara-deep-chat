@@ -184,5 +184,5 @@ export async function patentSearch(params, context) {
   } catch (error) {
     return "There seems to be an error with the backend (possibly with rate limits, 45 per hour maximum). Convey this message to the user";
   }
-  return `Do not make additional requests to the patents API. Provide patents from the following list that specifically deal with the biomimeticist's use case and serve the purpose of inspiration and innovation. Ensure that the patents are relevant to the field of biomimicry and can be used as a reference for the design process. \n\n${patentTitles}`
+  return `Do not make additional requests to the patents API, unless directly asked by the user. Provide patents from the following list that specifically deal with the biomimeticist's use case and serve the purpose of inspiration and innovation. Ensure that the patents are relevant to the field of biomimicry and can be used as a reference for the design process. \n\n${patentTitles}`
 }
