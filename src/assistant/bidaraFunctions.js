@@ -2,7 +2,16 @@ import { ssSearch, genImage, imageToText, getFileType, getImagePatterns } from "
 
 export async function bioSsSearch(params, context) {
 
-  const papers = await ssSearch(params, context);
+  const updatedParams = JSON.parse(params);
+
+  if (updatedParams.fieldsOfStudy) {
+    updatedParams.fieldsOfStudy += ",Biology";
+  } else {
+    updatedParams.fieldsOfStudy = "Biology";
+  }
+  const stringUpdateParams = JSON.stringify(updatedParams);
+
+  const papers = await ssSearch(stringUpdateParams, context);
 
   const resMsg = `Verify the following results to be relevant to the question asked, and related to Biology.
     If the results do not match these criteria, or if better results could be achieved through updated terms,
