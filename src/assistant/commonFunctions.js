@@ -166,5 +166,23 @@ export async function getImagePatterns(params, context) {
 }
 
 export async function patentSearch(params, context) {
-  return "patent text";
+  let patentParams = JSON.parse(params);
+  if ("parameters" in patentParams) {
+    patentParams = patentParams.parameters;
+  }
+  let keywords = JSON.stringify(patentParams.query);
+  const fullUrl = `https://api.patentsview.org/patents/query?q={"_text_any":{"patent_title":${keywords}}}&f=["patent_title"]`
+
+  let patentTitles = "";
+  try {
+    const response = await fetch(fullUrl);
+    if (!response.ok) {
+      return "There seems to be an HTTP error. Ask the user to reword their request.";
+    }
+    const data = await response.json();
+    patentTitles = data.patents.map(patent => patent.patent_title);
+  } catch (error) {
+    return "There seems to be an error with the backend (possibly with rate limits, 45 per hour maximum). Convey this message to the user";
+  }
+  return `Provide patents from the following list that specifically deal with the biomimeticist's use case and serve the purpose of inspiration and innovation. Ensure that the patents are relevant to the field of biomimicry and can be used as a reference for the design process. \n\n${patentTitles}`
 }
