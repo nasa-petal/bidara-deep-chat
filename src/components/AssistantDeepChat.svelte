@@ -205,6 +205,7 @@
         new_assistant: asstConfig,
         thread_id: threadId,
         load_thread_history: false,
+        files_tool_type: 'code_interpreter',
         function_handler: handleFuncCalling
       } : null
     }

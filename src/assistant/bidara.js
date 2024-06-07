@@ -3,9 +3,9 @@ import { PAPER_SEARCH_FUNC, TEXT_TO_IMAGE, IMAGE_TO_TEXT, GET_FILE_TYPE, GET_IMA
 const PROD_NAME = "BIDARA";
 const TEST_NAME = "BIDARA-TEST";
 
-export const NAME = TEST_NAME;
+export const NAME = PROD_NAME;
 
-export const VERSION = "1.61";
+export const VERSION = "1.60";
 
 export const LOGO = "bidara.png";
 export const LOGO_DESC = "girl with dark hair";
@@ -92,7 +92,7 @@ Nature uses shape to determine functionality.
 
 export const FUNCTIONS = [
   { type: "code_interpreter" },
-  { type: "retrieval" },
+  { type: "file_search" },
   { type: "function", function: PAPER_SEARCH_FUNC },
   { type: "function", function: TEXT_TO_IMAGE },
   { type: "function", function: IMAGE_TO_TEXT },
