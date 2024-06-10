@@ -1,12 +1,19 @@
 import { getDalleImageGeneration, getImageToText, uploadFile } from "../utils/openaiUtils";
 import { getFileByFileId, getFileTypeByName, pushFile } from "../utils/threadUtils";
 
+// ```bash
+// export SS_KEY="insert-ss-key-here"
+// ```
+// Defaults to empty string ""
+import { SS_KEY } from 'process.env'; 
+
 export async function ssSearch(params, context) {
   //call api and return results
   let searchParams = JSON.parse(params);
   if ("parameters" in searchParams) {
     searchParams = searchParams.parameters;
   }
+
   let fields = [];
   if (typeof searchParams.fields === 'string' || searchParams.fields instanceof String) {
     fields = searchParams.fields.split(",");
@@ -17,13 +24,24 @@ export async function ssSearch(params, context) {
   searchParams = new URLSearchParams(searchParams);
 
   try {
-    const response = await fetch("https://api.semanticscholar.org/graph/v1/paper/search?" + searchParams);
+    let url = "https://api.semanticscholar.org/graph/v1/paper/search?" + searchParams;
+    let options = { headers: {
+      "x-api-key": SS_KEY
+    }};
+
+    const response = await callWithBackoff(async () => {
+      return await fetch(url, options);
+    }, backoffExponential);
 
     if (response.status === 429 || response.code === 429 || response.statusCode === 429) {
       return "Semantic Scholar is currently having issues with their servers. So, for now, searching for academic papers will not work."
     }
-    const papers = await response.json();
-    return JSON.stringify(papers);
+
+    const papersJson = await response.json();
+    const papers = JSON.stringify(papersJson);
+
+    return papers;
+
   } catch (e) {
     console.error('error: ' + e);
     return "Semantic Scholar is currently having issues with their servers. So, for now, searching for academic papers will not work."
@@ -165,6 +183,7 @@ export async function getImagePatterns(params, context) {
   return text;
 }
 
+
 export async function patentSearch(params, context) {
   let patentParams = JSON.parse(params);
   if ("parameters" in patentParams) {
@@ -185,4 +204,37 @@ export async function patentSearch(params, context) {
     return "There seems to be an error with the backend (possibly with rate limits, 45 per hour maximum). Convey this message to the user";
   }
   return `Do not make additional requests to the patents API, unless directly asked by the user. Provide patents from the following list that specifically deal with the biomimeticist's use case and serve the purpose of inspiration and innovation. Ensure that the patents are relevant to the field of biomimicry and can be used as a reference for the design process. \n\n${patentTitles}`
+}
+  
+async function callWithBackoff(callback, backoffFunction) {
+  const maxRetries = 4;
+  const retryOffset = 1;
+  const numRetries = 0;
+
+  return await backoffFunction(callback, maxRetries, numRetries, retryOffset);
+}
+
+async function backoffExponential(callback, maxRetries, retries, retryOffset) {
+  try {
+    if (retries > 0) {
+      const timeToWait = (2 ** (retries + retryOffset)) * 100;
+      console.warn(`(${retries}) Retries. Waiting for ${timeToWait} ms.`)
+      await waitFor(timeToWait);
+    }
+
+    const res = await callback();
+
+    return res;
+  } catch (e) {
+    if (retries >= maxRetries) {
+      console.warn(`Max retries reached in backoff (${maxRetries}).`)
+      throw e;
+    }
+
+    return await backoffExponential(callback, maxRetries, retries + 1, retryOffset);
+  }
+}
+
+function waitFor(milliseconds) {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }

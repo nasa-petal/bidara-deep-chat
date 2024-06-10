@@ -24,6 +24,8 @@ jobs:
 
       - name: Build
         run: npm ci && npm run build
+        env:
+          SS_KEY: ${{ secrets.SS_KEY }}
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4
