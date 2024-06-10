@@ -2,7 +2,7 @@
   "name": "bidara-deep-chat-svelte",
   "version": "1.0.0",
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-commonjs": "^26.0.1",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-terser": "^0.4.4",
     "highlight.js": "^11.9.0",
