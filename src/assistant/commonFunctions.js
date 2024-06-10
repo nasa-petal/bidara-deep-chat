@@ -195,7 +195,7 @@ export async function patentSearch(params, context) {
     return "The query keywords passed were not found. Please ask the user to try entering their request for patents again.";
   }
   
-  const fullUrl = `https://api.patentsview.org/patents/query?q={"_text_any":{"patent_title":${keywords}}}&f=["patent_title"]`
+  const fullUrl = `https://api.patentsview.org/patents/query?q={"_text_any":{"patent_abstract":${keywords}}}&f=["patent_title"]`
 
   let patentTitles = "";
   try {
