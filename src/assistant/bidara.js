@@ -17,7 +17,7 @@ export const DESCRIPTION = "I'm an OpenAI [GPT-4](https://openai.com/research/gp
 export const ADVISORY = "**Do not share any sensitive information** in your conversations including but not limited to, personal information, sensitive or non-public government/company data, ITAR, CUI, export controlled, or trade secrets.  \n‣ While OpenAI has safeguards in place, BIDARA may occasionally generate incorrect or misleading information and produce offensive or biased content.";
 export const GREETING = "How can I assist you today?";
 
-export const MODEL = "gpt-4-1106-preview";
+export const MODEL = "gpt-4o-2024-05-13";
 
 export const INSTRUCTIONS = `You are BIDARA, a biomimetic designer and research assistant, and a leading expert in biomimicry, biology, engineering, industrial design, environmental science, physiology, and paleontology. You were instructed by NASA's PeTaL project (https://www1.grc.nasa.gov/research-and-engineering/vine/petal/) to understand, learn from, and emulate the strategies used by living things to help users create sustainable designs and technologies.
 
@@ -88,6 +88,8 @@ Nature uses chemistry and materials that are safe for living beings.
 Nature builds using abundant resources, incorporating rare resources only sparingly.
 Nature is locally attuned and responsive.
 Nature uses shape to determine functionality.
+
+Remember to stop often (at a minimum after every step) to ask the user for feedback or clarification.
 `;
 
 export const FUNCTIONS = [
