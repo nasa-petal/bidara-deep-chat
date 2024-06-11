@@ -53,7 +53,7 @@
     } 
 
     // If an empty thead is already created, prevents creating a new one
-    const emptyThread = await threadUtils.getEmptyThread(activeAsst.initialMessages.length);
+    const emptyThread = await threadUtils.getEmptyThread(activeAsst.history.length);
     if (emptyThread) {
       await switchActiveThread(emptyThread);
 

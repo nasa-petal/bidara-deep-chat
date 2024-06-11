@@ -5,7 +5,7 @@ const TEST_NAME = "BIDARA-TEST";
 
 export const NAME = PROD_NAME;
 
-export const VERSION = "1.55";
+export const VERSION = "1.70";
 
 export const LOGO = "bidara.png";
 export const LOGO_DESC = "girl with dark hair";
@@ -92,7 +92,7 @@ Nature uses shape to determine functionality.
 
 export const FUNCTIONS = [
   { type: "code_interpreter" },
-  { type: "retrieval" },
+  { type: "file_search" },
   { type: "function", function: PAPER_SEARCH_FUNC },
   { type: "function", function: TEXT_TO_IMAGE },
   { type: "function", function: IMAGE_TO_TEXT },
@@ -100,7 +100,7 @@ export const FUNCTIONS = [
   { type: "function", function: GET_IMAGE_PATTERNS },
 ]
 
-export const INITIAL_MESSAGES = [
+export const HISTORY = [
   { role: "ai", text: `Hi, I'm **${NAME}**, ${TAGLINE}. ${DESCRIPTION}` },
   { role: "ai", text: `Before we begin, please be advised:\n\n‣ ${ADVISORY}` },
   { role: "ai", text: `${GREETING}` }
