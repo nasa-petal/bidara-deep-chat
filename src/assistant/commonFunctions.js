@@ -207,9 +207,8 @@ export async function patentSearch(params, context) {
     
     // if the API query yields no results, suggest alternative queries that mean the same thing and could deliver the results the user wants
     if (data.patents == null) {
-      return `No results found by the API. Tell the user to try different or more general keywords for better results. Suggest keywords that are adjacent to or might yield better results when used with a patents databse than the user-given: ${keywords}`;
+      return `No results found by the API. Tell the user to try different or more general keywords for better results. Suggest keywords that would yield better results when used with a patents database than the user-given: ${keywords}`;
     }
-    console.log(data.patents);
     patentTitles = data.patents.map(patent => patent.patent_title);
   } catch (error) {
     return "There seems to be an error with the backend (possibly with rate limits, 45 per hour maximum). Convey this message to the user";
