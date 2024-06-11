@@ -299,6 +299,11 @@ export async function updateProperty(db, storeName, key, propertyKey, propertyVa
 
 			// Ensure resulting object has desired property. 
 			// Would error anyways, but gives a better message
+			if (!result) {
+				reject(`Object with key:'${key}' does not exist.`)
+				return;
+			}
+
 			if (!result.hasOwnProperty(propertyKey)) {
 				reject(`Object has no property: '${propertyKey}' (in store: ${storeName} by key: '${result}')`);
 				return;
