@@ -28,6 +28,12 @@ export async function getActiveThread(defaultAsst) {
     await bidaraDB.setThread(newThread);
     return newThread;
   }
+
+  const isValidThreadId = await validThread(thread.id);
+  if (!isValidThreadId) { // thread is invalid, so new thread with same asst
+    await bidaraDB.deleteThreadById(thread.id);
+    return null;
+  }
   
   let asst = thread.asst;
   if (!asst) { 
@@ -39,14 +45,6 @@ export async function getActiveThread(defaultAsst) {
     asst = await getNewAsst(asst, defaultAsst);
     await setThreadAsst(thread, asst);
     thread.asst = asst;
-  }
-
-  const isValidThreadId = await validThread(thread.id);
-  if (!isValidThreadId) { // thread is invalid, so new thread with same asst
-    const asst = await getNewAsst(null, defaultAsst);
-    const newThread = await createNewThread(asst);
-    await bidaraDB.setThread(newThread);
-    return newThread;
   }
 
   return thread;
