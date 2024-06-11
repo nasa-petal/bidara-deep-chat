@@ -9,6 +9,11 @@
     export let buttonBgColor;
     export let buttonText;
 
+    async function callWithoutProp(e, callback) {
+        e.stopPropagation();
+        await callback(e);
+    }
+
 </script>
 <div class="button-reveal-container">
     <button 
@@ -20,7 +25,7 @@
         >
 
         <p class="button-text my-0 font-sans block" >{buttonText}</p>
-        <button tabindex="0" class="revealed-button flex-shrink-0 focus:outline-none" on:click={handleClickRevealed}>
+        <button tabindex="0" class="revealed-button flex-shrink-0 focus:outline-none" on:click={(e) => callWithoutProp(e, handleClickRevealed)}>
             <img draggable="false" class="revealed-image unfocused" src={revealedButtonUnfocusImage}  alt="revealed unfocused select"/>
             <img draggable="false" class="revealed-image focused" src={revealedButtonFocusImage}  alt="revealed focused select"/>
         </button>
