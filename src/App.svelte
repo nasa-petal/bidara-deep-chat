@@ -74,9 +74,11 @@
       return;
     }
 
+    activeThread.id = null;
+
     if (threads && threads.length > 0) {
-      const thread = await threadUtils.getRecentThread();
-      await switchActiveThread(thread);
+      const recentThread = await threadUtils.getRecentThread();
+      await switchActiveThread(recentThread);
 
     } else {
       // temporary fix stops newThreadAndSwitch from not giving new thread on empty delete
@@ -93,7 +95,7 @@
 
     loading = true;
 
-    await threadUtils.setActiveThread(thread.id);
+    await threadUtils.setActiveThread(activeThread.id, thread.id);
 
 
     const asst = getAssistant(thread.asst.name);
