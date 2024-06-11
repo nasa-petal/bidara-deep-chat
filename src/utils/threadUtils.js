@@ -154,7 +154,7 @@ async function retrieveStoredFiles(threadId) {
 
 async function retrieveNewFiles(threadId, messages, storedFiles) {
   const newFileIds = messages.map((message) => {
-    const fileIds = message.file_ids;
+    const fileIds = message.attachments.map(attachment => attachment.file_id);
 
     const newFileIds = fileIds.filter( (fileId) => message.role !== "user" && !storedFiles.get(fileId));
     return newFileIds;
@@ -246,7 +246,7 @@ async function convertThreadMessagesToMessages(threadId, threadMessages) {
     const role = message.role === "assistant" ? "ai" : message.role;
 
     const content = message.content;
-    const fileIds = message.file_ids;
+    const fileIds = message.attachments.map(attachment => attachment.file_id);
 
     const files = handleAttachments(fileIds, storedFiles.map, newFiles.map);
 
