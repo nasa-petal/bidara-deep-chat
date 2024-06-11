@@ -94,11 +94,11 @@ export async function getFileByFileId(id) {
   return file
 }
 
-export async function setActiveThread(threadId) {
-  const currentActiveThread = await bidaraDB.getActiveThread();
-  if (currentActiveThread) {
-    await bidaraDB.setActiveStatusById(currentActiveThread.id, false);
+export async function setActiveThread(prevThreadId, threadId) {
+  if (prevThreadId) {
+    await bidaraDB.setActiveStatusById(prevThreadId, false);
   }
+
   await bidaraDB.setActiveStatusById(threadId, true);
 }
 
