@@ -7,12 +7,6 @@ let openaiKey = null;
 function getAssistantConfigFromName(asstName) {
   const asst = assistantOptions.find((opt) => opt.name === asstName);
 
-  if (!asst) {
-    console.log("opts");
-    console.log(assistantOptions);
-    return assistantOptions.find((opt) => opt.name === "BIDARA-TEST").config;
-  }
-
   return asst.config;
 }
 
