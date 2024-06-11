@@ -27,7 +27,7 @@ export async function validAssistant(id, asstName) {
     headers: {
       Authorization: 'Bearer ' + openaiKey,
       'Content-Type': 'application/json',
-      'OpenAI-Beta': 'assistants=v1'
+      'OpenAI-Beta': 'assistants=v2'
     },
     body: null
   });
@@ -54,7 +54,7 @@ export async function updateAssistant(id, config) {
     headers: {
       Authorization: 'Bearer ' + openaiKey,
       'Content-Type': 'application/json',
-      'OpenAI-Beta': 'assistants=v1'
+      'OpenAI-Beta': 'assistants=v2'
     },
     body: JSON.stringify(config)
   });
@@ -76,7 +76,7 @@ export async function createAssistant(config) {
     headers: {
       Authorization: 'Bearer ' + openaiKey,
       'Content-Type': 'application/json',
-      'OpenAI-Beta': 'assistants=v1'
+      'OpenAI-Beta': 'assistants=v2'
     },
     body: JSON.stringify(config)
   });
@@ -98,7 +98,7 @@ export async function getAssistantId(asstName, asstVersion, asstConfig) {
     headers: {
       Authorization: 'Bearer ' + openaiKey,
       'Content-Type': 'application/json',
-      'OpenAI-Beta': 'assistants=v1'
+      'OpenAI-Beta': 'assistants=v2'
     },
     body: null
   });
@@ -227,7 +227,7 @@ export async function validThread(thread_id) {
       headers: {
         Authorization: 'Bearer ' + openaiKey,
         'Content-Type': 'application/json',
-        'OpenAI-Beta': 'assistants=v1'
+        'OpenAI-Beta': 'assistants=v2'
       },
       body: null
     });
@@ -263,7 +263,7 @@ export async function getNewThreadId() {
     headers: {
       Authorization: 'Bearer ' + openaiKey,
       'Content-Type': 'application/json',
-      'OpenAI-Beta': 'assistants=v1'
+      'OpenAI-Beta': 'assistants=v2'
     },
     body: null
   });
@@ -349,7 +349,7 @@ export async function cancelThreadRun(threadId, runId) {
   const method = 'POST';
   const headers = {
     'Authorization': 'Bearer ' + openaiKey,
-    'OpenAI-Beta': 'assistants=v1'
+    'OpenAI-Beta': 'assistants=v2'
   };
 
   const request = {
@@ -381,7 +381,7 @@ export async function getThreadMessages(threadId, limit) {
   const headers = {
     'Authorization': 'Bearer ' + openaiKey,
     'Content-Type': 'application/json',
-    'OpenAI-Beta': 'assistants=v1'
+    'OpenAI-Beta': 'assistants=v2'
   };
 
   const request = {

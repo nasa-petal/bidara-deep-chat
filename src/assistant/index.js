@@ -4,7 +4,7 @@ import { funcCalling as bidaraFuncCalling } from './bidaraFunctions'
 const bidara = {
 	name: bidaraAsst.NAME,
 	config: bidaraAsst.CONFIG,
-	initialMessages: bidaraAsst.INITIAL_MESSAGES,
+	history: bidaraAsst.HISTORY,
 	funcCalling: bidaraFuncCalling,
 	version: bidaraAsst.VERSION,
 
