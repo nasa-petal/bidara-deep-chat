@@ -209,11 +209,11 @@ export async function patentSearch(params, context) {
     if (data.patents == null) {
       return `No results found by the API. Tell the user to try different or more general keywords for better results. Suggest keywords that would yield better results when used with a patents database than the user-given: ${keywords}`;
     }
-    patentTitles = data.patents.map(patent => patent.patent_title);
+    patentTitles = data.patents.map(patent => [patent.patent_title,"https://datatool.patentsview.org/#detail/patent/" + patent.patent_number, "http://api.projectpq.ai/patents/US" + patent.patent_number + "A1/drawings/1"]);
   } catch (error) {
     return "There seems to be an error with the backend (possibly with rate limits, 45 per hour maximum). Convey this message to the user";
   }
-  return `Do not make additional requests to the patents API, unless directly asked by the user. Format the patents from the following list (in the order that you receive them) that specifically deal with the biomimeticist's use case and serve the purpose of inspiration and innovation. Ensure that the patents are relevant to the field of biomimicry and can be used as a reference for the design process. \n\n${patentTitles}`
+  return `Do not make additional requests to the patents API, unless directly asked by the user. For each entry in the list of patents, print out the patent title accompanied by two URLs, all of which are found in the list. \n\n${patentTitles}`;
 }
   
 async function callWithBackoff(callback, backoffFunction) {
