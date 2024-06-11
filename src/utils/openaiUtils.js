@@ -1,11 +1,15 @@
 import { getStoredAPIKey, setStoredAPIKey } from "./storageUtils";
 import { getActiveThread, getFileByFileId } from "./threadUtils";
-import { assistantOptions } from "../assistant";
+import { ASSISTANT_OPTIONS } from "../assistant";
 
 let openaiKey = null;
 
 function getAssistantConfigFromName(asstName) {
-  const asst = assistantOptions.find((opt) => opt.name === asstName);
+  const asst = ASSISTANT_OPTIONS.find((opt) => opt.name === asstName);
+
+  if (!asst) {
+    return null;
+  }
 
   return asst.config;
 }
@@ -181,9 +185,14 @@ export async function getNewAsst(asst, defaultAsst) {
   let asstConfig;
   let name;
   let version;
+
+
   if (asst) {
     name = asst.name;
     asstConfig = getAssistantConfigFromName(name);
+  }
+
+  if (asstConfig) {
     version = /^.*v([0-9]+\.[0-9]+)$/.exec(asstConfig.name)[1];
 
   } else {
