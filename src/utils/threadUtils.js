@@ -28,6 +28,12 @@ export async function getActiveThread(defaultAsst) {
     await bidaraDB.setThread(newThread);
     return newThread;
   }
+
+  const isValidThreadId = await validThread(thread.id);
+  if (!isValidThreadId) { // thread is invalid, so new thread with same asst
+    await bidaraDB.deleteThreadById(thread.id);
+    return null;
+  }
   
   let asst = thread.asst;
   if (!asst) { 
@@ -39,14 +45,6 @@ export async function getActiveThread(defaultAsst) {
     asst = await getNewAsst(asst, defaultAsst);
     await setThreadAsst(thread, asst);
     thread.asst = asst;
-  }
-
-  const isValidThreadId = await validThread(thread.id);
-  if (!isValidThreadId) { // thread is invalid, so new thread with same asst
-    const asst = await getNewAsst(null, defaultAsst);
-    const newThread = await createNewThread(asst);
-    await bidaraDB.setThread(newThread);
-    return newThread;
   }
 
   return thread;
@@ -94,11 +92,11 @@ export async function getFileByFileId(id) {
   return file
 }
 
-export async function setActiveThread(threadId) {
-  const currentActiveThread = await bidaraDB.getActiveThread();
-  if (currentActiveThread) {
-    await bidaraDB.setActiveStatusById(currentActiveThread.id, false);
+export async function setActiveThread(prevThreadId, threadId) {
+  if (prevThreadId) {
+    await bidaraDB.setActiveStatusById(prevThreadId, false);
   }
+
   await bidaraDB.setActiveStatusById(threadId, true);
 }
 
@@ -154,7 +152,7 @@ async function retrieveStoredFiles(threadId) {
 
 async function retrieveNewFiles(threadId, messages, storedFiles) {
   const newFileIds = messages.map((message) => {
-    const fileIds = message.file_ids;
+    const fileIds = message.attachments.map(attachment => attachment.file_id);
 
     const newFileIds = fileIds.filter( (fileId) => message.role !== "user" && !storedFiles.get(fileId));
     return newFileIds;
@@ -246,7 +244,7 @@ async function convertThreadMessagesToMessages(threadId, threadMessages) {
     const role = message.role === "assistant" ? "ai" : message.role;
 
     const content = message.content;
-    const fileIds = message.file_ids;
+    const fileIds = message.attachments.map(attachment => attachment.file_id);
 
     const files = handleAttachments(fileIds, storedFiles.map, newFiles.map);
 

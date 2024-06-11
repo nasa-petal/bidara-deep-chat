@@ -1,7 +1,7 @@
 <script>
   import { onMount, onDestroy } from 'svelte';
   import { Navbar, Sidebar, AssistantDeepChat, Login } from './components';
-  import { assistantOptions } from "./assistant";
+  import { ASSISTANT_OPTIONS, DEFAULT_ASSISTANT } from "./assistant";
   import { getKeyAndThread, getNewAsst } from './utils/openaiUtils';
   import { createBidaraDB, closeBidaraDB } from "./utils/bidaraDB";
   import * as threadUtils from './utils/threadUtils';
@@ -10,8 +10,8 @@
 
   let activeKey = null;
   let activeThread = null;
-  const defaultAsst = assistantOptions[0];
-  let activeAsst = defaultAsst;
+
+  let activeAsst = DEFAULT_ASSISTANT;
   let threads = null;
 
   let loading = true;
@@ -20,18 +20,31 @@
 
   async function initKeyAsstAndThreads() {
 
-    const keyAsstAndThread = await getKeyAndThread(defaultAsst);
+    const keyAsstAndThread = await getKeyAndThread(DEFAULT_ASSISTANT);
+    threads = await threadUtils.getThreads();
 
     if (!keyAsstAndThread[0]) {
       return;
     }
 
     activeKey = keyAsstAndThread[0];
-    activeThread = keyAsstAndThread[1];
+
+    if (!keyAsstAndThread[1]) {
+      if (threads.length > 0) {
+        activeThread = await threadUtils.getRecentThread();
+      } else {
+        const newAsst = await getNewAsst(DEFAULT_ASSISTANT);
+        activeThread = await threadUtils.getNewThread(newAsst);
+      }
+
+      await threadUtils.setActiveThread(null, activeThread.id)
+
+    } else {
+      activeThread = keyAsstAndThread[1];
+    }
 
     activeAsst = getAssistant(activeThread.asst.name);
 
-    threads = await threadUtils.getThreads();
     loggedIn = true;
   }
 
@@ -53,7 +66,7 @@
     } 
 
     // If an empty thead is already created, prevents creating a new one
-    const emptyThread = await threadUtils.getEmptyThread(activeAsst.initialMessages.length);
+    const emptyThread = await threadUtils.getEmptyThread(activeAsst.history.length);
     if (emptyThread) {
       await switchActiveThread(emptyThread);
 
@@ -74,9 +87,11 @@
       return;
     }
 
+    activeThread.id = null;
+
     if (threads && threads.length > 0) {
-      const thread = await threadUtils.getRecentThread();
-      await switchActiveThread(thread);
+      const recentThread = await threadUtils.getRecentThread();
+      await switchActiveThread(recentThread);
 
     } else {
       // temporary fix stops newThreadAndSwitch from not giving new thread on empty delete
@@ -93,12 +108,27 @@
 
     loading = true;
 
-    await threadUtils.setActiveThread(thread.id);
+    await threadUtils.setActiveThread(activeThread.id, thread.id);
 
 
     const asst = getAssistant(thread.asst.name);
 
-    activeThread = await threadUtils.getActiveThread(asst);
+    const newActiveThread = await threadUtils.getActiveThread(asst);
+
+    if (!newActiveThread) {
+      if (threads.length > 0) {
+        threads = await threadUtils.getThreads();
+        await threadUtils.setActiveThread(null, activeThread.id);
+        loading = false;
+
+      } else {
+        await newThreadAndSwitch();
+      }
+
+      return;
+    }
+
+    activeThread = newActiveThread;
     activeAsst = asst;
   }
 
@@ -110,7 +140,7 @@
   }
 
   function getAssistant(asstName) {
-    return assistantOptions.find((opt) => opt.name === asstName);
+    return ASSISTANT_OPTIONS.find((opt) => opt.name === asstName);
   }
 
   async function changeAssistants(newAsst) {
@@ -140,7 +170,7 @@
         bind:chatName={activeThread.name} 
         bind:sidebar={open} 
         bind:currAsst={activeAsst}
-        assistantOptions={assistantOptions}
+        assistantOptions={ASSISTANT_OPTIONS}
         handleRename={renameActiveThread} 
         changeAssistant={changeAssistants}
         />   
