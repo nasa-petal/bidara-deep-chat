@@ -185,18 +185,18 @@ export async function getImagePatterns(params, context) {
 
 
 export async function patentSearch(params, context) {
+  // retrieve the keywords to search for in patent titles
   let patentParams = JSON.parse(params);
   if ("parameters" in patentParams) {
     patentParams = patentParams.parameters;
   }
   let keywords = JSON.stringify(patentParams.query);
-
   if (!keywords) {
     return "The query keywords passed were not found. Please ask the user to try entering their request for patents again.";
   }
-  
-  const fullUrl = `https://api.patentsview.org/patents/query?q={"_text_any":{"patent_abstract":${keywords}}}&f=["patent_title"]`
 
+  // response to API query should be the patent titles that match in order of the one with most citations by other US patents to least
+  const fullUrl = `https://api.patentsview.org/patents/query?q={"_text_all":{"patent_title":${keywords}}}&f=["patent_title","patent_num_cited_by_us_patents"]&s=[{"patent_num_cited_by_us_patents":"desc"}]`
   let patentTitles = "";
   try {
     const response = await fetch(fullUrl);
@@ -204,11 +204,17 @@ export async function patentSearch(params, context) {
       return "There seems to be an HTTP error. Ask the user to reword their request.";
     }
     const data = await response.json();
+    
+    // if the API query yields no results, suggest alternative queries that mean the same thing and could deliver the results the user wants
+    if (data.patents == null) {
+      return `No results found by the API. Tell the user to try different or more general keywords for better results. Suggest keywords that are adjacent to or might yield better results when used with a patents databse than the user-given: ${keywords}`;
+    }
+    console.log(data.patents);
     patentTitles = data.patents.map(patent => patent.patent_title);
   } catch (error) {
     return "There seems to be an error with the backend (possibly with rate limits, 45 per hour maximum). Convey this message to the user";
   }
-  return `Do not make additional requests to the patents API, unless directly asked by the user. Provide patents from the following list that specifically deal with the biomimeticist's use case and serve the purpose of inspiration and innovation. Ensure that the patents are relevant to the field of biomimicry and can be used as a reference for the design process. \n\n${patentTitles}`
+  return `Do not make additional requests to the patents API, unless directly asked by the user. Format the patents from the following list (in the order that you receive them) that specifically deal with the biomimeticist's use case and serve the purpose of inspiration and innovation. Ensure that the patents are relevant to the field of biomimicry and can be used as a reference for the design process. \n\n${patentTitles}`
 }
   
 async function callWithBackoff(callback, backoffFunction) {
