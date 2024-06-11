@@ -21,17 +21,30 @@
   async function initKeyAsstAndThreads() {
 
     const keyAsstAndThread = await getKeyAndThread(DEFAULT_ASSISTANT);
+    threads = await threadUtils.getThreads();
 
     if (!keyAsstAndThread[0]) {
       return;
     }
 
     activeKey = keyAsstAndThread[0];
-    activeThread = keyAsstAndThread[1];
+
+    if (!keyAsstAndThread[1]) {
+      if (threads.length > 0) {
+        activeThread = await threadUtils.getRecentThread();
+      } else {
+        const newAsst = await getNewAsst(DEFAULT_ASSISTANT);
+        activeThread = await threadUtils.getNewThread(newAsst);
+      }
+
+      await threadUtils.setActiveThread(null, activeThread.id)
+
+    } else {
+      activeThread = keyAsstAndThread[1];
+    }
 
     activeAsst = getAssistant(activeThread.asst.name);
 
-    threads = await threadUtils.getThreads();
     loggedIn = true;
   }
 
@@ -100,7 +113,22 @@
 
     const asst = getAssistant(thread.asst.name);
 
-    activeThread = await threadUtils.getActiveThread(asst);
+    const newActiveThread = await threadUtils.getActiveThread(asst);
+
+    if (!newActiveThread) {
+      if (threads.length > 0) {
+        threads = await threadUtils.getThreads();
+        await threadUtils.setActiveThread(null, activeThread.id);
+        loading = false;
+
+      } else {
+        await newThreadAndSwitch();
+      }
+
+      return;
+    }
+
+    activeThread = newActiveThread;
     activeAsst = asst;
   }
 
