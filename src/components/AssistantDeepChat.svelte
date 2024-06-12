@@ -28,6 +28,7 @@
   let newFileIds = [];
   let currSandbox = "";
   let processingSandbox = false;
+  let prevDelta = "";
 
   let deepChatRef;
   let loadedMessages = false;
@@ -131,34 +132,40 @@
   }
 
   function handleImageParse(response) {
-      if (!shouldProcessImages) return response;
-      if (!response.delta.content[0].type === "text") return response;
+    if (!shouldProcessImages) return response;
+    if (!response.delta.content[0].type === "text") return response;
 
-      const newContent = response.delta.content[0].text.value;
+    const newContent = response.delta.content[0].text.value;
 
-      if (!processingSandbox && newContent === "sandbox") {
-        processingSandbox = true;
-        currSandbox = newContent;
+    if (!processingSandbox && newContent === "sandbox" && prevDelta === "](") {
+      processingSandbox = true;
+      currSandbox = newContent;
 
-        response.delta.content[0].text.value = "";
-        return response;
-      }
-
-      if (!processingSandbox) return response;
-
-      if (newContent[0] === ")" ) {
-        processingSandbox = false;
-
-        const image = imagesToProcess.find(img => img.annotation === currSandbox);
-        imagesToProcess = imagesToProcess.filter(img => img.annotation !== currSandbox);
-
-        response.delta.content[0].text.value = image.src + newContent;
-
-        return response;
-      }
-
-      currSandbox += newContent;
       response.delta.content[0].text.value = "";
+      return response;
+    }
+
+    prevDelta = newContent;
+
+    if (!processingSandbox) return response;
+
+    if (newContent[0] === ")" ) {
+      processingSandbox = false;
+
+      const image = imagesToProcess.find(img => img.annotation === currSandbox);
+      imagesToProcess = imagesToProcess.filter(img => img.annotation !== currSandbox);
+
+      if (imagesToProcess.length < 1) {
+        shouldProcessImages = false;
+      }
+
+      response.delta.content[0].text.value = image.src + newContent;
+
+      return response;
+    }
+
+    currSandbox += newContent;
+    response.delta.content[0].text.value = "";
   }
 
   async function responseInterceptor(response) {
