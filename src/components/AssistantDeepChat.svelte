@@ -104,7 +104,6 @@
     let context = {
       lastMessageId,
       processImageCallback,
-      callOnRunComplete,
     }
 
     return await asst.funcCalling(functionDetails, context);
