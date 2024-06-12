@@ -86,6 +86,8 @@ function BidaraDB() {
 			return BIDARA_DB;
 		},
 		close: async () => {
+			if (!BIDARA_DB) return;
+
 			await dbUtils.closeDB(BIDARA_DB);
 			BIDARA_DB = null;
 		}
