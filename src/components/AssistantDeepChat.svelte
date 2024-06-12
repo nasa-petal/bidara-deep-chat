@@ -21,10 +21,13 @@
   // vars for callbacks
   let lastMessageId;
   let currRunId = null;
-  let newFileUploads = [];
-  let newFileIds = [];
   let shouldProcessImages = false;
   let imagesToProcess = [];
+  // vars for image processing
+  let newFileUploads = [];
+  let newFileIds = [];
+  let currSandbox = "";
+  let processingSandbox = false;
 
   let deepChatRef;
   let loadedMessages = false;
@@ -72,12 +75,6 @@
       if (message.message?.files?.length > 0) {
         newFileUploads = message.message.files;
       }
-    } else if (message.message.role === "ai") {
-      if (newFileIds.length > 0) {
-        newFileUploads = message.message.files;
-
-        handleFileUploads(newFileIds, newFileUploads);
-      }
     }
   }
 
@@ -106,7 +103,8 @@
   async function handleFuncCalling(functionDetails) {
     let context = {
       lastMessageId,
-      processImageCallback
+      processImageCallback,
+      callOnRunComplete,
     }
 
     return await asst.funcCalling(functionDetails, context);
@@ -133,30 +131,44 @@
     newFileIds = [];
   }
 
+  function handleImageParse(response) {
+      if (!shouldProcessImages) return response;
+      if (!response.delta.content[0].type === "text") return response;
+
+      const newContent = response.delta.content[0].text.value;
+
+      if (!processingSandbox && newContent === "sandbox") {
+        processingSandbox = true;
+        currSandbox = newContent;
+
+        response.delta.content[0].text.value = "";
+        return response;
+      }
+
+      if (!processingSandbox) return response;
+
+      if (newContent[0] === ")" ) {
+        processingSandbox = false;
+
+        const image = imagesToProcess.find(img => img.annotation === currSandbox);
+        imagesToProcess = imagesToProcess.filter(img => img.annotation !== currSandbox);
+
+        response.delta.content[0].text.value = image.src + newContent;
+
+        return response;
+      }
+
+      currSandbox += newContent;
+      response.delta.content[0].text.value = "";
+  }
+
   async function responseInterceptor(response) {
     if (response.id && response.object === "thread.run") {
         currRunId = response.id;
     }
-    if (response.object === "list") {
-      if (response.data[0].attachments.length > 0) {
-        newFileIds = response.data[0].attachments.map(attachment => attachment.file_id);
-      }
 
-      if (shouldProcessImages) {
-        imagesToProcess.forEach((imageToProcess) => {
-          const updatedContent = response.data[0].content.map((content) => {
-            if (content.type === "text") {
-              content.text.value = content.text.value.replaceAll(imageToProcess.annotation, imageToProcess.src);
-            }
-            return content;
-          })
-
-          response.data[0].content = updatedContent;
-        });
-
-        shouldProcessImages = false;
-        imagesToProcess = [];
-      }
+    if (response.object === "thread.message.delta") {
+      response = handleImageParse(response);
     }
     
     return response;
@@ -210,6 +222,7 @@
       } : null
     }
   }}
+  connect={{ stream: true }}
   history={asst?.history}
   errorMessages={{
     displayServiceErrorMessages: true
