@@ -65,80 +65,89 @@ const BIDARA_DB_CONFIG = {
 	] 
 }
 
-let BIDARA_DB = null;
+const DB = BidaraDB();
 
-export async function createBidaraDB() {
-	if (BIDARA_DB) {
-		throw new Error("Bidara DB already instantiated.");
-	}
+function BidaraDB() {
+	let BIDARA_DB = null;
+	let created = false;
 
-	BIDARA_DB = await dbUtils.openDB(BIDARA_DB_CONFIG.name, BIDARA_DB_CONFIG.stores, BIDARA_DB_CONFIG.version);
-}
+	return {
+		get: async () => {
+			if (BIDARA_DB) return BIDARA_DB;
 
-export async function closeBidaraDB() {
-	await dbUtils.closeDB(BIDARA_DB);
-}
-
-async function waitForDB() {
-	if (BIDARA_DB) return;
-	const maxWaitCount = 10;
-
-	return await new Promise(async (resolve, reject) => {
-		let waitCount = 0;
-		while (true) {
-			if (BIDARA_DB) {
-				resolve();
-				return;
-			} 
-
-			waitCount++;
-
-			if (waitCount > maxWaitCount) {
-				reject("Database took too long to respond.");
-				return;
+			if (created) {
+				BIDARA_DB = await dbUtils.openDB(BIDARA_DB_CONFIG.name, BIDARA_DB_CONFIG.version);
+				return BIDARA_DB;
 			}
 
-			await new Promise((resolveTimeout) => setTimeout(resolveTimeout, 10));
+			BIDARA_DB = await dbUtils.createDB(BIDARA_DB_CONFIG.name, BIDARA_DB_CONFIG.stores, BIDARA_DB_CONFIG.version);
+			created = true;
+
+			return BIDARA_DB;
+		},
+		close: async () => {
+			await dbUtils.closeDB(BIDARA_DB);
+			BIDARA_DB = null;
 		}
-	});
+	}
 }
 
 export async function getAllThreads() {
-	await waitForDB();
+	const db = await DB.get();
 
-	const threads = await dbUtils.readAll(BIDARA_DB, CHAT_STORE_NAME, "created_time", true);
+	const threads = await dbUtils.readAll(db, CHAT_STORE_NAME, "created_time", true);
+
+	await DB.close();
+
 	return threads;
 }
 
 export async function getThreadById(id) {
-	await waitForDB();
+	const db = await DB.get();
 
-	const thread = await dbUtils.readByKey(BIDARA_DB, CHAT_STORE_NAME, id);
+	const thread = await dbUtils.readByKey(db, CHAT_STORE_NAME, id);
+
+	await DB.close();
+
 	return thread;
 }
 
 export async function getActiveThread() {
-	await waitForDB();
+	const db = await DB.get();
 
-	return await dbUtils.readFirstByIndex(BIDARA_DB, CHAT_STORE_NAME, "active", true);
+	const thread = await dbUtils.readFirstByIndex(db, CHAT_STORE_NAME, "active", true);
+
+	await DB.close();
+
+	return thread;
 }
 
 export async function getMostRecentlyCreatedThread() {
-	await waitForDB();
+	const db = await DB.get();
 
-	return await dbUtils.readFirstByIndex(BIDARA_DB, CHAT_STORE_NAME, "created_time", false);
+	const thread = await dbUtils.readFirstByIndex(db, CHAT_STORE_NAME, "created_time", false);
+
+	await DB.close();
+
+	return thread;
 }
 
 export async function getMostRecentlyUpdatedThread() {
-	await waitForDB();
+	const db = await DB.get();
 
-	return await dbUtils.readFirstByIndex(BIDARA_DB, CHAT_STORE_NAME, "updated_time", true);
+	const thread = await dbUtils.readFirstByIndex(db, CHAT_STORE_NAME, "updated_time", true);
+
+	await DB.close();
+
+	return thread;
 }
 
 export async function getThreadFiles(threadId) {
-	await waitForDB();
+	const db = await DB.get();
 
-	const files = await dbUtils.readByProperty(BIDARA_DB, FILE_STORE_NAME, "threadId", threadId);
+	const files = await dbUtils.readByProperty(db, FILE_STORE_NAME, "threadId", threadId);
+
+	await DB.close();
 
 	if (!files) {
 		return [];
@@ -148,16 +157,22 @@ export async function getThreadFiles(threadId) {
 }
 
 export async function getFileById(fileId) {
-	await waitForDB();
+	const db = await DB.get();
 
-	const file = await dbUtils.readByKey(BIDARA_DB, FILE_STORE_NAME, fileId);
+	const file = await dbUtils.readByKey(db, FILE_STORE_NAME, fileId);
+
+	await DB.close();
+
 	return file;
 }
 
 export async function getEmptyThread(emptyLength) {
-	await waitForDB();
+	const db = await DB.get();
 
-	const emptyThread = await dbUtils.readFirstByIndex(BIDARA_DB, CHAT_STORE_NAME, "length", false);
+	const emptyThread = await dbUtils.readFirstByIndex(db, CHAT_STORE_NAME, "length", false);
+
+	await DB.close();
+
 	if (emptyThread && emptyThread.length <= emptyLength) {
 		return emptyThread;
 	}
@@ -166,93 +181,106 @@ export async function getEmptyThread(emptyLength) {
 }
 
 export async function getNameById(id) {
-	await waitForDB();
-
 	const thread = await getThreadById(id);
 	return thread.name;
 }
 
 export async function getLengthById(id) {
-	await waitForDB();
-
 	const thread = await getThreadById(id);
 	return thread.length;
 }
 
 export async function getFilteredThreads(thread_filter) {
-	await waitForDB();
-
 	return await getAllThreads().filter(thread_filter);
 }
 
 async function updateTimeById(id) {
-	await waitForDB();
+	const db = await DB.get();
 
 	const updated_time = Date.now();
-	await dbUtils.updateProperty(BIDARA_DB, CHAT_STORE_NAME, id, "update_time", updated_time)
+	await dbUtils.updateProperty(db, CHAT_STORE_NAME, id, "update_time", updated_time)
+
+	await DB.close();
 }
 
 export async function pushMessageToId(id, message) {
-	await waitForDB();
+	const db = await DB.get();
 
-	await dbUtils.pushToListProperty(BIDARA_DB, CHAT_STORE_NAME, id, "messages", message,);
+	await dbUtils.pushToListProperty(db, CHAT_STORE_NAME, id, "messages", message,);
+
 	const length = await getLengthById(id);
 	await setLengthById(id, length + 1);
 	await updateTimeById(id);
+
+	await DB.close();
 }
 
 export async function pushFile(file) {
-	await waitForDB();
+	const db = await DB.get();
 
 	// { index: int, file: b64Data }
-	await dbUtils.write(BIDARA_DB, FILE_STORE_NAME, file);
+	await dbUtils.write(db, FILE_STORE_NAME, file);
+
+	await DB.close();
 }
 
 export async function setThread(thread) {
-	await waitForDB();
+	const db = await DB.get();
 
-	await dbUtils.write(BIDARA_DB, CHAT_STORE_NAME, thread);
+	await dbUtils.write(db, CHAT_STORE_NAME, thread);
+
+	await DB.close();
 }
 
 export async function setMessagesById(id, messages) {
-	await waitForDB();
+	const db = await DB.get();
 
-	await dbUtils.updateProperty(BIDARA_DB, CHAT_STORE_NAME, id, "messages", messages);
+	await dbUtils.updateProperty(db, CHAT_STORE_NAME, id, "messages", messages);
+
+	await DB.close();
 }
 
 export async function setNameById(id, name) {
-	await waitForDB();
+	const db = await DB.get();
 
-	await dbUtils.updateProperty(BIDARA_DB, CHAT_STORE_NAME, id, "name", name);
+	await dbUtils.updateProperty(db, CHAT_STORE_NAME, id, "name", name);
+
+	await DB.close();
 }
 
 export async function setLengthById(id, length) {
-	await waitForDB();
+	const db = await DB.get();
 
-	await dbUtils.updateProperty(BIDARA_DB, CHAT_STORE_NAME, id, "length", length);
+	await dbUtils.updateProperty(db, CHAT_STORE_NAME, id, "length", length);
+
+	await DB.close();
 }
 
 export async function setAsstById(id, asst) {
-	await waitForDB();
+	const db = await DB.get();
 
-	await dbUtils.updateProperty(BIDARA_DB, CHAT_STORE_NAME, id, "asst", asst);
+	await dbUtils.updateProperty(db, CHAT_STORE_NAME, id, "asst", asst);
+
+	await DB.close();
 }
 
 export async function setActiveStatusById(id, status) {
-	await waitForDB();
+	const db = await DB.get();
 
 	if (status) {
-		await dbUtils.updateProperty(BIDARA_DB, CHAT_STORE_NAME, id, "active", ACTIVE_STATUS);
+		await dbUtils.updateProperty(db, CHAT_STORE_NAME, id, "active", ACTIVE_STATUS);
 
 	} else {
-		await dbUtils.updateProperty(BIDARA_DB, CHAT_STORE_NAME, id, "active", INACTIVE_STATUS);
+		await dbUtils.updateProperty(db, CHAT_STORE_NAME, id, "active", INACTIVE_STATUS);
 	}
-	await waitForDB();
 
+	await DB.close();
 }
 
 export async function deleteThreadById(id) {
-	await waitForDB();
+	const db = await DB.get();
 
-	await dbUtils.deleteByKey(BIDARA_DB, CHAT_STORE_NAME, id);
+	await dbUtils.deleteByKey(db, CHAT_STORE_NAME, id);
+
+	await DB.close();
 }
