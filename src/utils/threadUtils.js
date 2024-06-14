@@ -150,6 +150,49 @@ async function retrieveStoredFiles(threadId) {
   };
 }
 
+export async function retrieveFile(threadId, fileId) {
+  const fileInfo = await getFileInfo(fileId);
+  if (!fileInfo) {
+    return { fileId, threadId, src: "", name: "[ Deleted File ]", type: "any" };
+  }
+
+  const fileSrc = await getFileSrc(fileId);
+  if (!fileSrc) {
+    return { fileId, threadId, src: "", name: "[ Deleted File ]", type: "any" };
+  }
+
+  let fileName;
+  if (fileInfo.filename.startsWith("/mnt/data/")) {
+    fileName = fileInfo.filename.substring(10);
+  } else {
+    fileName = fileInfo.filename;
+  }
+
+  const fileType = getFileTypeByName(fileName) === "image" ? "image" : "any";
+
+  const file = { fileId, threadId, src:fileSrc, name:fileName, type:fileType};
+
+  return file;
+}
+
+export async function retrieveFiles(threadId, fileIds) {
+  const filesMap = new Map();
+
+  const promises = fileIds.map(async (fileId) => {
+    const file = await retrieveFile(threadId, fileId)
+    filesMap.set(fileId, file);
+
+    return file;
+  });
+
+  const files = await Promise.all(promises);
+
+  return {
+    list: files,
+    map: filesMap
+  };
+}
+
 async function retrieveNewFiles(threadId, messages, storedFiles) {
   const newFileIds = messages.map((message) => {
     const fileIds = message.attachments.map(attachment => attachment.file_id);
@@ -159,36 +202,11 @@ async function retrieveNewFiles(threadId, messages, storedFiles) {
   })
   .flat();
 
-  const newFilesMap = new Map();
-
-  const promises = newFileIds.map(async (fileId) => {
-    const fileInfo = await getFileInfo(fileId);
-    if (!fileInfo) {
-      return { fileId, threadId, src: "", name: "[ Deleted File ]", type: "any" };
-    }
-
-    const fileSrc = await getFileSrc(fileId);
-    if (!fileSrc) {
-      return { fileId, threadId, src: "", name: "[ Deleted File ]", type: "any" };
-    }
-
-    const fileName = fileInfo.filename.substring(10);
-
-    const fileType = getFileTypeByName(fileName) === "image" ? "image" : "any";
-
-    const newFile = { fileId, threadId, src:fileSrc, name:fileName, type:fileType};
-    newFilesMap.set(fileId, newFile);
-
-    return newFile;
-  });
-
-  const newFiles = await Promise.all(promises);
-
-  await pushFiles(newFiles);
+  const files = await retrieveFiles(threadId, newFileIds);
 
   return {
-    list: newFiles,
-    map: newFilesMap
+    list: files.list,
+    map: files.map
   };
 }
 

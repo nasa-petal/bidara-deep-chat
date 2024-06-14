@@ -113,21 +113,29 @@
   }
 
   async function handleFileUploads(fileIds, fileUploads) {
-    const formattedFiles = fileUploads.map((file, i) => {
-      const fileId = fileIds[i];
-      const name = file.ref?.name ? file.ref.name : file.name;
-      const newFile = {
-        fileId: fileId,
-        threadId: lastMessageId, 
-        name,
-        type: file.type,
-        src: file.src
-      }
+    let newFiles;
 
-      return newFile;
-    })
+    if (!fileUploads || fileUploads.length < 1) {
+      const files = await threadUtils.retrieveFiles(lastMessageId, fileIds);
+      newFiles = files.list;
 
-    await threadUtils.pushFiles(formattedFiles);
+    } else {
+      newFiles = fileUploads.map((file, i) => {
+        const fileId = fileIds[i];
+        const name = file.ref?.name ? file.ref.name : file.name;
+        const newFile = {
+          fileId: fileId,
+          threadId: lastMessageId, 
+          name,
+          type: file.type,
+          src: file.src
+        }
+
+        return newFile;
+      })
+    }
+
+    await threadUtils.pushFiles(newFiles);
 
     newFileUploads = [];
     newFileIds = [];
