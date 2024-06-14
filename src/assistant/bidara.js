@@ -1,11 +1,11 @@
-import { PAPER_SEARCH_FUNC, TEXT_TO_IMAGE, IMAGE_TO_TEXT, GET_FILE_TYPE, GET_IMAGE_PATTERNS } from "./common"
+import { PAPER_SEARCH_FUNC, TEXT_TO_IMAGE, IMAGE_TO_TEXT, GET_FILE_TYPE, GET_IMAGE_PATTERNS, PATENT_SEARCH_FUNC } from "./common"
 
 const PROD_NAME = "BIDARA";
 const TEST_NAME = "BIDARA-TEST";
 
 export const NAME = PROD_NAME;
 
-export const VERSION = "1.8";
+export const VERSION = "1.9";
 
 export const LOGO = "bidara.png";
 export const LOGO_DESC = "girl with dark hair";
@@ -100,6 +100,7 @@ export const FUNCTIONS = [
   { type: "function", function: IMAGE_TO_TEXT },
   { type: "function", function: GET_FILE_TYPE },
   { type: "function", function: GET_IMAGE_PATTERNS },
+  { type: "function", function: PATENT_SEARCH_FUNC },
 ]
 
 export const HISTORY = [
