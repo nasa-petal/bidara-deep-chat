@@ -10,6 +10,7 @@
   export let loginHandler;
 
   export let onLoadComplete;
+  export let renameThread = null;
 
   export let width = "100%";
   export let height = "100%";
@@ -61,6 +62,29 @@
   async function onMessage(message) { 
     if (!deepChatRef || message.isInitial) {
       return
+    }
+
+    if (thread.length === 0 || thread.length === asst.history + 1) {
+      const maxCharLen = 50;
+      const words = message.message.text.split(/\s+/);
+
+      let name = "";
+
+      for (let i = 0; i < words.length; i++) {
+        const word = words[i];
+        if (i !== 0) {
+          name += " ";
+        }
+
+        if (name.length + word.length <= maxCharLen) {
+          name += word;
+        } else {
+          name += word.slice(0, maxCharLen - name.length);
+          break;
+        }
+      }
+
+      await renameThread(name);
     }
 
     await updateMessages();
