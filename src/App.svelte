@@ -3,7 +3,6 @@
   import { Navbar, Sidebar, AssistantDeepChat, Login } from './components';
   import { ASSISTANT_OPTIONS, DEFAULT_ASSISTANT } from "./assistant";
   import { getKeyAndThread, getNewAsst } from './utils/openaiUtils';
-  import { createBidaraDB, closeBidaraDB } from "./utils/bidaraDB";
   import * as threadUtils from './utils/threadUtils';
   import hljs from "highlight.js";
   window.hljs = hljs;
@@ -47,14 +46,6 @@
 
     loggedIn = true;
   }
-
-  onMount(async () => {
-    await createBidaraDB();
-  });
-
-  onDestroy(async () => {
-    await closeBidaraDB();
-  })
 
   async function newThreadAndSwitch() {
     // If the thread is already "new", stay on it
@@ -195,6 +186,7 @@
             thread={activeThread}
             loginHandler={null}
             onLoadComplete={onLoadComplete}
+            renameThread={renameActiveThread}
 
             width="100%"
             height="100%"

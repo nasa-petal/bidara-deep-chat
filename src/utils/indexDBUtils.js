@@ -1,4 +1,4 @@
-export async function openDB(name, stores, version) {
+export async function createDB(name, stores, version) {
 	return new Promise((resolve, reject) => {
 
 		const request = indexedDB.open(name, version)
@@ -10,6 +10,23 @@ export async function openDB(name, stores, version) {
 				createStore(event, db, store.name, store.primaryKey, store.indices);
 			});
 		};
+
+		request.onsuccess = (event) => {
+			const db = event.target.result;
+			resolve(db);
+		}
+
+		request.onerror = (event) => {
+			const error = event.target.error;
+			reject(error);
+			return;
+		}
+	});
+}
+
+export async function openDB(name, version) {
+	return new Promise((resolve, reject) => {
+		const request = indexedDB.open(name, version)
 
 		request.onsuccess = (event) => {
 			const db = event.target.result;
