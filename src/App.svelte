@@ -186,6 +186,7 @@
             thread={activeThread}
             loginHandler={null}
             onLoadComplete={onLoadComplete}
+            renameThread={renameActiveThread}
 
             width="100%"
             height="100%"
