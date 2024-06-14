@@ -1,4 +1,4 @@
-import { ssSearch, genImage, imageToText, getFileType, getImagePatterns } from "./commonFunctions";
+import { ssSearch, genImage, imageToText, getFileType, getImagePatterns, patentSearch } from "./commonFunctions";
 
 export async function bioSsSearch(params, context) {
 
@@ -48,6 +48,9 @@ export async function callFunc(functionDetails, context) {
   }
   else if (functionDetails.name == "get_patterns_in_image") {
     tmp = await getImagePatterns(functionDetails.arguments, context);
+  }
+  else if (functionDetails.name == "patent_search") {
+    tmp = await patentSearch(functionDetails.arguments, context);
   }
   return tmp;
 }
