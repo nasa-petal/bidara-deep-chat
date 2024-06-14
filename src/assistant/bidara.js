@@ -1,11 +1,11 @@
-import { PAPER_SEARCH_FUNC, TEXT_TO_IMAGE, IMAGE_TO_TEXT, GET_FILE_TYPE, GET_IMAGE_PATTERNS } from "./common"
+import { PAPER_SEARCH_FUNC, TEXT_TO_IMAGE, IMAGE_TO_TEXT, GET_FILE_TYPE, GET_IMAGE_PATTERNS, PATENT_SEARCH_FUNC } from "./common"
 
 const PROD_NAME = "BIDARA";
 const TEST_NAME = "BIDARA-TEST";
 
 export const NAME = PROD_NAME;
 
-export const VERSION = "1.8";
+export const VERSION = "1.9";
 
 export const LOGO = "bidara.png";
 export const LOGO_DESC = "girl with dark hair";
@@ -13,7 +13,7 @@ export const LOGO_DESC = "girl with dark hair";
 export const TAGLINE = "Bio-Inspired Design and Research Assistant";
 export const TEXT_DESCRIPTION = "I'm an OpenAI GPT-4 assistant, that was instructed by NASA's PeTaL initiative to help others understand, learn from, and emulate the strategies used by living things to create sustainable designs and technologies using the Biomimicry Institute's design process.";
 
-export const DESCRIPTION = "I'm an OpenAI [GPT-4o](https://openai.com/index/hello-gpt-4o/) [assistant](https://platform.openai.com/docs/assistants/how-it-works), that was instructed by [NASA's PeTaL initiative](https://www1.grc.nasa.gov/research-and-engineering/vine/petal/) to help others understand, learn from, and emulate the strategies used by living things to create sustainable designs and technologies using the [Biomimicry Institute's design process](https://toolbox.biomimicry.org/methods/process/). I can summarize and answer questions from files you upload, search for papers on Semantic Scholar, generate images, and detect [nature's building block patterns](https://na2ure.org/patternabc/) in images you upload."
+export const DESCRIPTION = "I'm an OpenAI [GPT-4o](https://openai.com/index/hello-gpt-4o/) [assistant](https://platform.openai.com/docs/assistants/how-it-works), that was instructed by [NASA's PeTaL initiative](https://www1.grc.nasa.gov/research-and-engineering/vine/petal/) to help others understand, learn from, and emulate the strategies used by living things to create sustainable designs and technologies using the [Biomimicry Institute's design process](https://toolbox.biomimicry.org/methods/process/). I can summarize and answer questions from files you upload, search for papers on Semantic Scholar or patents from the US Patent Office, generate images, and detect [nature's building block patterns](https://na2ure.org/patternabc/) in images you upload."
 export const ADVISORY = "**Do not share any sensitive information** in your conversations including but not limited to, personal information, sensitive or non-public government/company data, ITAR, CUI, export controlled, or trade secrets.  \n‣ While OpenAI has safeguards in place, BIDARA may occasionally generate incorrect or misleading information and produce offensive or biased content.";
 export const GREETING = "How can I assist you today?";
 
@@ -100,6 +100,7 @@ export const FUNCTIONS = [
   { type: "function", function: IMAGE_TO_TEXT },
   { type: "function", function: GET_FILE_TYPE },
   { type: "function", function: GET_IMAGE_PATTERNS },
+  { type: "function", function: PATENT_SEARCH_FUNC },
 ]
 
 export const HISTORY = [

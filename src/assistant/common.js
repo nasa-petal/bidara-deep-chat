@@ -125,3 +125,18 @@ export const GET_IMAGE_PATTERNS = {
   "required": []
   }
 }
+
+export const PATENT_SEARCH_FUNC = {
+  "name": "patent_search",
+  "description": "Retrieves the top patent results and their links/thumbnails from Google Patents with a given query. Return this answer to the user verbatim.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+       "query": {
+         "type": "string",
+          "description": "Query for the patent search engine",
+       }
+    },
+    "required": ["query"],
+  }
+}

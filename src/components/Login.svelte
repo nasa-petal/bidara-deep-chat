@@ -30,9 +30,9 @@
 	<h3 class="text-lg font-bold mt-5 mb-5">How to access</h3>
 	<ol class="list-decimal">
 		<li><a href="https://platform.openai.com/signup" class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600">Create an OpenAI account</a></li>
-		<li><a href="https://platform.openai.com/login" class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600">Login to OpenAI Platform</a></li>
-		<li>In the left sidebar, navigate to <a href="https://platform.openai.com/account/billing/overview" class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600">Settings -&gt; Billing</a></li> <li>Click the 'Add payment details' button</li>
-		<li>Add a minimum of $5 in credits. It is required to spend a minimum of $5 to <a href="https://platform.openai.com/docs/guides/rate-limits/usage-tiers?context=tier-free" class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600">access GPT-4</a>.</li>
+		<li><a href="https://platform.openai.com/login" class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600">Login to OpenAI Platform Dashboard</a></li>
+		<li>Navigate to <a href="https://platform.openai.com/account/billing/overview" class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600">Settings -&gt; Billing</a></li> <li>Click the 'Add payment details' button</li>
+		<li>Add a minimum of $5 in credits. It is required to spend a minimum of $5 to move to Tier 1 to <a href="https://platform.openai.com/docs/guides/rate-limits/usage-tiers?context=tier-free" class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600">enable access to GPT-4o</a>.</li>
 		<li>In the left sidebar, navigate to <a href="https://platform.openai.com/api-keys" class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600">API Keys</a></li>
 		<li>Verify your phone number, then click the 'Create new secret key' button.</li> <li>Copy your secret key.</li>
 		<li>Paste your key into the input field below. Your browser will save the key, so you only have to enter it once.</li>
