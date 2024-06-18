@@ -23,7 +23,7 @@
   },
   "scripts": {
     "build": "rollup -c --bundleConfigAsCjs",
-    "dev": "[ -z \"${SS_KEY}\"  ] && echo \"WARN: SS_KEY not set. Defaulting to ''\" && export SS_KEY=\"\" || set SS_KEY=\"\"; [ -z \"${TAV_KEY}\" ] && echo \"WARN: TAV_KEY not set. Defaulting to ''\" && export TAV_KEY=\"\" || set TAV_KEY=\"\"; rollup -c -w --bundleConfigAsCjs",
+    "dev": "[ -z \"${SS_KEY}\"  ] && echo \"WARN: SS_KEY not set. Defaulting to ''\" && export SS_KEY=\"\" || set SS_KEY=\"\"; [ -z \"${PQAI_KEY}\"  ] && echo \"WARN: PQAI_KEY not set. Defaulting to ''\" && export PQAI_KEY=\"\" || set PQAI_KEY=\"\"; [ -z \"${TAV_KEY}\" ] && echo \"WARN: TAV_KEY not set. Defaulting to ''\" && export TAV_KEY=\"\" || set TAV_KEY=\"\"; rollup -c -w --bundleConfigAsCjs",
     "start": "sirv public"
   },
   "keywords": [],
