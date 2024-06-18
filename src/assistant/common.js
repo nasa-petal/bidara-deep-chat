@@ -140,3 +140,18 @@ export const PATENT_SEARCH_FUNC = {
     "required": ["query"],
   }
 }
+
+export const GET_ALTERNATIVE_QUERY = {
+  "name": "get_alternative_query",
+  "description": "Search the NASA Spinoffs database for projects similar to the user queried and how that technology was applied in different domains.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "query": {
+        "type": "string",
+        "description": "Query containing keywords describing the project the user is currently thinking about.",
+      }
+    },
+    "required": ["query"]
+  }
+}
