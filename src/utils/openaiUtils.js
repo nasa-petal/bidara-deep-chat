@@ -560,7 +560,7 @@ export async function getImageDescription(base64, prompt) {
     prompt = "Give a detailed but concise description of the image. If there are any engineering, biological, or mechanical processes present, include how they're present."
   }
 
-  const model = "gpt-4-vision-preview"
+  const model = "gpt-4o-2024-05-13"
   const messages = [
     {
       "role": "user",

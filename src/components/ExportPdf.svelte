@@ -25,10 +25,56 @@
     return string
   }
 
+  function getImagesInText(text) {
+    if (!text) {
+      return [];
+    }
+
+    const msgFileLinkRegEx = /\[.*\]\(data:[\S]+\)/igm;
+    const matches = (text.match(msgFileLinkRegEx) || [])
+
+    const fileNameRegex = /\[.*\]/;
+    const fileSrcRegex = /\(data:[\S]+\)/igm;
+
+    const files = matches.map((match) => {
+      let name = (match.match(fileNameRegex) || [""])[0];
+      let src = (match.match(fileSrcRegex) || [""])[0];
+      let type = "";
+
+      if (src.startsWith("(data:image")) {
+        type = "image";
+      } else {
+        return {};
+      }
+
+      if (name.length > 0) {
+        name = name.slice(1,-1);
+      }
+      if (src.length > 0) {
+        src = src.slice(1,-1);
+      }
+
+      return {
+        name,
+        src,
+        type
+      }
+    })
+
+    const imageFiles = files.filter(file => file?.type === "image");
+
+    return imageFiles;
+  }
+
   function getMessageHtmlTree(chatName, messages) {
     const contents = messages.map((message) => {
+      const filesInText = getImagesInText(message.text);
+
+      const msgImgLinkRegEx = /\]\(data:image[\S]+\)/igm;
       const msgFileLinkRegEx = /\]\(data:[\S]+\)/igm;
-      message.text = findReplaceRegEx(message.text, msgFileLinkRegEx, '](Removed file source because it exceeded limit.)')
+
+      message.text = findReplaceRegEx(message.text, msgImgLinkRegEx, '](Image attached below)');
+      message.text = findReplaceRegEx(message.text, msgFileLinkRegEx, '](Removed file source because it exceeded limit.)');
 
       const role = message.role === "ai" ? "Bidara:" : "User:";
 
@@ -38,11 +84,13 @@
           text: message.text,
         }
       } else {
-        const files = message.files.map(file => { 
+        let files = message.files.map(file => { 
           const src = file.src ? file.src : "no source";
           const type = file.type ? file.type : "";
           return { name: file.name, src: src, type: type } 
         })
+
+        files = files.concat(filesInText);
 
         if (message.text) {
           return {
