@@ -98,8 +98,8 @@ Most recent updated date: ${formattedDate}
 `;
 
 const BIO_WEB_SEARCH = {
-  description: WEB_SEARCH_FUNC.description + "MUST be bio or engineering related, or directly relevant to the discussion. DO NOT search for anything else outside of these domains.",
-  ...WEB_SEARCH_FUNC
+  ...WEB_SEARCH_FUNC,
+  description: WEB_SEARCH_FUNC.description + "MUST be bio or engineering related, or directly relevant to the discussion. DO NOT search for anything else outside of these domains."
 }
 
 export const FUNCTIONS = [
