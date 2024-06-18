@@ -5,7 +5,7 @@ import { getFileByFileId, getFileTypeByName, pushFile } from "../utils/threadUti
 // export SS_KEY="insert-ss-key-here"
 // ```
 // Defaults to empty string ""
-import { SS_KEY } from 'process.env'; 
+import { SS_KEY, TAV_KEY } from 'process.env'; 
 
 export async function ssSearch(params, context) {
   //call api and return results
@@ -235,6 +235,97 @@ export async function patentSearch(params, context) {
     return "There seems to be an error with the backend (possibly with rate limits, 45 per hour maximum). Convey this message to the user";
   }
   return `Do not make additional requests to the patents API, unless directly asked by the user. For each entry in the list of patents, print out all the information and images accompanying each patent title. Make sure the entries specifically deal with the biomimeticist's use case and serve the purpose of inspiration and innovation. Ensure that the patents are relevant to the field of biomimicry and can be used as a reference for the design process. \n\n${patentInfo}`;
+}
+
+export async function webSearch(params, context) {
+  //call api and return results
+  let webParams = JSON.parse(params);
+  if ("parameters" in webParams) {
+    webParams = webParams.parameters;
+  }
+
+  const query = webParams.query + " " + webParams.links;
+  const links = webParams.links;
+
+  const domains = links ? 
+    links.map((link) => { 
+    const matches = link.match(/^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)/img) 
+      return matches.length > 0 ? 
+        matches[0] 
+        : "";
+    }) 
+    :  [];
+
+  try {
+    const url = "https://api.tavily.com/search";
+    const method = "POST";
+    const headers = {
+      "Content-Type": "application/json"
+    }
+    const body = {
+      api_key: TAV_KEY,
+      include_answer: true,
+      include_domains: domains,
+      include_images: false,
+      include_raw_content: false,
+      max_results: 5,
+      query: query,
+      search_depth: "basic", // advanced causes each call to count as 2 againts our 1000
+      topic: "general"
+    }
+
+    const response = await fetch(url, {
+      method,
+      headers,
+      body: JSON.stringify(body)
+    });
+
+    if (!response.ok || response.status === 429 || response.code === 429 || response.statusCode === 429) {
+      return "Web search is currently having issues with their servers. So, for now, searching for general web results will not work."
+    }
+
+    const res = await response.json();
+
+    let directResults = "";
+    if (links?.length > 0) {
+      links.map((link) => {
+        const match = res.results.find((result) => result.url === link);
+        if (!match) { return; }
+
+        res.results = res.results.filter((result) => result.url !== link);
+
+        directResults += `\nResult matching link ('${link}'): {
+      title: "${match.title}",
+      url: "${match.url}",
+      content: "${match.content}"
+    }\n`
+
+      })
+    }
+
+    const resMsg = `Possible answer: "${res.answer}"
+${directResults}
+
+Answer gathered from:
+{ 
+  results: [
+    ${res.results.map((result) => `{
+      title: "${result.title}",
+      url: "${result.url}",
+      content: "${result.content}"
+    }\n`)}
+  ]
+}
+
+You MUST provide citations from at least one of the provided links above.
+Do not make any claims that are not supported by this information.`
+
+    return resMsg;
+
+  } catch (e) {
+    console.error('error: ' + e);
+    return "Web search is currently having issues with their servers. So, for now, searching for general web results will not work."
+  }
 }
   
 async function callWithBackoff(callback, backoffFunction) {
