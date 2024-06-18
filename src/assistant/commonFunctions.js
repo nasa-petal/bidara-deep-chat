@@ -268,3 +268,39 @@ async function backoffExponential(callback, maxRetries, retries, retryOffset) {
 function waitFor(milliseconds) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
+
+// Offer this functionality as a way to expand the biomimeticist's perspective during step 1a.
+// helps the biomimeticist brainstorm and see how previous NASA technologies have been applied
+// outside of their intended domain and how that learning can be brought into their own project
+export async function nasaSearch(params, context) {
+  // Retrieve the keywords for the intended project query
+  let searchParams = JSON.parse(params);
+  if ("parameters" in searchParams) {
+    searchParams = searchParams.parameters;
+  }
+  let keywords = JSON.stringify(searchParams.query);
+  if (!keywords) {
+    return "The query keywords passed were not found. Please try again.";
+  }
+
+  // Search the techtransfer spinoff API to find similar projects that NASA has worked on
+  const fullUrl = `https://api.nasa.gov/techtransfer/spinoff/?${keywords}&api_key=DEMO_KEY`.replace(/['"]+/g, ''); // the url doesn't allow quotation marks around the keywords
+  let nasaProducts = "";
+  try {
+    const response = await fetch(fullUrl);
+    const data = await response.json();
+
+    // Response format is:
+    // 1. The headline of the article about NASA's project
+    // 2. An abstract describing how this project deviates from the norm
+    // 3. The primary NASA center of the project
+    nasaProducts = data.results.map(product => 
+      [product[2],
+       product[3],
+       product[9]]
+    );
+    return `Return the following results in a modular format, including the NASA center they are in, as well as a short description of what they do: ${nasaProducts}`;
+  } catch (error) {
+    console.error(error);
+  }
+}
