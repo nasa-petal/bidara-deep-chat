@@ -5,7 +5,7 @@ import { getFileByFileId, getFileTypeByName, pushFile } from "../utils/threadUti
 // export SS_KEY="insert-ss-key-here"
 // ```
 // Defaults to empty string ""
-import { SS_KEY } from 'process.env'; 
+import { SS_KEY, PQAI_KEY } from 'process.env'; 
 
 export async function ssSearch(params, context) {
   //call api and return results
@@ -194,47 +194,46 @@ export async function patentSearch(params, context) {
   if (!keywords) {
     return "The query keywords passed were not found. Please ask the user to try entering their request for patents again.";
   }
-
-  console.log(keywords)
-
-  // response to API query should be the information 
-  // with the patent titles that match 
-  // in order of the one with most citations by other US patents to least
-  const fields = `["patent_title","patent_num_cited_by_us_patents","patent_abstract","patent_number","patent_date"]`;
-  const fullUrl = `https://api.patentsview.org/patents/query?q={"_text_all":{"patent_title":${keywords}}}&f=${fields}&s=[{"patent_num_cited_by_us_patents":"desc"}]`
-
-
-  console.log(fullUrl);
-
-  // perform the request
-  // the response format is:
-  // 1. title of the patent
-  // 2. the first drawing to appear in the patent
-  // 3. a short description of the patent
-  // 4. a link to the website for more info on the patent
-  let patentInfo = "";
+  
+  // Search for the top 7 patents that match the search query (uses vector similarity instead of direct matches)
+  const url = `https://api.projectpq.ai/search/102?q=${keywords}&n=7&type=patent&token=${PQAI_KEY}`;
+  let sortedPatentInfo = "";
   try {
-    const response = await fetch(fullUrl);
+    const response = await fetch(url);
     if (!response.ok) {
-      return "There seems to be an HTTP error. Ask the user to reword their request.";
+      return "There seems to be an error with the API. Ask the user to reword their request or try again later.";
     }
     const data = await response.json();
-    
-    // if the API query yields no results, suggest alternative queries that mean the same thing and could deliver the results the user wants
-    if (data.patents == null) {
-      return `No results found by the API. Tell the user to try different or more general keywords for better results. Suggest keywords that would yield better results when used with a patents database than the user-given: ${keywords}`;
+
+    // This error should technically not happen due to vector similarity search, but just in case:
+    if (data.results == null) {
+      return `No results found by the API. Tell the user to try keywords for a more specific part of the patent or reframe the design statement altogether for better results`;
     }
 
-    patentInfo = data.patents.map(patent => 
-      [patent.patent_title,
-      "<img src=" + `"http://api.projectpq.ai/patents/US` + patent.patent_number + `A1/drawings/1" ` + ` alt="Patent Illustration Unavailable" />`,
-      patent.patent_abstract,
-      "https://datatool.patentsview.org/#detail/patent/" + patent.patent_number
-      ]);
+    // Response format is:
+    // 1. The official title of the patent
+    // 2. The first diagram/drawing that occurs in the patent
+    // 3. An abstract paragraph, describing what the patent does
+    // 4. The date the patent was published
+    // 5. The similarity score between the patent result and the original query (the results are sorted from highest to lowest score)
+    let patentInfo = data.results.map(patent =>
+      [
+        patent.title,
+        "<img src=" + `"http://api.projectpq.ai/patents/` + patent.id + `/drawings/1" ` + ` alt="Patent Illustration Unavailable" />`,
+        patent.abstract,
+        patent.www_link,
+        patent.publication_date,
+        patent.score
+      ]
+    )
+
+    // sort the patent results by score
+    sortedPatentInfo = patentInfo.sort(function(a, b) { return b[5] - a[5] }); 
   } catch (error) {
-    return "There seems to be an error with the backend (possibly with rate limits, 45 per hour maximum). Convey this message to the user";
+    return "There seems to be an error with the backend (possibly with rate limits). Convey this message to the user."
   }
-  return `Do not make additional requests to the patents API, unless directly asked by the user. For each entry in the list of patents, print out all the information and images accompanying each patent title. Make sure the entries specifically deal with the biomimeticist's use case and serve the purpose of inspiration and innovation. Ensure that the patents are relevant to the field of biomimicry and can be used as a reference for the design process. \n\n${patentInfo}`;
+  const prompt = `Do not make additional requests to the patents API, unless directly asked by the user. For each entry in the list of patents, print out all the information and images accompanying each patent title. Make sure the entries specifically deal with the biomimeticist's use case and serve the purpose of inspiration and innovation. Ensure that the patents are relevant to the field of biomimicry and can be used as a reference for the design process.`;
+  return prompt + sortedPatentInfo;
 }
   
 async function callWithBackoff(callback, backoffFunction) {
