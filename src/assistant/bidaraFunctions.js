@@ -1,4 +1,4 @@
-import { ssSearch, genImage, imageToText, getFileType, getImagePatterns, patentSearch, nasaSearch } from "./commonFunctions";
+import { ssSearch, genImage, imageToText, getFileType, getImagePatterns, patentSearch, nasaSpinoffSearch } from "./commonFunctions";
 
 export async function bioSsSearch(params, context) {
 
@@ -29,7 +29,7 @@ export async function bioSsSearch(params, context) {
 export async function callFunc(functionDetails, context) {
   let tmp = '';
   if (functionDetails.name == "get_alternative_query") {
-    tmp = await nasaSearch(functionDetails.arguments, context);
+    tmp = await nasaSpinoffSearch(functionDetails.arguments, context);
   }
   else if(functionDetails.name == "get_graph_paper_relevance_search") {
     tmp = await bioSsSearch(functionDetails.arguments);
