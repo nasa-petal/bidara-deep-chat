@@ -272,7 +272,7 @@ function waitFor(milliseconds) {
 // Offer this functionality as a way to expand the biomimeticist's perspective during step 1a.
 // helps the biomimeticist brainstorm and see how previous NASA technologies have been applied
 // outside of their intended domain and how that learning can be brought into their own project
-export async function nasaSearch(params, context) {
+export async function nasaSpinoffSearch(params, context) {
   // Retrieve the keywords for the intended project query
   let searchParams = JSON.parse(params);
   if ("parameters" in searchParams) {
