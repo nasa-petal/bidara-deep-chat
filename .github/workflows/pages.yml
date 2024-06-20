@@ -27,6 +27,7 @@ jobs:
         env:
           SS_KEY: ${{ secrets.SS_KEY }}
           PQAI_KEY: ${{ secrets.PQAI_KEY }}
+          TAV_KEY: ${{ secrets.TAV_KEY }}
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4

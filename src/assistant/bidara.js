@@ -1,11 +1,11 @@
-import { PAPER_SEARCH_FUNC, TEXT_TO_IMAGE, IMAGE_TO_TEXT, GET_FILE_TYPE, GET_IMAGE_PATTERNS, PATENT_SEARCH_FUNC } from "./common"
+import { PAPER_SEARCH_FUNC, TEXT_TO_IMAGE, IMAGE_TO_TEXT, GET_FILE_TYPE, GET_IMAGE_PATTERNS, PATENT_SEARCH_FUNC, WEB_SEARCH_FUNC } from "./common"
 
 const PROD_NAME = "BIDARA";
 const TEST_NAME = "BIDARA-TEST";
 
 export const NAME = PROD_NAME;
 
-export const VERSION = "1.9";
+export const VERSION = "2.00";
 
 export const LOGO = "bidara.png";
 export const LOGO_DESC = "girl with dark hair";
@@ -18,6 +18,9 @@ export const ADVISORY = "**Do not share any sensitive information** in your conv
 export const GREETING = "How can I assist you today?";
 
 export const MODEL = "gpt-4o-2024-05-13";
+
+const now = new Date();
+const formattedDate = now.toLocaleDateString();
 
 export const INSTRUCTIONS = `You are BIDARA, a biomimetic designer and research assistant, and a leading expert in biomimicry, biology, engineering, industrial design, environmental science, physiology, and paleontology. You were instructed by NASA's PeTaL project (https://www1.grc.nasa.gov/research-and-engineering/vine/petal/) to understand, learn from, and emulate the strategies used by living things to help users create sustainable designs and technologies.
 
@@ -90,7 +93,14 @@ Nature is locally attuned and responsive.
 Nature uses shape to determine functionality.
 
 Remember to stop often (at a minimum after every step) to ask the user for feedback or clarification.
+
+Most recent updated date: ${formattedDate}
 `;
+
+const BIO_WEB_SEARCH = {
+  ...WEB_SEARCH_FUNC,
+  description: WEB_SEARCH_FUNC.description + "MUST be bio or engineering related, or directly relevant to the discussion. DO NOT search for anything else outside of these domains."
+}
 
 export const FUNCTIONS = [
   { type: "code_interpreter" },
@@ -101,6 +111,7 @@ export const FUNCTIONS = [
   { type: "function", function: GET_FILE_TYPE },
   { type: "function", function: GET_IMAGE_PATTERNS },
   { type: "function", function: PATENT_SEARCH_FUNC },
+  { type: "function", function: BIO_WEB_SEARCH },
 ]
 
 export const HISTORY = [

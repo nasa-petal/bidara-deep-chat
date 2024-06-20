@@ -54,7 +54,7 @@ export const PAPER_SEARCH_FUNC = {
         }
       }
     },
-    "required": []
+    "required": [ "query" ]
   }
 }
 
@@ -73,7 +73,7 @@ export const TEXT_TO_IMAGE = {
         "description": "The name for the PNG image file."
       }
     },
-    "required": []
+    "required": [ "prompt", "file_name" ]
   }
 }
 
@@ -92,7 +92,7 @@ export const IMAGE_TO_TEXT = {
         "description": "The prompt to query about the image."
       },
     },
-    "required": []
+    "required": [ "file_id", "prompt" ]
   }
 }
 
@@ -107,7 +107,7 @@ export const GET_FILE_TYPE = {
         "description": "The id of the file"
       },
     },
-    "required": []
+    "required": [ "file_id" ]
   }
 }
 
@@ -122,7 +122,7 @@ export const GET_IMAGE_PATTERNS = {
         "description": "The id of the file"
       }
     },
-  "required": []
+  "required": [ "file_id" ]
   }
 }
 
@@ -138,5 +138,34 @@ export const PATENT_SEARCH_FUNC = {
        }
     },
     "required": ["query"],
+  }
+}
+
+export const WEB_SEARCH_FUNC = {
+  "name": "general_web_search_retrieval",
+  "description": "Retrive information related to links, general questions, etc. from the web. Should not be used for random queries such as 'What was the final score of the game last night?', 'What's the latest news?', or 'What was the change in AAPL over the last week?'. Must be substantive queries related to the discussion at hand.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "query": {
+        "type": "string",
+        "description": "Query for the web search engine. Should be search engine optimized to include ALL details relevant to the query. Do NOT include information related to filters such as 'site' or '\"\"'"
+      },
+      "links": {
+        "type": "array",
+        "description": "List of links to include in query. If provided, results will only be provided matching these links.",
+        "items": {
+          "type": "string"
+        }
+      },
+      "get_full_page_contents": {
+        "type": "boolean",
+        "description": "If full page contents should be retrieved. Should only be used when necessary. Only valid when links are provided."
+      }
+    },
+    "required": [
+      "query",
+      "links"
+    ]
   }
 }
