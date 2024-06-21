@@ -17,22 +17,20 @@
     const trashBgColor = 'var(--red)';
 
     async function handleSelectThread() {
-        handleSelect();
+        handleSelect(thread);
     }
 
     async function handleDeleteThread() {
-        const success = handleDelete();
+        handleDelete(thread);
 
         // Make visual cue that weren't allowed to delete thread;
     }
 
     function isMobile() {
-        const userAgent = navigator.userAgent.toLowerCase();
-        if (/mobile|android|iphone|ipad/.test(userAgent)) {
-            return true;
-        } else {
-            return false;
-        }
+        const userAgent = navigator.userAgent;
+        const isMobile = /iPad|iPhone|iPod|Android|Windows|mobile/i.test(userAgent) 
+            || (/MacIntel|Mac/i.test(userAgent) && navigator.maxTouchPoints > 1); // ipad
+        return isMobile;
     }
 
 </script>
@@ -71,6 +69,7 @@
 <style>
     .chat-button-container {
         height: 3em;
+        width: 100%;
         color: var(--text-primary-color);
         border-bottom: 1px solid var(--border-color);
     }

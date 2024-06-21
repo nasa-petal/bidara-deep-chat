@@ -213,7 +213,10 @@
     }
 
     const inputButtons = input.getElementsByClassName("input-button");
-    inputButtons.forEach(button => {
+    if (!inputButtons) { return };
+
+    for (let i = 0; i < inputButtons.length; i++) {
+      const button = inputButtons[i];
       const buttonClickEventListener = button.onclick;
 
       if (!buttonClickEventListener) {
@@ -222,7 +225,7 @@
 
       button.tabIndex = 0;
       button.addEventListener('keydown', (e)=>{ if (e.key === 'Enter') buttonClickEventListener(e); });
-    });
+    }
   }
 </script>
 
