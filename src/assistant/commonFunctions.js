@@ -243,8 +243,12 @@ export async function webSearch(params, context) {
     webParams = webParams.parameters;
   }
 
-  const query = webParams.query + " " + webParams.links;
   const links = webParams.links;
+
+  const query = links ?
+    webParams.query + " " + links
+    : webParams.query;
+
 
   const domains = links ? 
     links.map((link) => { 
