@@ -169,3 +169,18 @@ export const WEB_SEARCH_FUNC = {
     ]
   }
 }
+
+export const SUGGEST_FIXES = {
+  "name": "suggest_fixes_to_requirements",
+  "description": "Look at a list of requirements from chat history and make changes",
+  "parameters": {
+    "type": "object",
+    "properties": {
+       "query": {
+         "type": "string",
+         "description": "A request asking to review requirements and potentially fix them.",
+       }
+    },
+    "required": ["query"]
+  }
+}
