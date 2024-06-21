@@ -150,7 +150,7 @@
 
 </script>
 
-<main class="flex">
+<main class="flex w-full h-full">
   <div class="w-full h-full flex flex-col justify-between">
     {#await initKeyAsstAndThreads() then}
     {#if !loggedIn}
@@ -166,8 +166,8 @@
         changeAssistant={changeAssistants}
         />   
 
-      <div id="content-container" class="flex justify-between w-full h-full flex-1" class:open>
-        <div>
+      <div id="content-container" class="flex justify-between w-full h-full flex-1">
+        <div class="sidebar-container">
           <Sidebar 
             bind:threads
             bind:open
@@ -178,7 +178,7 @@
             />
         </div>
 
-        <div id="chat-container" class="w-full" class:loading>
+        <div id="chat-container" class="w-full" class:loading class:open>
           {#key activeThread.id}
           <AssistantDeepChat
             key={activeKey}
@@ -203,31 +203,35 @@
 <style>
   #content-container {
     height: calc(100% - 3rem);
-    overflow-y: hidden;
+    overflow: hidden;
+  }
+
+  .sidebar-container {
+    overflow: hidden;
   }
 
   #chat-container {
     transition: width 0.3s ease, filter 0.3s ease-out;
   }
   
-  .open #chat-container {
+  .open {
     width: 80%;
   }
 
   @media only screen and (max-width: 1400px) {
-    .open #chat-container {
+    .open {
       width: 70%;
     }
   }
 
   @media only screen and (max-width: 1000px) {
-    .open #chat-container {
+    .open {
       width: 60%;
     }
   }
 
   @media only screen and (max-width: 700px) {
-    .open #chat-container {
+    .open {
       width: 100%;
     }
   }
