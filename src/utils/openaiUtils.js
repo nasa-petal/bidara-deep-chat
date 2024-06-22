@@ -1,6 +1,7 @@
 import { getStoredAPIKey, setStoredAPIKey } from "./storageUtils";
 import { getActiveThread, getFileByFileId } from "./threadUtils";
 import { ASSISTANT_OPTIONS } from "../assistant";
+import { ENV } from "process.env";
 
 let openaiKey = null;
 
@@ -258,6 +259,14 @@ export async function getNewThreadId() {
   if (!openaiKey) {
     throw new Error('openai key not set. cannot get new thread.');
   }
+
+  const metadata = {
+    "env": ENV
+  }
+
+  const body = {
+    metadata
+  }
   const response = await fetch("https://api.openai.com/v1/threads", {
     method: "POST",
     headers: {
@@ -265,7 +274,7 @@ export async function getNewThreadId() {
       'Content-Type': 'application/json',
       'OpenAI-Beta': 'assistants=v2'
     },
-    body: null
+    body: JSON.stringify(body)
   });
 
   const r = await response.json();
