@@ -80,7 +80,6 @@
     height: calc(100% - 3em);
     left: -20%;
     background-color: var(--nav-color);
-    border-right: 1px solid var(--border-color);
     transition: left ease 0.3s, width ease 0.3s, visibility 0.3s 0s;
     overflow-y: scroll;
     visibility: hidden;
