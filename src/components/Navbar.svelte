@@ -93,7 +93,7 @@
     width: 100%;
     height: 10em;
     margin-top: -7em;
-    padding: 7.5em env(safe-area-inset-right) 0.5em env(safe-area-inset-left);
+    padding: 7.5em 0.75em 0.5em 0.75em;
   }
   button {
     width: 50%;
