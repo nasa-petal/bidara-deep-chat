@@ -1,7 +1,5 @@
 <script>
-    import { draggable } from 'svelte-agnostic-draggable'
     import { onMount } from 'svelte';
-    import mapTouchToMouseFor from 'svelte-touch-to-mouse'
 
     export let handleClick;
     export let handleSlide;
@@ -20,22 +18,21 @@
 
     export let selected = false;
 
-    let touching = false;
-    let wasDragged = false
-    let clicked = false;
-    let clickTolerance = 5;
-
-    let deltaX = 0;
     let maxDragWidth;
     let slideThreshWidth;
-
-    let initialLeft = 0;
     let width;
-    let position;
+    const scrollThresh = 10;
+    const movingThresh = 5;
+
 
     let rendered = false;
 
-    mapTouchToMouseFor('.draggable');
+    let sliderElement;
+    let revealElement;
+    let moving = false;
+    let scrolling = false;
+    let left = 0;
+    let movementY = 0;
 
     // not a great solution, but forces '.slide-button' to render before '.reveal' to prevent flickering
     onMount(() => {
@@ -44,106 +41,135 @@
         }, 1);
     })
 
-    function onMouseDown () { 
-        wasDragged = false; 
-    }
-
-    function onDragStart (event) { 
-        width = event.target.clientWidth;
+    function onMouseDown (e) { 
+        width = sliderElement.clientWidth;
         slideThreshWidth = width  * slideThresh;
         maxDragWidth = width * maxSlide;
-        touching = true;
+        sliderElement.style.transition = "none";
     }
 
-    function onDrag(event) {
-        if (!touching ) return;
+    function onMouseMove(e) {
+        left += e.movementX;
+        movementY += Math.abs(e.movementY);
+        if (!moving && movementY > scrollThresh) {
+            scrolling = true;
+            return;
+        } 
 
-        position = event.detail.position.left;
-        deltaX = (-1) * (position - initialLeft);
+        scrolling = false;
 
-        if (deltaX <= 0) {
-            event.preventDefault();
-            event.detail.position.left = 0;
-            event.detail.position.top = 0;
-
-        } else if ( deltaX >= maxDragWidth ) {
-            event.detail.position.left = (-1) * maxDragWidth;
-
-        } else if (deltaX >= slideThreshWidth) {
-            const revealImage = document.getElementById(revealId);
-            revealImage.style.transition = 'margin-right 0.3s ease';
-            revealImage.style.marginRight = slideThreshWidth + 'px';
-
-        } else {
-            const revealImage = document.getElementById(revealId);
-            revealImage.style.transition = 'margin-right 0.3s ease';
-            revealImage.style.marginRight = '1em';
+        if (!moving && left < -movingThresh) {
+            moving = true;
+            e.preventDefault();
         }
-
-        if (deltaX >= clickTolerance) {
-            wasDragged = true;
-
-        }
-    }
-
-    async function handleButtonClick() {
-        await handleClick();
-        clicked = false;
-    }
-
-    async function onMouseUp () {
-        if (! wasDragged && ! clicked) {
-            await handleButtonClick();
-        }
-
-
-        if (! touching) {
+        
+        if (!moving) {
             return;
         }
 
-        deltaX = (-1) * (position - initialLeft);
-
-        if (deltaX >= slideThreshWidth) {
-            handleSlide();
+        if (left < -maxDragWidth) {
+            return;
         }
 
-        deltaX = 0;
+        if (left > 0) {
+            left = 0;
+            sliderElement.style.left = left + "px";
+            return;
+        }
 
-        const revealImage = document.getElementById(revealId);
-        revealImage.style.transition = 'margin-right 0.3s ease';
-        revealImage.style.marginRight = '1em';
+        if (left < -slideThreshWidth) {
+            revealElement.style.marginRight = slideThreshWidth + "px";
+        } else {
+            revealElement.style.marginRight = "1em";
+        }
+
+        sliderElement.style.left = left + "px";
+    }
+
+    async function onMouseUp(e) {
+        movementY = 0;
+        sliderElement.style.transition = "left 0.5s ease";
+
+        if (scrolling) {
+            scrolling = false;
+            left = 0;
+            sliderElement.style.left = left + "px";
+            return;
+        }
+
+        if (!moving) {
+            await handleClick();
+            return;
+        } 
+
+        moving = false;
+
+        if (left <= -slideThreshWidth) {
+            left = 0;
+            sliderElement.style.left = left + "px";
+            await handleSlide();
+            return;
+        } 
+
+        left = 0;
+        sliderElement.style.left = left + "px";
+    }
+
+    let prevTouch;
+    let firstTouch;
+    let touching = false;
+
+    function onTouchStart(e) {
+        touching = true;
+        firstTouch = e.touches[0];
+        prevTouch = firstTouch;
+        onMouseDown(e);
+    }
+
+    function onTouchMove(e) {
+        const newTouch = e.touches[0];
+        e.movementX = newTouch.pageX - prevTouch.pageX;
+        e.movementY = newTouch.pageY - prevTouch.pageY;
+        e.totalX = newTouch.pageX - firstTouch.pageX;
+        e.totalY = newTouch.pageY - firstTouch.pageY;
+
+        onMouseMove(e);
+
+        prevTouch = newTouch;
+    }
+
+    function onTouchEnd(e) {
+        onMouseUp(e);
 
         touching = false;
     }
 </script>
 
-<div class="slider-button-reveal-container">
+<div class="slider-button-reveal-container" class:selected>
     <div 
-        id={sliderId} 
+        id={sliderId}
         role="button"
+        bind:this={sliderElement}
         tabindex="-1"
-        class="slider-button draggable flex justify-between items-center py-0" 
-        class:selected class:touching 
-        use:draggable={{axis:'x', revert: 'true', revertDuration:'200'}} 
-        on:mousedown={onMouseDown} 
-        on:mouseup={onMouseUp} 
-        on:drag:start={onDragStart} 
-        on:drag:move={onDrag}
+        class="slider-button flex justify-between items-center py-0" 
+        on:mousedown={onMouseDown}
+        on:mousemove={onMouseMove}
+        on:mouseup={onMouseUp}
+        on:touchstart={onTouchStart}
+        on:touchmove={onTouchMove}
+        on:touchend={onTouchEnd}
+        on:touchcancel={onTouchEnd}
         style="background-color: {slideBgColor};"
         >
-        <p class="slider-button-text draggable my-0 font-sans block w-full focus:outline-none" >{sliderText}</p>
-        <div class="slider-grabber draggable">
-            <img class="slider-image draggable" src={sliderImage} alt="Dragger" />
-        </div>
+        <p class="slider-button-text my-0 font-sans block w-full focus:outline-none" >{sliderText}</p>
+        <img class="slider-image" src={sliderImage} alt="Dragger" draggable="false" />
     </div>
-    {#if rendered}
     <div 
         class="reveal flex justify-end items-center"
         style="background-color: {revealBgColor};"
         >
-        <img id={revealId} class="reveal-image" src={revealImage} alt="Revealed"/>
+        <img bind:this={revealElement} id={revealId} class="reveal-image" src={revealImage} alt="Revealed"/>
     </div>
-    {/if}
 </div>
 
 <style>
@@ -152,7 +178,6 @@
         width: 100%;
         position: relative;
         cursor: pointer;
-        transition: background-color 0.3s ease;
         transition: margin-right 0.3s ease;
     }
 
@@ -161,11 +186,11 @@
         whitespace: nowrap;
         height: 100%;
         width: 100%;
+        position: absolute;
         left: 0;
         top: 0;
         padding: 1em;
         z-index: 25 !important;
-        transition: background-color 0.3s ease;
     }
 
     .slider-button-text {
@@ -175,27 +200,22 @@
         text-overflow: ellipsis;
         white-space: nowrap;
         cursor: pointer;
-        padding-left: env(safe-area-inset-left);
     }
 
     .reveal {
         position: absolute;
-        z-index: 20 !important;
+        z-index: -20 !important;
         height: 100%;
         width: 100%;
         left: 0;
         top: 0;
-        transition: margin-right 0.3s ease;
     }
 
     .reveal-image {
         width: 1em;
         height: 1em;
         margin-right: 1em;
-    }
-
-    .slider-grabber {
-        padding: 0.5em;
+        transition: margin-right 0.3s ease;
     }
 
     .slider-image {
@@ -208,15 +228,7 @@
         transition: margin-right 0.3s ease;
     }
 
-    .draggable {
-        z-index: 11;
-        -webkit-touch-callout:none;
-        -ms-touch-action:none; touch-action:none;
-        -moz-user-select:none; -webkit-user-select:none; -ms-user-select:none; user-select:none;
-    }
-
-    .selected {
-        transition: background-color 0.3s ease;
+    .selected > .slider-button {
         background-color: var(--user-message-background-color) !important;
         color: var(--white) !important;
     }

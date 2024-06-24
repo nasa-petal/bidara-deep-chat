@@ -51,14 +51,16 @@
 </script>
 
 <div>
-  <aside class="absolute shadow-lg flex flex-col" class:open>
+  <aside class="absolute flex flex-col" class:open>
     <button tabindex="0" class="focus:outline-none new-thread rounded-full m-2 text-base font-sans p-2" disabled={!open} on:click={handleButtonClick}>New Thread</button>
     <nav class="w-full">
-      {#if threads !== null}
-        {#each threads as thread}
-          <Chat handleSelect={() => handleChatClick(thread)} handleDelete={() => handleChatSwipe(thread)} selected={thread.id === selectedThreadId} bind:thread/>
-        {/each}
-      {/if}
+      <div class="w-full h-full">
+        {#if threads !== null}
+          {#each threads as thread}
+            <Chat handleSelect={handleChatClick} handleDelete={handleChatSwipe} selected={thread.id === selectedThreadId} bind:thread/>
+          {/each}
+        {/if}
+      </div>
     </nav>
   </aside>
 </div>
@@ -68,15 +70,18 @@
     outline: 5px auto -webkit-focus-ring-color; 
   }
 
+  nav {
+    padding-bottom: calc(2 * env(safe-area-inset-bottom));
+  }
+
   aside {
     z-index: 20;
     width: 20%;
     height: calc(100% - 3em);
     left: -20%;
     background-color: var(--nav-color);
-    border-right: 1px solid var(--border-color);
     transition: left ease 0.3s, width ease 0.3s, visibility 0.3s 0s;
-    overflow-y: auto;
+    overflow-y: scroll;
     visibility: hidden;
   }
 
