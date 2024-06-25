@@ -119,6 +119,16 @@
       return;
     }
 
+    if (newActiveThread.id !== thread.id) {
+      await threadUtils.setActiveThread(null, newActiveThread.id);
+      threads = await threadUtils.getThreads();
+    }
+
+    if (newActiveThread.id === activeThread.id) {
+      loading = false;
+      return;
+    }
+
     activeThread = newActiveThread;
     activeAsst = asst;
   }
