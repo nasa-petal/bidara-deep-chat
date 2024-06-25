@@ -41,22 +41,13 @@ npm run dev
 
 ### Nice to haves
 
-- save chat logs.
 - ability rate responses and add feedback.
 - ability to send ratings, feedback and chat log to us.
 - don't do TtS unless StT has been used.
 - Proxy requests to OpenAI through an authenticated API. Users can request access. Ability to generate api keys once authenticated. Authorized API keys required to communicate with API.
 
-- Show the quote from the file used to generate the response when BIDARA uses knowledge retrieval. https://platform.openai.com/docs/assistants/how-it-works/message-annotations 
-
-- GPT-4 vision support so it can 'see' images, including ones uploaded by users.
-
 - Functions:
-
-- patent search - https://developer.uspto.gov/api-catalog/bulk-search-and-download, https://patentsview.org/apis/api-faqs, https://www.npmjs.com/package/uspto-patents-view-api 
 
 - get pdf of paper from semantic scholar link and upload to assistant.thread.messages.files for retrieval. as a temp workaround can use openAccessPdf links to download pdfs on client, and then upload them on client directly to openai assistant.
 
-- get all messages using openai API. Then BIDARA can use the list of messages to summarize the conversation, or save the conversation history to PDF. 
-
-- get all code interpreter code. useful to check its work..
+- get all code interpreter code. useful to check its work.
