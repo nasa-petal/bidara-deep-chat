@@ -11,7 +11,8 @@ BIDARA can guide users through the Biomimicry Institute’s [Design Process](htt
 
 ## :fire: Features enabled
 
-&nbsp;&nbsp;&nbsp;&nbsp; :white_check_mark: **Multiple chats**    
+&nbsp;&nbsp;&nbsp;&nbsp; :white_check_mark: **Multiple chats (saved offline)**    
+&nbsp;&nbsp;&nbsp;&nbsp; :white_check_mark: **Mobile optimized**    
 &nbsp;&nbsp;&nbsp;&nbsp; :white_check_mark: **Code Interpreter** *[more info](https://platform.openai.com/docs/assistants/tools/code-interpreter), [filetypes supported](https://platform.openai.com/docs/assistants/tools/supported-files)*    
 &nbsp;&nbsp;&nbsp;&nbsp; :white_check_mark: **Knowledge Retrieval** *[more info](https://platform.openai.com/docs/assistants/tools/knowledge-retrieval), [filetypes supported](https://platform.openai.com/docs/assistants/tools/supported-files)*    
 &nbsp;&nbsp;&nbsp;&nbsp; :white_check_mark: **Function Calling**    
@@ -24,8 +25,7 @@ BIDARA can guide users through the Biomimicry Institute’s [Design Process](htt
 
 ## :computer: For developers
 
-`bidara-deep-chat` uses Svelte and [the deep-chat web component](https://github.com/OvidijusParsiunas/deep-chat) to connect to BIDARA over the OpenAI Assistants API.
-Template based on https://github.com/sveltejs/template
+`bidara-deep-chat` is a front-end web app that uses Svelte and [the deep-chat web component](https://github.com/OvidijusParsiunas/deep-chat) to connect directly to BIDARA over the OpenAI Assistants API (no backend required). Template based on https://github.com/sveltejs/template
 
 ### Run locally
 ```
