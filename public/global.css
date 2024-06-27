@@ -69,7 +69,7 @@
 html {
   background: var(--chat-background-color);
   text-size-adjust: 100%; /* Prevent font scaling in landscape while allowing user zoom */
-  height: 100%;
+  height: 100dvh;
   overscroll-behavior-y: none;
   -webkit-overscroll-behavior-y: none;
 }
