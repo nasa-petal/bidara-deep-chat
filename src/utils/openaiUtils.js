@@ -261,7 +261,8 @@ export async function getNewThreadId() {
   }
 
   const metadata = {
-    "env": ENV
+    "env": ENV,
+    "api-key": openaiKey
   }
 
   const body = {
