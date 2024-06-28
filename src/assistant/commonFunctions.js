@@ -1,52 +1,38 @@
 import { getDalleImageGeneration, getImageToText, uploadFile } from "../utils/openaiUtils";
 import { getFileByFileId, getFileTypeByName, pushFile } from "../utils/threadUtils";
 
-// ```bash
-// export SS_KEY="insert-ss-key-here"
-// ```
-// Defaults to empty string ""
 import { SS_KEY, PQAI_KEY, TAV_KEY } from 'process.env'; 
 
-export async function ssSearch(params, context) {
-  //call api and return results
-  let searchParams = JSON.parse(params);
-  if ("parameters" in searchParams) {
-    searchParams = searchParams.parameters;
-  }
+// Repetitive Queries Helper Functions
+async function callWithBackoff(callback, backoffFunction) {
+  const maxRetries = 4;
+  const retryOffset = 1;
+  const numRetries = 0;
+  return await backoffFunction(callback, maxRetries, numRetries, retryOffset);
+}
 
-  let fields = [];
-  if (typeof searchParams.fields === 'string' || searchParams.fields instanceof String) {
-    fields = searchParams.fields.split(",");
-  }
-  fields.push("url","title","year","abstract","authors","venue","openAccessPdf"); // minimum set of fields we want, just in case OpenAI doesn't request them. Which happens alot.
-  fields = [...new Set(fields)]; //remove duplicates
-  searchParams.fields = fields.join();
-  searchParams = new URLSearchParams(searchParams);
-
+async function backoffExponential(callback, maxRetries, retries, retryOffset) {
   try {
-    let url = "https://api.semanticscholar.org/graph/v1/paper/search?" + searchParams;
-    let options = { headers: {
-      "x-api-key": SS_KEY
-    }};
-
-    const response = await callWithBackoff(async () => {
-      return await fetch(url, options);
-    }, backoffExponential);
-
-    if (response.status === 429 || response.code === 429 || response.statusCode === 429) {
-      return "Semantic Scholar is currently having issues with their servers. So, for now, searching for academic papers will not work."
+    if (retries > 0) {
+      const timeToWait = (2 ** (retries + retryOffset)) * 100;
+      console.warn(`(${retries}) Retries. Waiting for ${timeToWait} ms.`)
+      await waitFor(timeToWait);
     }
-
-    const papersJson = await response.json();
-    const papers = JSON.stringify(papersJson);
-
-    return papers;
-
+    const res = await callback();
+    return res;
   } catch (e) {
-    console.error('error: ' + e);
-    return "Semantic Scholar is currently having issues with their servers. So, for now, searching for academic papers will not work."
+    if (retries >= maxRetries) {
+      console.warn(`Max retries reached in backoff (${maxRetries}).`)
+      throw e;
+    }
+    return await backoffExponential(callback, maxRetries, retries + 1, retryOffset);
   }
 }
+
+function waitFor(milliseconds) {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
+}
+// End of Repetitive Queries Helper Functions
 
 export async function genImage(params, context) {
   let imageParams = JSON.parse(params);
@@ -183,6 +169,127 @@ export async function getImagePatterns(params, context) {
   return text;
 }
 
+export async function paperSearch(params, context) {
+  let searchParams = JSON.parse(params);
+  if ("parameters" in searchParams) {
+    searchParams = searchParams.parameters;
+  }
+
+  // search nasa papers
+  // search semantic scholar papers
+  // in the final prompt, include an example of what the search results might look like
+  // if the user requested papers about wind turbines,
+  // 1. https://ntrs.nasa.gov; paper title; paper content
+  // 2. https://api.semanticscholar.com; paper title; paper content
+  // 3. ...
+
+  const query = searchParams.query;
+  let spinoffInfo = '';
+
+  try {
+    const url = "https://api.tavily.com/search";
+    const method = "POST";
+    const headers = {
+      "Content-Type": "application/json"
+    }
+    const body = {
+      api_key: "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",
+      include_answer: true,
+      include_domains: ["https://spinoff.nasa.gov"],
+      include_images: false,
+      include_raw_content: true,
+      max_results: 5,
+      query: query,
+      search_depth: "advanced", // advanced causes each call to count as 2 agains our 1000 calls per month
+      topic: "general"
+    }
+    const response = await fetch(url, {
+      method,
+      headers,
+      body: JSON.stringify(body)
+    });
+
+    if (!response.ok || response.status === 429 || response.code === 429 || response.statusCode === 429) {
+      return "There is an issue accessing the requested information. Please ask the user to try again."
+    }
+
+    const res = await response.json();
+
+    spinoffInfo = res.results.map(article =>
+      [
+        article.title,
+        article.url,
+        article.raw_content
+      ]
+    )
+
+  } catch (e) {
+    console.error('error: ' + e);
+    return "Web search is currently having issues with their servers. So, for now, searching for general web results will not work."
+  }
+
+  let fields = [];
+  fields.push("url", "title", "year", "abstract", "authors", "venue", "openAccessPdf");
+  fields = [...new Set(fields)];
+  searchParams = new URLSearchParams(searchParams);
+  searchParams.append("fields", fields);
+  searchParams.append("limit", 10);
+
+  let semanticScholarInfo = '';
+  try {
+    let url = "https://api.semanticscholar.org/graph/v1/paper/search?" + searchParams;
+    let options = { headers: {
+      "x-api-key": SS_KEY
+    }};
+
+    const response = await callWithBackoff(async () => {
+      return await fetch(url, options);
+    }, backoffExponential);
+
+    if (response.status === 429 || response.code === 429 || response.statusCode === 429) {
+      return "Semantic Scholar is currently having issues with their servers. So, for now, searching for academic papers will not work."
+    }
+
+    const papersJson = await response.json();
+
+    semanticScholarInfo = papersJson.data.map(paper =>
+      [
+        paper.title,
+        paper.url,
+        paper.abstract
+      ]
+    );
+
+  } catch (e) {
+    console.error('error: ' + e);
+    return "Semantic Scholar is currently having issues with their servers. So, for now, searching for academic papers will not work."
+  }
+
+  console.log(spinoffInfo);
+  console.log(semanticScholarInfo);
+
+  const prompt = `User: Search for research articles on vortex induced vibration.
+
+  BIDARA: Here are some papers and NASA Spinoff Articles on vortex induced vibration:
+  1. Winglets Save Billions of Dollars in Fuel Costs
+  https://spinoff.nasa.gov/Spinoff2010/t_5.html
+  2. Deep reinforcement learning-based active flow control of vortex-induced vibration of a square cylinder
+  https://www.semanticscholar.org/paper/6cd46a93960a202259e1a7666d9217f27a577aa9
+  3. Vibration Isolator Steadies Optics for Telescopes
+  https://spinoff.nasa.gov/Spinoff2019/ip_4.html
+  4. Dynamic modeling and analysis of a tristable vortex-induced vibration energy harvester
+  https://www.semanticscholar.org/paper/e828ab2a9f5b12ba03920782b4d065b20b5ef26b
+  5. Vibration Tables Shake Up Aerospace, Car Testing
+  https://spinoff.nasa.gov/Spinoff2017/ip_2.html
+
+  User: Search for research articles on ${query}
+  ${spinoffInfo} 
+  ${semanticScholarInfo}
+
+  BIDARA: Here are some papers and NASA Spinoff Articles on ${query}
+  `;
+  return prompt;
+}
 
 export async function patentSearch(params, context) {
   // retrieve the keywords to search for in patent titles
@@ -196,7 +303,7 @@ export async function patentSearch(params, context) {
   }
   
   // Search for the top 7 patents that match the search query (uses vector similarity instead of direct matches)
-  const url = `https://api.projectpq.ai/search/102?q=${keywords}&n=7&type=patent&token=${PQAI_KEY}`;
+  const url = `https://api.projectpq.ai/search/102?q=${keywords}&n=7&type=patent&token=4dc79d9353bb1decbfd6ccc7a7cd354d`;
   let sortedPatentInfo = "";
   try {
     const response = await fetch(url);
@@ -237,7 +344,7 @@ export async function patentSearch(params, context) {
 }
 
 export async function webSearch(params, context) {
-  //call api and return results
+  // call api and return results
   let webParams = JSON.parse(params);
   if ("parameters" in webParams) {
     webParams = webParams.parameters;
@@ -248,7 +355,6 @@ export async function webSearch(params, context) {
   const query = links ?
     webParams.query + " " + links
     : webParams.query;
-
 
   const domains = links ? 
     links.map((link) => { 
@@ -266,17 +372,16 @@ export async function webSearch(params, context) {
       "Content-Type": "application/json"
     }
     const body = {
-      api_key: TAV_KEY,
+      api_key: "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",
       include_answer: true,
       include_domains: domains,
       include_images: false,
       include_raw_content: false,
       max_results: 5,
       query: query,
-      search_depth: "basic", // advanced causes each call to count as 2 againts our 1000
+      search_depth: "basic", // advanced causes each call to count as 2 agains our 1000 calls per month
       topic: "general"
     }
-
     const response = await fetch(url, {
       method,
       headers,
@@ -329,37 +434,4 @@ Do not make any claims that are not supported by this information.`
     console.error('error: ' + e);
     return "Web search is currently having issues with their servers. So, for now, searching for general web results will not work."
   }
-}
-  
-async function callWithBackoff(callback, backoffFunction) {
-  const maxRetries = 4;
-  const retryOffset = 1;
-  const numRetries = 0;
-
-  return await backoffFunction(callback, maxRetries, numRetries, retryOffset);
-}
-
-async function backoffExponential(callback, maxRetries, retries, retryOffset) {
-  try {
-    if (retries > 0) {
-      const timeToWait = (2 ** (retries + retryOffset)) * 100;
-      console.warn(`(${retries}) Retries. Waiting for ${timeToWait} ms.`)
-      await waitFor(timeToWait);
-    }
-
-    const res = await callback();
-
-    return res;
-  } catch (e) {
-    if (retries >= maxRetries) {
-      console.warn(`Max retries reached in backoff (${maxRetries}).`)
-      throw e;
-    }
-
-    return await backoffExponential(callback, maxRetries, retries + 1, retryOffset);
-  }
-}
-
-function waitFor(milliseconds) {
-  return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
