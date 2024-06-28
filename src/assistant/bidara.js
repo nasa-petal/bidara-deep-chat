@@ -1,4 +1,4 @@
-import { PAPER_SEARCH_FUNC, TEXT_TO_IMAGE, IMAGE_TO_TEXT, GET_FILE_TYPE, GET_IMAGE_PATTERNS, PATENT_SEARCH_FUNC, WEB_SEARCH_FUNC } from "./common"
+import { TEXT_TO_IMAGE, IMAGE_TO_TEXT, GET_FILE_TYPE, GET_IMAGE_PATTERNS, PAPER_SEARCH_FUNC, PATENT_SEARCH_FUNC, WEB_SEARCH_FUNC} from "./common"
 
 const PROD_NAME = "BIDARA";
 const TEST_NAME = "BIDARA-TEST";
@@ -105,13 +105,13 @@ const BIO_WEB_SEARCH = {
 export const FUNCTIONS = [
   { type: "code_interpreter" },
   { type: "file_search" },
-  { type: "function", function: PAPER_SEARCH_FUNC },
   { type: "function", function: TEXT_TO_IMAGE },
   { type: "function", function: IMAGE_TO_TEXT },
   { type: "function", function: GET_FILE_TYPE },
   { type: "function", function: GET_IMAGE_PATTERNS },
+  { type: "function", function: PAPER_SEARCH_FUNC },
   { type: "function", function: PATENT_SEARCH_FUNC },
-  { type: "function", function: BIO_WEB_SEARCH },
+  { type: "function", function: BIO_WEB_SEARCH }
 ]
 
 export const HISTORY = [
