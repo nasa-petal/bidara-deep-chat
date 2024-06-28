@@ -179,6 +179,7 @@
         position: relative;
         cursor: pointer;
         transition: margin-right 0.3s ease;
+        padding-left: env(safe-area-inset-left);
     }
 
     .slider-button {
@@ -200,6 +201,7 @@
         text-overflow: ellipsis;
         white-space: nowrap;
         cursor: pointer;
+        padding-left: env(safe-area-inset-left);
     }
 
     .reveal {

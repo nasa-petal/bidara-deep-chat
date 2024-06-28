@@ -70,7 +70,7 @@
 </script>
 
 <header class="flex py-2 justify-between items-center text-gray-600">
-  <nav class="flex mx-2">
+  <nav class="sidebar-toggle flex">
     <Hamburger bind:open={sidebar}/>
   </nav>
 
@@ -79,7 +79,10 @@
   {:else}
     <button tabindex="0" class="focus:no-outline px-3 py-1 rounded-full" on:click={handleButtonClick}>{chatName}</button>
   {/if}
-  <NavMenu bind:chatName={chatName} bind:open={navMenuOpen} handleModalOpen={handleModalOpen}/>
+  <div class="menu-toggle">
+    <NavMenu bind:chatName={chatName} bind:open={navMenuOpen} handleModalOpen={handleModalOpen}/>
+  </div>
+
 </header>
 
 <AssistantSelectModal bind:open={assistantModalOpen} handleClose={handleModalClose} handleAssistantChange={handleAssistantChange} bind:currAsst options={assistantOptions} />
@@ -106,4 +109,13 @@
   input {
     background-color: var(--nav-off-color);
   }
+
+  .sidebar-toggle {
+    margin-left: env(safe-area-inset-left);
+  }
+
+  .menu-toggle {
+    margin-right: env(safe-area-inset-left);
+  }
+
 </style>

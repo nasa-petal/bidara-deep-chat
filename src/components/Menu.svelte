@@ -9,9 +9,9 @@
 	}
 </script>
 
-<div class="container p-2">
-	<button tabindex="0" class="focus:outline-none menu-button" class:open on:click={() => {open = !open;}}>
-		<img class="menu-image" src="ellipsis-vertical-blue.svg" alt="menu"/>
+<div class="container">
+	<button tabindex="0" class="focus:outline-none menu-button w-full h-full" class:open on:click={() => {open = !open;}}>
+		<img class="menu-image m-auto" src="ellipsis-vertical-blue.svg" alt="menu"/>
 	</button>
 	<div class="menu-container bg-gray-600 focus:no-outline" class:open>
 		<menu class="p-1"><slot /></menu>
@@ -52,8 +52,8 @@
 		box-shadow: 0 0 1rem 0 var(--box-shadow-color);
 
 		position: absolute;
+		right: calc(1% + env(safe-area-inset-left));
 		visibility: hidden;
-		right: 1%;
 		overflow: hidden;
 
 		z-index: 39;
