@@ -193,7 +193,7 @@ export async function paperSearch(params, context) {
       "Content-Type": "application/json"
     }
     const body = {
-      api_key: "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",
+      api_key: TAV_KEY,
       include_answer: true,
       include_domains: ["https://spinoff.nasa.gov"],
       include_images: false,
@@ -303,7 +303,7 @@ export async function patentSearch(params, context) {
   }
   
   // Search for the top 7 patents that match the search query (uses vector similarity instead of direct matches)
-  const url = `https://api.projectpq.ai/search/102?q=${keywords}&n=7&type=patent&token=4dc79d9353bb1decbfd6ccc7a7cd354d`;
+  const url = `https://api.projectpq.ai/search/102?q=${keywords}&n=7&type=patent&token=${PQAI_KEY}`;
   let sortedPatentInfo = "";
   try {
     const response = await fetch(url);
@@ -372,7 +372,7 @@ export async function webSearch(params, context) {
       "Content-Type": "application/json"
     }
     const body = {
-      api_key: "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",
+      api_key: TAV_KEY,
       include_answer: true,
       include_domains: domains,
       include_images: false,
