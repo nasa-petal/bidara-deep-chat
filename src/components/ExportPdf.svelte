@@ -1,5 +1,6 @@
 <script>
   import { jsPDF } from "jspdf";
+    import ExportView from "./ExportView.svelte";
 
   export let chatName;
 
@@ -295,6 +296,9 @@
 <button class="w-full h-full p-1 flex justify-between items-center focus:outline-none" on:click={handleExport}>
   <p>Export to PDF</p>
 </button>
+<!-- {#if exportingToPdf }
+<ExportView messages=[{ "role": "assistant", message: "test"}]/>
+{/if} -->
 
 <style>
   button:focus-visible {
