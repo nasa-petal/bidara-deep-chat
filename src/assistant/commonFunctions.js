@@ -60,6 +60,10 @@ export async function genImage(params, context) {
   let imagePrompt = JSON.stringify(imageParams.prompt) + " Realistic depiction of the object and its environment. Stay true to science, engineering, and biology. DO NOT INCLUDE ANY WORDS OR BRANDING."
   let fileName = imageParams.file_name;
 
+  let imagePromptURL = new URLSearchParams(imagePrompt);
+
+  const url = `http://localhost:8000/${imagePromptURL}`;
+  const response = await fetch(url);
 
   const res = await getDalleImageGeneration(imagePrompt);
 
