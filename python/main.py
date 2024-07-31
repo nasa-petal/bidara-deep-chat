@@ -24,7 +24,7 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 import base64
 from tensorflow.python.ops.numpy_ops import np_config
-from PIL import Image
+from PIL import Image, ImageOps
 from transformers import TFSamModel, SamProcessor
 from openai import OpenAI
 from pathlib import Path
@@ -103,6 +103,7 @@ def show_points_and_boxes_on_image(raw_image, boxes, input_points, input_labels=
         show_box(box, plt.gca())
 
 def show_masks_on_image(raw_image, masks, scores):
+    raw_image = ImageOps.grayscale(raw_image)
     if len(masks[0].shape) == 4:
         final_masks = tf.squeeze(masks[0])
     if scores.shape[0] == 1:
@@ -112,7 +113,7 @@ def show_masks_on_image(raw_image, masks, scores):
     top_index_of_score = np.argmax(final_scores.numpy())
     top_score = final_scores.numpy()[top_index_of_score]
     mask = tf.stop_gradient(final_masks[top_index_of_score])
-    axes.imshow(np.array(raw_image))
+    axes.imshow(np.array(raw_image), cmap = "gray")
     show_mask(mask, axes)
     plt.axis("off")
     fig.savefig("../public/masked_biology_image.png")
@@ -122,7 +123,7 @@ def encode_image(image_path):
     return base64.b64encode(image_file.read()).decode('utf-8')
 
 # -----------------------------------------------------------------------------
-# 2 PREPARE IMAGES TO BE VIEWED WITH PLOTLY
+# 3 PREPARE IMAGES TO BE VIEWED WITH PLOTLY
 # -----------------------------------------------------------------------------
 
 def image():
@@ -233,7 +234,7 @@ OPTIONS = {"chat with image": image,
            "simulate tests": image}
 
 # -----------------------------------------------------------------------------
-# 3 INITIALIZE APP, VARIABLES, AND ML MODELS
+# 4 INITIALIZE APP, VARIABLES, AND ML MODELS
 # -----------------------------------------------------------------------------
 
 CURRENT_DIRECTORY = os.path.abspath(os.path.dirname(__file__))
@@ -255,7 +256,7 @@ state, ctrl = server.state, server.controller
 image_description = ""
 
 # -----------------------------------------------------------------------------
-# 4 DEFINE BEHAVIOR WHEN TEXT IS ENTERED, BUTTONS ARE PUSHED, ETC.
+# 5 DEFINE BEHAVIOR WHEN TEXT IS ENTERED, BUTTONS ARE PUSHED, ETC.
 # -----------------------------------------------------------------------------
 
 @state.change("current_display")
@@ -312,7 +313,7 @@ def ready_to_chat():# include OpenAI VLM functionality
     ).choices[0].message.content
 
 # -----------------------------------------------------------------------------
-# 5 LAY OUT ELEMENTS OF APP
+# 6 LAY OUT ELEMENTS OF APP
 # -----------------------------------------------------------------------------
 
 state.trame__title = "BIDARA Visual Chat"
@@ -386,7 +387,7 @@ with SinglePageWithDrawerLayout(server) as layout:
                 vuetify.VSpacer()
 
 # -----------------------------------------------------------------------------
-# 6 INTERACT WITH BIDARA
+# 7 INTERACT WITH BIDARA
 # -----------------------------------------------------------------------------
 
 def generate_image(image_prompt: str):
