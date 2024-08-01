@@ -5,7 +5,7 @@ const TEST_NAME = "Chat-TEST";
 
 export const NAME = PROD_NAME;
 
-export const VERSION = "0.01";
+export const VERSION = "0.02";
 
 export const LOGO = "";
 export const LOGO_DESC = "";

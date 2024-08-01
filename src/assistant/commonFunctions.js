@@ -57,7 +57,7 @@ export async function genImage(params, context) {
   const threadId = context.lastMessageId;
   const processImageCallback = context.processImageCallback;
 
-  let imagePrompt = JSON.stringify(imageParams.prompt) + " Realistic depiction of the object and its environment. Stay true to science, engineering, and biology. DO NOT INCLUDE ANY WORDS OR BRANDING."
+  let imagePrompt = JSON.stringify(imageParams.prompt)
   let fileName = imageParams.file_name;
 
 

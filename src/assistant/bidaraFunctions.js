@@ -26,6 +26,20 @@ export async function bioSsSearch(params, context) {
 
   return resMsg;
 }
+
+export async function bioGenImage(params, context) {
+
+  const updatedParams = JSON.parse(params);
+
+  updatedParams.prompt = updatedParams.prompt + " Realistic depiction of the object and its environment. Stay true to science, engineering, and biology. DO NOT INCLUDE ANY WORDS OR BRANDING."
+
+  const stringUpdateParams = JSON.stringify(updatedParams);
+
+  const response = await genImage(stringUpdateParams, context);
+
+  return response;
+}
+
 export async function callFunc(functionDetails, context) {
   let tmp = '';
   if(functionDetails.name == "get_graph_paper_relevance_search") {
@@ -33,7 +47,7 @@ export async function callFunc(functionDetails, context) {
   }
   else if(functionDetails.name == "text_to_image") {
     if (context?.processImageCallback && context?.lastMessageId) {
-      tmp = await genImage(functionDetails.arguments, context);
+      tmp = await bioGenImage(functionDetails.arguments, context);
 
     } else {
       tmp = "There was an error in retrieving `text_to_image`."
