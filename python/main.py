@@ -15,6 +15,8 @@ from trame.ui.vuetify import SinglePageWithDrawerLayout
 from trame.widgets import vtk, vuetify, trame, plotly
 
 # display interactive image
+import pandas as pd
+import networkx as nx
 import plotly.graph_objects as go
 import plotly.express as px
 
@@ -23,6 +25,7 @@ import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import base64
+from pyinaturalist import *
 from tensorflow.python.ops.numpy_ops import np_config
 from PIL import Image, ImageOps
 from transformers import TFSamModel, SamProcessor
@@ -116,7 +119,8 @@ def show_masks_on_image(raw_image, masks, scores):
     axes.imshow(np.array(raw_image), cmap = "gray")
     show_mask(mask, axes)
     plt.axis("off")
-    fig.savefig("../public/masked_biology_image.png")
+    plt.tight_layout()
+    plt.savefig("../public/masked_biology_image.png")
 
 def encode_image(image_path):
   with open(image_path, "rb") as image_file:
@@ -136,28 +140,28 @@ def image():
     fig = go.Figure()
     fig.add_trace(
         go.Scatter(
-            x = [0, img_width * scale_factor],
-            y = [0, img_height * scale_factor],
+            x = [0, img_width],
+            y = [0, img_height],
             mode = "markers",
             marker_opacity = 0
         )
     )
     fig.update_xaxes(
         visible = True,
-        range = [0, img_width * scale_factor],
+        range = [0, img_width],
         title = "Please enter the coordinates of an object you want to focus on, then ask a question about it."
     )
     fig.update_yaxes(
         visible = True,
-        range = [0, img_height * scale_factor],
+        range = [0, img_height],
         scaleanchor = "x"
     )
     fig.add_layout_image(
         dict(
             x = 0,
-            sizex = img_width * scale_factor,
-            y = img_height * scale_factor,
-            sizey = img_height * scale_factor,
+            sizex = img_width,
+            y = img_height,
+            sizey = img_height,
             xref = "x",
             yref = "y",
             opacity = 1.0,
@@ -186,28 +190,28 @@ def masked_image():
     fig = go.Figure()
     fig.add_trace(
         go.Scatter(
-            x = [0, img_width * scale_factor],
-            y = [0, img_height * scale_factor],
+            x = [0, img_width],
+            y = [0, img_height],
             mode = "markers",
             marker_opacity = 0
         )
     )
     fig.update_xaxes(
-        visible = False,
-        range = [0, img_width * scale_factor],
+        visible = True,
+        range = [0, img_width],
         title = "The object you decided to focus on is highlighted in the above image."
     )
     fig.update_yaxes(
-        visible = False,
-        range = [0, img_height * scale_factor],
+        visible = True,
+        range = [0, img_height],
         scaleanchor = "x"
     )
     fig.add_layout_image(
         dict(
             x = 0,
-            sizex = img_width * scale_factor,
-            y = img_height * scale_factor,
-            sizey = img_height * scale_factor,
+            sizex = img_width,
+            y = img_height,
+            sizey = img_height,
             xref = "x",
             yref = "y",
             opacity = 1.0,
@@ -226,12 +230,137 @@ def masked_image():
     )
     return fig
 
+def text_to_structure():
+    z = 15 * np.random.random(100)
+    x = np.sin(z) + 0.1 * np.random.randn(100)
+    y = np.cos(z) + 0.1 * np.random.randn(100)
+    fig = go.Figure(data = [go.Mesh3d(
+        x = x,
+        y = y,
+        z = z,
+        color = 'green',
+        opacity = 0.20
+    )])
+
+    return fig
+
+def threedim_knowledge_graph():
+    ZKC_graph = nx.karate_club_graph()
+    Mr_Hi = 0
+    John_A = 33
+
+    num_nodes = 34
+
+    club_labels = list(nx.get_node_attributes(ZKC_graph, 'club').values())
+
+    community_0 = [8, 14, 15, 18, 20, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33]
+    community_1 = [0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 16, 17, 19, 21]
+    community_label = [1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+    spring_pos = nx.spring_layout(ZKC_graph, seed = 2)
+
+    nx.draw_networkx_nodes(ZKC_graph, spring_pos, nodelist = community_0, node_color = 'g', alpha = 0.4)
+    nx.draw_networkx_nodes(ZKC_graph, spring_pos, nodelist = community_1, node_color = 'm', alpha = 0.4)
+
+    nx.draw_networkx_nodes(ZKC_graph, spring_pos, nodelist = [John_A], node_color = 'g', alpha = 1)
+    nx.draw_networkx_nodes(ZKC_graph, spring_pos, nodelist = [Mr_Hi], node_color = 'm', alpha = 1)
+
+    nx.draw_networkx_edges(ZKC_graph, spring_pos, style = 'dashed', width = 0.5)
+
+    spring_3D = nx.spring_layout(ZKC_graph, dim = 3, seed = 18)
+    
+    x_nodes = [spring_3D[i][0] for i in range(num_nodes)]
+    y_nodes = [spring_3D[i][1] for i in range(num_nodes)]
+    z_nodes = [spring_3D[i][2] for i in range(num_nodes)]
+
+    edge_list = ZKC_graph.edges()
+
+    x_edges = []
+    y_edges = []
+    z_edges = []
+
+    for edge in edge_list:
+        x_coords = [spring_3D[edge[0]][0], spring_3D[edge[1]][0], None]
+        x_edges += x_coords
+
+        y_coords = [spring_3D[edge[0]][1], spring_3D[edge[1]][1], None]
+        y_edges += y_coords
+
+        z_coords = [spring_3D[edge[0]][2], spring_3D[edge[1]][2], None]
+        z_edges += z_coords
+
+    trace_edges = go.Scatter3d(x = x_edges,
+                               y = y_edges,
+                               z = z_edges,
+                               mode = 'lines',
+                               line = dict(color = 'black', width = 2),
+                               hoverinfo = 'none')
+    
+    trace_nodes = go.Scatter3d(x = x_nodes,
+                               y = y_nodes,
+                               z = z_nodes,
+                               mode = 'markers',
+                               marker = dict(symbol = 'circle',
+                                             size = 10,
+                                             color = community_label,
+                                             colorscale = ['lightgreen', 'magenta'],
+                                             line = dict(color = 'black', width = 0.5)),
+                               text = club_labels,
+                               hoverinfo = 'text')
+    
+    trace_MrHi = go.Scatter3d(x = [x_nodes[Mr_Hi]],
+                              y = [y_nodes[Mr_Hi]],
+                              z = [z_nodes[Mr_Hi]],
+                              mode = 'markers',
+                              name = 'Mr_Hi',
+                              marker = dict(symbol = 'circle',
+                                            size = 10,
+                                            color = 'darkmagenta',
+                                            line = dict(color = 'black', width = 0.5)),
+                              text = ['Mr_Hi'],
+                              hoverinfo = 'text')
+    
+    trace_JohnA = go.Scatter3d(x = [x_nodes[John_A]],
+                               y = [y_nodes[John_A]],
+                               z = [z_nodes[John_A]],
+                               mode = 'markers',
+                               name = 'John_A',
+                               marker = dict(symbol = 'circle',
+                                             size = 10,
+                                             color = 'green',
+                                             line = dict(color = 'black', width = 0.5)),
+                               text = ['Officer'],
+                               hoverinfo = 'text')
+    
+    axis = dict(showbackground = False,
+                showline = False,
+                zeroline = False,
+                showgrid = False,
+                showticklabels = False,
+                title = '')
+    
+    layout = go.Layout(title = "Two Predicted Factions of Zachary's Karate Club",
+                       width = 650,
+                       height = 625,
+                       showlegend = False,
+                       scene = dict(xaxis = dict(axis),
+                                    yaxis = dict(axis),
+                                    zaxis = dict(axis)),
+                       margin = dict(t = 100),
+                       hovermode = 'closest')
+    
+    data = [trace_edges, trace_nodes, trace_MrHi, trace_JohnA]
+    fig = go.Figure(data = data, layout = layout)
+
+    return fig
+
 def on_event(type, e):
     print(type, e)
 
 OPTIONS = {"chat with image": image,
-           "text to structure": image,
-           "simulate tests": image}
+           "text to structure": text_to_structure,
+           "simulate tests": text_to_structure,
+           "3d knowledge graph": threedim_knowledge_graph}
 
 # -----------------------------------------------------------------------------
 # 4 INITIALIZE APP, VARIABLES, AND ML MODELS
@@ -253,6 +382,8 @@ app.add_middleware(
 )
 server = get_server(client_type="vue2")
 state, ctrl = server.state, server.controller
+ctrl.on_data_change.add(ctrl.view_update)
+ctrl.on_data_change.add(ctrl.pipeline_update)
 image_description = ""
 
 # -----------------------------------------------------------------------------
@@ -261,20 +392,23 @@ image_description = ""
 
 @state.change("current_display")
 def update_plot(current_display, **kwargs):
+    state.current_display = current_display
     ctrl.figure_update(OPTIONS[current_display]())
 
 @state.change("x_coordinate")
 def update_x_coordinate(x_coordinate, **kwargs):
-    state.x_coordinate = x_coordinate
+    if x_coordinate != '':
+        state.x_coordinate = int(x_coordinate)
 
 @state.change("y_coordinate")
 def update_y_coordinate(y_coordinate, **kwargs):
-    state.y_coordinate = y_coordinate
+    if y_coordinate != '':
+        state.y_coordinate = int(y_coordinate)
 
 def ready_to_highlight():
     # include SAM functionality
     generated_image_object = Image.open("../public/generated_biology_image.png")
-    input_points = [[[state.x_coordinate, state.y_coordinate]]]
+    input_points = [[[state.x_coordinate, 1024 - state.y_coordinate]]]
     inputs = processor(generated_image_object, input_points = input_points, return_tensors="tf")
     outputs = model(**inputs)
     masks = processor.image_processor.post_process_masks(
@@ -290,7 +424,8 @@ def ready_to_highlight():
 def update_question(question, **kwargs):
     state.question = question
 
-def ready_to_chat():# include OpenAI VLM functionality
+def ready_to_chat(): 
+    # include OpenAI VLM functionality
     state.answer = client.chat.completions.create(
         model = "gpt-4o",
         messages = [
@@ -323,10 +458,11 @@ with SinglePageWithDrawerLayout(server) as layout:
     with layout.toolbar:
         vuetify.VSpacer()
         vuetify.VSelect(
-            v_model = ("current_display", "chat with image"),
+            v_model = ("current_display", "3d knowledge graph"),
             items = ("options", ["chat with image",
                                  "text to structure",
-                                 "simulate tests"]),
+                                 "simulate tests",
+                                 "3d knowledge graph"]),
             hide_details=True,
             dense=True
         )
