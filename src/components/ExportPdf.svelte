@@ -4,6 +4,8 @@
 
   export let chatName;
 
+  let exportingToPdf = false;
+
   function getMessages() {
     const deepChatRef = document.getElementById("chat-element");
     const messages = deepChatRef.getMessages();
@@ -291,14 +293,26 @@
     exportAsPdf();
   }
 
+  function handleExportView() {
+    exportingToPdf = true;
+  }
+
 </script>
 
 <button class="w-full h-full p-1 flex justify-between items-center focus:outline-none" on:click={handleExport}>
   <p>Export to PDF</p>
 </button>
+<!-- <button class="w-full h-full p-1 flex justify-between items-center focus:outline-none" on:click={handleExportView}>
+  <p>Export to PDF</p>
+</button> -->
+
 <!-- {#if exportingToPdf }
 <ExportView messages=[{ "role": "assistant", message: "test"}]/>
 {/if} -->
+
+{#if exportingToPdf }
+<ExportView {messages}/>
+{/if}
 
 <style>
   button:focus-visible {
