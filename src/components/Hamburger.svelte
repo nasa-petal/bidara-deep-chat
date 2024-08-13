@@ -3,8 +3,8 @@
 </script>
 
 <div class="container flex items-center">
-    <button tabindex="0" class="focus:outline-none menu" class:open on:click={() => open = !open}>
-        <img class="menu-image" src="chevron-right-blue.svg" alt="menu"/>
+    <button tabindex="0" class="focus:outline-none menu w-full h-full" class:open on:click={() => open = !open}>
+        <img class="menu-image m-auto" src="chevron-right-blue.svg" alt="menu"/>
     </button>
 </div>
 

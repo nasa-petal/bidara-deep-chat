@@ -11,6 +11,7 @@
   import Chat from './Chat.svelte'
 
   function isSmallScreen() {
+    //console.log("screen size:", window.innerWidth)
     return window.innerWidth < 700;
   }
 
@@ -50,20 +51,20 @@
 
 </script>
 
-<div>
-  <aside class="absolute flex flex-col" class:open>
-    <button tabindex="0" class="focus:outline-none new-thread rounded-full m-2 text-base font-sans p-2" disabled={!open} on:click={handleButtonClick}>New Thread</button>
-    <nav class="w-full">
-      <div class="w-full h-full">
-        {#if threads !== null}
-          {#each threads as thread}
-            <Chat handleSelect={handleChatClick} handleDelete={handleChatSwipe} selected={thread.id === selectedThreadId} bind:thread/>
-          {/each}
-        {/if}
-      </div>
-    </nav>
-  </aside>
-</div>
+<aside class:open>
+  <div class="side-container w-full h-full flex flex-col">
+  <button tabindex="0" class="focus:outline-none new-thread rounded-full text-base font-sans p-2" disabled={!open} on:click={handleButtonClick}>New Thread</button>
+  <nav class="w-full">
+    <div class="w-full h-full">
+      {#if threads !== null}
+        {#each threads as thread}
+          <Chat handleSelect={handleChatClick} handleDelete={handleChatSwipe} selected={thread.id === selectedThreadId} bind:thread/>
+        {/each}
+      {/if}
+    </div>
+  </nav>
+  </div>
+</aside>
 
 <style>
   button:focus-visible {
@@ -74,15 +75,23 @@
     padding-bottom: calc(2 * env(safe-area-inset-bottom));
   }
 
+  button {
+    margin: 0.5em;
+    margin-left: calc(0.5em + env(safe-area-inset-left));
+  }
+
+  .side-container {
+    border-right: 1px solid var(--border-color);
+  }
+
   aside {
+    position: absolute;
     z-index: 20;
-    width: 20%;
-    height: calc(100% - 3em);
-    left: -20%;
+    width: calc(300px + env(safe-area-inset-left));
+    height: calc(100dvh - 3em);
     background-color: var(--nav-color);
-    transition: left ease 0.3s, width ease 0.3s, visibility 0.3s 0s;
-    overflow-y: scroll;
-    visibility: hidden;
+    transition: left 0.3s ease, visibility 0.3s ease, width 0.3s ease;
+    left: calc(-300px - env(safe-area-inset-left));
   }
 
   button {
@@ -90,8 +99,8 @@
   }
 	
   .open {
+    visibility: visible;
     left: 0;
-    visibility: visible
   }
 
   .new-thread {
@@ -102,25 +111,19 @@
     font-weight: bold;
   }
 
-  @media only screen and (max-width: 1400px) {
-    aside {
-      width: 30%;
-      left: -30%;
-    }
-  }
-
-  @media only screen and (max-width: 1000px) {
-    aside {
-      width: 40%;
-      left: -40%;
-    }
-  }
-
   @media only screen and (max-width: 700px) {
     aside {
       width: 100%;
       left: -100%;
+    }
+    button {
+      margin-left: env(safe-area-inset-left);
+    }
+    .side-container {
       border-right: none;
+    }
+    ::-webkit-scrollbar-track {
+      background-color: var(--nav-color);
     }
   }
 </style>
