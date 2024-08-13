@@ -11,7 +11,7 @@
   import Chat from './Chat.svelte'
 
   function isSmallScreen() {
-    console.log("screen size:", window.innerWidth)
+    //console.log("screen size:", window.innerWidth)
     return window.innerWidth < 700;
   }
 
