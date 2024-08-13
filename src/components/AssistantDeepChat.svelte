@@ -240,7 +240,7 @@
         new_assistant: asstConfig,
         thread_id: threadId,
         load_thread_history: false,
-        files_tool_type: 'code_interpreter',
+        files_tool_type: 'file_search',
         function_handler: handleFuncCalling
       } : null
     }
