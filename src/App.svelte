@@ -157,7 +157,6 @@
   function onLoadComplete() {
     loading = false;
   }
-
 </script>
 
 <main class="flex w-full h-full">
@@ -176,8 +175,9 @@
         changeAssistant={changeAssistants}
         />   
 
-      <div id="content-container" class="flex justify-between w-full h-full flex-1">
-        <div class="sidebar-container">
+      <div class="content-container flex justify-between w-full h-full" class:open>
+
+        <div class="sidebar-container w-0 h-full">
           <Sidebar 
             bind:threads
             bind:open
@@ -188,8 +188,8 @@
             />
         </div>
 
-        <div id="chat-container" class="w-full" class:loading class:open>
-          {#key activeThread.id}
+        {#key activeThread.id}
+        <div class="chat-container w-full" class:loading>
           <AssistantDeepChat
             key={activeKey}
             asst={activeAsst}
@@ -201,8 +201,8 @@
             width="100%"
             height="100%"
             />
-          {/key}
         </div>
+        {/key}
       </div>
     {/if}
     {/await}
@@ -211,51 +211,47 @@
 
 
 <style>
-  #content-container {
-    height: calc(100% - 3rem);
-    overflow: hidden;
-  }
-
-  .sidebar-container {
-    overflow: hidden;
-  }
-
-  #chat-container {
-    transition: width 0.3s ease, filter 0.3s ease-out;
-  }
-  
-  .open {
-    width: 80%;
-  }
-
-  @media only screen and (max-width: 1400px) {
-    .open {
-      width: 70%;
-    }
-  }
-
-  @media only screen and (max-width: 1000px) {
-    .open {
-      width: 60%;
-    }
-  }
-
-  @media only screen and (max-width: 700px) {
-    .open {
-      width: 100%;
-    }
-  }
-
   main {
     font-family: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     width: 100%;
     height: calc(100% + env(safe-area-inset-top));
-    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .content-container {
+    height: calc(100% - 3rem);
+    width: 100%;
+    padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   }
 
   .loading {
     filter: blur(2px);
     pointer-events: none;
+  }
+
+  .chat-container {
+    transition: width 0.3s ease;
+  }
+  .sidebar-container {
+    transition: width 0.3s ease;
+  }
+
+  .open > .sidebar-container {
+    width: 300px;
+  }
+
+  .open > .chat-container {
+    width: calc(100% - 300px);
+  }
+
+  @media only screen and (max-width: 700px) {
+    .open > .sidebar-container {
+      width: 0;
+    }
+
+    .open > .chat-container {
+      width: 100%;
+    }
   }
 </style>
 

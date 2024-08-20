@@ -5,7 +5,7 @@ const TEST_NAME = "BIDARA-TEST";
 
 export const NAME = PROD_NAME;
 
-export const VERSION = "2.00";
+export const VERSION = "2.01";
 
 export const LOGO = "bidara.png";
 export const LOGO_DESC = "girl with dark hair";
@@ -17,7 +17,7 @@ export const DESCRIPTION = "I'm an OpenAI [GPT-4o](https://openai.com/index/hell
 export const ADVISORY = "**Do not share any sensitive information** in your conversations including but not limited to, personal information, sensitive or non-public government/company data, ITAR, CUI, export controlled, or trade secrets.  \n‣ While OpenAI has safeguards in place, BIDARA may occasionally generate incorrect or misleading information and produce offensive or biased content.";
 export const GREETING = "How can I assist you today?";
 
-export const MODEL = "gpt-4o-2024-05-13";
+export const MODEL = "gpt-4o-2024-08-06";
 
 const now = new Date();
 const formattedDate = now.toLocaleDateString();
