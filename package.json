@@ -15,7 +15,7 @@
     "svelte": "^4.2.18"
   },
   "dependencies": {
-    "deep-chat-dev": "^9.0.179",
+    "deep-chat-dev": "^9.0.189",
     "jspdf": "^2.5.1",
     "sirv-cli": "^2.0.0",
     "svelte-agnostic-draggable": "^0.2.0",
