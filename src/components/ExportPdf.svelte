@@ -299,23 +299,31 @@
 
 </script>
 
-<button class="w-full h-full p-1 flex justify-between items-center focus:outline-none" on:click={handleExport}>
+<button class="w-full h-full p-1 flex justify-between items-center focus:outline-none" on:click={handleExportView}>
   <p>Export to PDF</p>
 </button>
-<!-- <button class="w-full h-full p-1 flex justify-between items-center focus:outline-none" on:click={handleExportView}>
-  <p>Export to PDF</p>
-</button> -->
 
-<!-- {#if exportingToPdf }
-<ExportView messages=[{ "role": "assistant", message: "test"}]/>
-{/if} -->
 
-{#if exportingToPdf }
-<ExportView {messages}/>
+{#if exportingToPdf}
+  <div class="export-view-overlay">
+    <ExportView messages={getMessages()} {chatName} />
+  </div>
 {/if}
+
 
 <style>
   button:focus-visible {
     outline: 5px auto -webkit-focus-ring-color; 
+  }
+
+  .export-view-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    z-index: 9999;
+    overflow-y: auto;
   }
 </style>

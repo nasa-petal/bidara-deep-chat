@@ -4,6 +4,7 @@
   import { ASSISTANT_OPTIONS, DEFAULT_ASSISTANT } from "./assistant";
   import { getKeyAndThread, getNewAsst } from './utils/openaiUtils';
   import * as threadUtils from './utils/threadUtils';
+  import ExportPdf from './ExportPdf.svelte';
   import hljs from "highlight.js";
   window.hljs = hljs;
 
@@ -157,6 +158,8 @@
   function onLoadComplete() {
     loading = false;
   }
+
+
 </script>
 
 <main class="flex w-full h-full">
@@ -204,6 +207,7 @@
         </div>
         {/key}
       </div>
+      <ExportPdf chatName={activeThread.name} />
     {/if}
     {/await}
   </div>

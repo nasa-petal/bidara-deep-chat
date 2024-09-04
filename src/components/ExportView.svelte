@@ -1,3 +1,4 @@
+
 <script>
     export let messages = []; // list of messages
     /*
@@ -9,11 +10,13 @@
         { "role": "<insert role here", "message": "<insert message here>"},
     ]
     */
+    
+    export let chatName;
 </script>
 
 <div class="container">
     <div class="title">
-        <h1 class="chat-name">New Chat</h1>
+        <h1 class="chat-name">{chatName}</h1>
         <div class="credits">Bidara by NASA PeTaL</div>
     </div>
     <hr class="first-divider">
@@ -37,7 +40,6 @@
         {/each}
     </div>
 </div>
-
 
 <style>
 
