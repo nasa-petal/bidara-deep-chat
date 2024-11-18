@@ -261,6 +261,12 @@ export async function loadMessages(threadId) {
   return messages;
 }
 
+// export async function getFileExpirationDetails(fileId){
+//   try{
+    
+//   }
+// }
+
 async function convertThreadMessagesToMessages(threadId, threadMessages) {
   const storedFiles = await retrieveStoredFiles(threadId);
 

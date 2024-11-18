@@ -221,8 +221,14 @@ export async function pushFile(file) {
 	const db = await DB.get();
 
 	// { index: int, file: b64Data }
+	if(!file.expiration_date) {
+		const currentTime = Date.now()
+		const expirationTime = currentTime + 7 * 24 * 60 * 60 * 1000;
+		file.expiration_date = expirationTime;
+	}
 	await dbUtils.write(db, FILE_STORE_NAME, file);
 
+	console,log(`File "${file.name} pished with expiration date: ${new Date(file.expiration_date).toISOString()}`);
 	await DB.close();
 }
 
