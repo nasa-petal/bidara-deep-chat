@@ -92,13 +92,33 @@ export async function getThreadImages(id) {
 }
 
 export async function getThreadFiles(id) {
+
   const files = await bidaraDB.getThreadFiles(id);
+
+  if (files.length === 0) {
+    console.warn(`No files found for Thread ID: ${id}`);
+  } else {
+    files.forEach(file => {
+      if (file.expiration_date) {
+        console.log(`File "${file.name}" (ID: ${file.fileId}) expires on: ${new Date(file.expiration_date).toISOString()}`);
+      } else {
+        console.warn(`File "${file.name}" (ID: ${file.fileId}) does not have an expiration date.`);
+      }
+    });
+    await notifyFilesNearExpiration(); // Notify about files near expiration
+  }
+
 
   return files;
 }
 
 export async function getFileByFileId(id) {
   const file = await bidaraDB.getFileById(id);
+  if (file && file.expiration_date) {
+    console.log(`File "${file.name}" (ID: ${id}) expires on: ${new Date(file.expiration_date).toISOString()}`);
+  } else if (file) {
+    console.warn(`File "${file.name}" (ID: ${id}) does not have an expiration date.`);
+  }
   return file
 }
 
@@ -137,7 +157,14 @@ export async function deleteThread(threadId) {
 }
 
 export async function pushFile(file) {
+  if (!file.expiration_date) {
+    const currentTime = Date.now();
+    const expirationTime = currentTime + 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
+    file.expiration_date = expirationTime;
+  }
   await bidaraDB.pushFile(file);
+  console.log(`File "${file.name}" pushed with expiration date: ${new Date(file.expiration_date).toISOString()}`);
+
 }
 
 export async function pushFiles(files) {
@@ -145,6 +172,21 @@ export async function pushFiles(files) {
     await pushFile(file);
   })
 }
+
+export async function cleanUpExpiredFiles() {
+  const currentTime = Date.now();
+  const allFiles = await bidaraDB.getAllFiles(); // Assuming `getAllFiles` is implemented in `bidaraDB`
+
+  const expiredFiles = allFiles.filter(file => file.expiration_date && file.expiration_date < currentTime);
+
+  for (const file of expiredFiles) {
+    await bidaraDB.deleteFileById(file.fileId);
+    console.log(`Deleted expired file "${file.name}" (ID: ${file.fileId})`);
+  }
+
+  console.log(`Cleanup complete. ${expiredFiles.length} expired files removed.`);
+}
+
 
 async function retrieveStoredFiles(threadId) {
   const files = await getThreadFiles(threadId);
@@ -261,11 +303,22 @@ export async function loadMessages(threadId) {
   return messages;
 }
 
-// export async function getFileExpirationDetails(fileId){
-//   try{
-    
-//   }
-// }
+export async function getFileExpirationDate(fileId) {
+  const db = await db.get();
+
+  const file = await dbUtils.readByKey(db, FILE_STORE_NAME, fileId);
+
+  await db.close();
+
+  if (file && file.expiration_date) {
+    console.log(`File ID: ${fileId} expires on: ${new Date(file.expiration_date).toISOString()}`);
+    return new Date(file.expiration_date);
+  } else {
+    console.warn(`File ID: ${fileId} does not have an expiration date.`);
+    return null;
+  }
+}
+
 
 async function convertThreadMessagesToMessages(threadId, threadMessages) {
   const storedFiles = await retrieveStoredFiles(threadId);

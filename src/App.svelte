@@ -17,6 +17,8 @@
   let loggedIn = false;
   let open = false;
 
+  // let cleanupInterval; // store the interval ID
+
   async function initKeyAsstAndThreads() {
 
     const keyAsstAndThread = await getKeyAndThread(DEFAULT_ASSISTANT);

@@ -228,9 +228,72 @@ export async function pushFile(file) {
 	}
 	await dbUtils.write(db, FILE_STORE_NAME, file);
 
-	console,log(`File "${file.name} pished with expiration date: ${new Date(file.expiration_date).toISOString()}`);
+	console.log(`File "${file.name} pished with expiration date: ${new Date(file.expiration_date).toISOString()}`);
 	await DB.close();
 }
+
+export async function getExpiredFiles() {
+	const db = await DB.get();
+	const currentTime = Date.now();
+  
+	const allFiles = await dbUtils.readAll(db, FILE_STORE_NAME);
+	const expiredFiles = allFiles.filter(file => file.expiration_date && file.expiration_date < currentTime);
+  
+	await DB.close();
+  
+	return expiredFiles;
+  }
+  
+  export async function cleanUpExpiredFiles() {
+	const expiredFiles = await getExpiredFiles();
+  
+	if (expiredFiles.length === 0) {
+	  console.log("No expired files to clean up.");
+	  return;
+	}
+  
+	const db = await DB.get();
+	for (const file of expiredFiles) {
+	  await dbUtils.deleteByKey(db, FILE_STORE_NAME, file.fileId);
+	  console.log(`Deleted expired file "${file.name}" (ID: ${file.fileId})`);
+	}
+  
+	await DB.close();
+  }
+
+  export async function logFileExpirationDate(fileId) {
+	const db = await DB.get();
+  
+	const file = await dbUtils.readByKey(db, FILE_STORE_NAME, fileId);
+  
+	await DB.close();
+  
+	if (file && file.expiration_date) {
+	  console.log(`File "${file.name}" (ID: ${file.fileId}) expires on: ${new Date(file.expiration_date).toISOString()}`);
+	} else if (file) {
+	  console.warn(`File "${file.name}" (ID: ${file.fileId}) does not have an expiration date.`);
+	} else {
+	  console.error(`File with ID: ${fileId} not found.`);
+	}
+  }
+
+  export async function notifyFilesNearExpiration() {
+	const db = await DB.get();
+	const currentTime = Date.now();
+	const threeDaysInMs = 3 * 24 * 60 * 60 * 1000;
+  
+	const allFiles = await dbUtils.readAll(db, FILE_STORE_NAME);
+	const nearExpirationFiles = allFiles.filter(file => file.expiration_date && file.expiration_date - currentTime < threeDaysInMs);
+  
+	await DB.close();
+  
+	nearExpirationFiles.forEach(file => {
+	  console.warn(`File "${file.name}" (ID: ${file.fileId}) is nearing expiration: ${new Date(file.expiration_date).toISOString()}`);
+	});
+  }
+  
+  
+  
 
 export async function setThread(thread) {
 	const db = await DB.get();

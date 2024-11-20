@@ -1,6 +1,7 @@
 {
   "name": "bidara-deep-chat-svelte",
   "version": "1.0.0",
+  "type": "module",
   "devDependencies": {
     "@rollup/plugin-commonjs": "^26.0.1",
     "@rollup/plugin-node-resolve": "^15.2.3",
@@ -16,7 +17,9 @@
   },
   "dependencies": {
     "deep-chat-dev": "^9.0.179",
+    "dotenv": "^16.4.5",
     "jspdf": "^2.5.1",
+    "openai": "^4.73.0",
     "sirv-cli": "^2.0.0",
     "svelte-agnostic-draggable": "^0.2.0",
     "svelte-touch-to-mouse": "^1.0.0"
