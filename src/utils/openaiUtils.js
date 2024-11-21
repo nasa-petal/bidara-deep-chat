@@ -3,7 +3,71 @@ import { getActiveThread, getFileByFileId } from "./threadUtils";
 import { ASSISTANT_OPTIONS } from "../assistant";
 import { ENV } from "process.env";
 
+// todo: test all functions with fetch calls to make sure they still work after the header refactor. (test with public openai, not azure.)
+/*
+createAssistant
+updateAssistant
+getFileContent
+getFileInfo
+uploadFile - works
+getChatCompletion - works
+getAssistantId - works
+getNewThreadId - works
+getThreadMessages - works
+cancelThreadRun - works
+validThread - works
+validAssistant - works
+validAPIKey -works
+getDalleImageGeneration - works
+*/
+
 let openaiKey = null;
+let apiEndpoint = 'https://api.openai.com/v1';
+let apiVersion = '';
+let apiVersionMultipleParams = '';
+
+let azureOpenAI = false;
+
+function getAPIHeaders(type = 'default') {
+  let retHeader = '';
+
+  if (azureOpenAI) {
+    if (type == 'default' || type == 'wooaib') {
+      retHeader = {
+        'api-key': openaiKey,
+        'Content-Type': 'application/json'
+      };
+    }
+    else if (type == 'woct') {
+      retHeader = {
+        'api-key': openaiKey
+      };
+    }
+  }
+  else {
+    // OpenAI Headers
+    if (type == 'default') {
+      retHeader = {
+        'Authorization': 'Bearer ' + openaiKey,
+        'Content-Type': 'application/json',
+        'OpenAI-Beta': 'assistants=v2'
+      };
+    }
+    else if (type == 'woct') {
+      retHeader = {
+        'Authorization': 'Bearer ' + openaiKey,
+        'OpenAI-Beta': 'assistants=v2'
+      };
+    }
+    else if (type == 'wooaib') {
+      retHeader = {
+        'Authorization': 'Bearer ' + openaiKey,
+        'Content-Type': 'application/json'
+      };
+    }
+  }
+  return retHeader;
+}
 
 function getAssistantConfigFromName(asstName) {
   const asst = ASSISTANT_OPTIONS.find((opt) => opt.name === asstName);
@@ -23,13 +87,9 @@ export async function validAssistant(id, asstName) {
   if (!openaiKey) {
     throw new Error('openai key not set. cannot validate assistant.');
   }
-  const response = await fetch("https://api.openai.com/v1/assistants/" + id, {
+  const response = await fetch(apiEndpoint + "/assistants/" + id + apiVersion, {
     method: "GET",
-    headers: {
-      Authorization: 'Bearer ' + openaiKey,
-      'Content-Type': 'application/json',
-      'OpenAI-Beta': 'assistants=v2'
-    },
+    headers: getAPIHeaders(),
     body: null
   });
 
@@ -50,13 +110,9 @@ export async function updateAssistant(id, config) {
   if (!openaiKey) {
     throw new Error('openai key not set. cannot update assistant.');
   }
-  const response = await fetch("https://api.openai.com/v1/assistants/" + id, {
+  const response = await fetch(apiEndpoint + "/assistants/" + id + apiVersion, {
     method: "POST",
-    headers: {
-      Authorization: 'Bearer ' + openaiKey,
-      'Content-Type': 'application/json',
-      'OpenAI-Beta': 'assistants=v2'
-    },
+    headers: getAPIHeaders(),
     body: JSON.stringify(config)
   });
 
@@ -72,13 +128,9 @@ export async function createAssistant(config) {
   if (!openaiKey) {
     throw new Error('openai key not set. cannot update assistant.');
   }
-  const response = await fetch("https://api.openai.com/v1/assistants", {
+  const response = await fetch(apiEndpoint + "/assistants" + apiVersion, {
     method: "POST",
-    headers: {
-      Authorization: 'Bearer ' + openaiKey,
-      'Content-Type': 'application/json',
-      'OpenAI-Beta': 'assistants=v2'
-    },
+    headers: getAPIHeaders(),
     body: JSON.stringify(config)
   });
 
@@ -94,13 +146,9 @@ export async function getAssistantId(asstName, asstVersion, asstConfig) {
     throw new Error('openai key not set. cannot search for bidara assistant.');
   }
   // get assistants
-  const response = await fetch("https://api.openai.com/v1/assistants?limit=50", {
+  const response = await fetch(apiEndpoint + "/assistants?limit=50" + apiVersionMultipleParams, {
     method: "GET",
-    headers: {
-      Authorization: 'Bearer ' + openaiKey,
-      'Content-Type': 'application/json',
-      'OpenAI-Beta': 'assistants=v2'
-    },
+    headers: getAPIHeaders(),
     body: null
   });
 
@@ -132,9 +180,10 @@ export async function getAssistantId(asstName, asstVersion, asstConfig) {
 }
 
 export async function validApiKey(key) {
-  const response = await fetch("https://api.openai.com/v1/models", {
+  openaiKey = key;
+  const response = await fetch(apiEndpoint + "/models", {
     method: "GET",
-    headers: { Authorization: 'Bearer ' + key, 'Content-Type': 'application/json' },
+    headers: getAPIHeaders(),
     body: null
   });
 
@@ -223,13 +272,9 @@ export async function validThread(thread_id) {
   }
 
   try {
-    const response = await fetch(`https://api.openai.com/v1/threads/${thread_id}`, {
+    const response = await fetch(apiEndpoint + `/threads/${thread_id}` + apiVersion, {
       method: "GET",
-      headers: {
-        Authorization: 'Bearer ' + openaiKey,
-        'Content-Type': 'application/json',
-        'OpenAI-Beta': 'assistants=v2'
-      },
+      headers: getAPIHeaders(),
       body: null
     });
 
@@ -268,13 +313,9 @@ export async function getNewThreadId() {
   const body = {
     metadata
   }
-  const response = await fetch("https://api.openai.com/v1/threads", {
+  const response = await fetch(apiEndpoint + "/threads" + apiVersion, {
     method: "POST",
-    headers: {
-      Authorization: 'Bearer ' + openaiKey,
-      'Content-Type': 'application/json',
-      'OpenAI-Beta': 'assistants=v2'
-    },
+    headers: getAPIHeaders(),
     body: JSON.stringify(body)
   });
 
@@ -312,8 +353,8 @@ export async function getDalleImageGeneration(prompt, image_size = null, image_q
       return null;
     }
 
-    const requestURL = "https://api.openai.com/v1/images/generations";
-
+    const requestURL = apiEndpoint + "/images/generations";
+    //todo: update headers for Azure.
     const request = {
       method: "POST",
       headers: {
@@ -346,7 +387,7 @@ export async function getDalleImageGeneration(prompt, image_size = null, image_q
 }
 
 export async function cancelThreadRun(threadId, runId) {
-  const url = `https://api.openai.com/v1/threads/${threadId}/runs/${runId}/cancel`;
+  const url = apiEndpoint + `/threads/${threadId}/runs/${runId}/cancel` + apiVersion;
 
   if (!openaiKey) {
     throw new Error('openai key not set. cannot validate thread.');
@@ -357,10 +398,7 @@ export async function cancelThreadRun(threadId, runId) {
   }
 
   const method = 'POST';
-  const headers = {
-    'Authorization': 'Bearer ' + openaiKey,
-    'OpenAI-Beta': 'assistants=v2'
-  };
+  const headers = getAPIHeaders('woct');
 
   const request = {
     method,
@@ -377,7 +415,7 @@ export async function cancelThreadRun(threadId, runId) {
 }
 
 export async function getThreadMessages(threadId, limit) {
-  const url = `https://api.openai.com/v1/threads/${threadId}/messages?limit=${limit}`;
+  const url = apiEndpoint + `/threads/${threadId}/messages?limit=${limit}` + apiVersionMultipleParams;
 
   if (!openaiKey) {
     throw new Error('openai key not set. cannot validate thread.');
@@ -388,11 +426,7 @@ export async function getThreadMessages(threadId, limit) {
   }
 
   const method = 'GET';
-  const headers = {
-    'Authorization': 'Bearer ' + openaiKey,
-    'Content-Type': 'application/json',
-    'OpenAI-Beta': 'assistants=v2'
-  };
+  const headers = getAPIHeaders();
 
   const request = {
     method,
@@ -411,17 +445,15 @@ export async function getThreadMessages(threadId, limit) {
 }
 
 export async function getFileContent(fileId) {
-  const url = `https://api.openai.com/v1/files/${fileId}/content`;
+  //todo update for Azure
+  const url = `${apiEndpoint}/files/${fileId}/content`;
 
   if (!openaiKey) {
     throw new Error('openai key not set. cannot validate thread.');
   }
 
   const method = 'GET';
-  const headers = {
-    'Authorization': 'Bearer ' + openaiKey,
-    'Content-Type': 'application/json',
-  };
+  const headers = getAPIHeaders('wooaib');
 
   const request = {
     method,
@@ -460,7 +492,8 @@ export async function getFileSrc(fileId) {
 }
 
 export async function getFileInfo(fileId) {
-  const url = `https://api.openai.com/v1/files/${fileId}`;
+  //todo update for Azure
+  const url = `${apiEndpoint}/files/${fileId}`;
 
   if (!openaiKey) {
     throw new Error('openai key not set. cannot validate thread.');
@@ -493,12 +526,9 @@ export async function getChatCompletion(model, messages, tokenLimit) {
     throw new Error('openai key not set. cannot validate thread.');
   }
 
-  const url = `https://api.openai.com/v1/chat/completions`;
+  const url = apiEndpoint + `/chat/completions`;
   const method = 'POST';
-  const headers = {
-    'Authorization': 'Bearer ' + openaiKey,
-    'Content-Type': 'application/json',
-  };
+  const headers = getAPIHeaders('wooaib');
   const body = JSON.stringify({
     "model": model,
     "messages": messages,
@@ -535,7 +565,9 @@ export async function uploadFile(b64Data, fileName, type) {
   form.append('purpose', 'assistants');
   form.append('file', file);
 
-  const url = `https://api.openai.com/v1/files`;
+  //todo update for Azure.
+
+  const url = apiEndpoint + `/files`;
   const method = 'POST';
   const headers = {
     'Authorization': 'Bearer ' + openaiKey,
@@ -570,7 +602,7 @@ export async function getImageDescription(base64, prompt) {
     prompt = "Give a detailed but concise description of the image. If there are any engineering, biological, or mechanical processes present, include how they're present."
   }
 
-  const model = "gpt-4o-2024-05-13"
+  const model = "gpt-4o-2024-05-13" //todo: update for azure.
   const messages = [
     {
       "role": "user",
