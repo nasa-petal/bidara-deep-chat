@@ -88,8 +88,13 @@ function BidaraDB() {
 		close: async () => {
 			if (!BIDARA_DB) return;
 
-			await dbUtils.closeDB(BIDARA_DB);
-			BIDARA_DB = null;
+			try {
+				await dbUtils.closeDB(BIDARA_DB);
+			} catch (error) {
+				console.error("Error closing database:", error);
+			} finally {
+				BIDARA_DB = null;
+			}
 		}
 	}
 }
@@ -145,28 +150,48 @@ export async function getMostRecentlyUpdatedThread() {
 }
 
 export async function getThreadFiles(threadId) {
-	const db = await DB.get();
+	try{
+		const db = await DB.get();
 
-	const files = await dbUtils.readByProperty(db, FILE_STORE_NAME, "threadId", threadId);
+		const files = await dbUtils.readByProperty(db, FILE_STORE_NAME, "threadId", threadId);
 
-	await DB.close();
+		await DB.close();
 
-	if (!files) {
+		if (files) {
+			return files.map(file => {
+				if (file.file instanceof Blob) {
+					console.log("file.file is an instance of Blob", file.file)
+					file.fileUrl = URL.createObjectURL(file.file);
+					console.log("in bidaraDB, file.fileUrl", file.fileUrl)
+				}
+				return file;
+			});
+		}
+
 		return [];
-	}
-
-	return files;
-}
+	} catch (error) {
+		console.error("Error retrieving files:", error);
+	}}
 
 export async function getFileById(fileId) {
 	const db = await DB.get();
-
-	const file = await dbUtils.readByKey(db, FILE_STORE_NAME, fileId);
-
+  
+	let fileRecord; // Ensure fileRecord is declared
+  
+	try {
+		fileRecord = await dbUtils.readByKey(db, FILE_STORE_NAME, fileId);
+		if (fileRecord && fileRecord.file instanceof Blob) {
+			fileRecord.fileUrl = URL.createObjectURL(fileRecord.file); // Convert Blob to URL
+	    }
+	} catch (error) {
+		console.error("Error retrieving file:", error);
+	}
+  
 	await DB.close();
-
-	return file;
-}
+	console.log("in getFileById,", fileRecord)
+	return fileRecord || null; // Ensure a value is returned
+  }
+  
 
 export async function getEmptyThread(emptyLength) {
 	const db = await DB.get();
@@ -217,14 +242,38 @@ export async function pushMessageToId(id, message) {
 	await DB.close();
 }
 
+// export async function pushFile(file) {
+// 	const db = await DB.get();
+
+// 	// { index: int, file: b64Data }
+// 	await dbUtils.write(db, FILE_STORE_NAME, file);
+
+// 	await DB.close();
+// }
 export async function pushFile(file) {
-	const db = await DB.get();
+	try{
+		const db = await DB.get();
 
-	// { index: int, file: b64Data }
-	await dbUtils.write(db, FILE_STORE_NAME, file);
+	// making sure the file is stored as a Blob
+		const fileRecord = {
+			fileId: file.fileId,
+			threadId: file.threadId,
+			name: file.name,
+			type: file.type,
+			file: new Blob([file.data], { type: file.type }), // Store as Blob
+			created_time: Date.now(),
+		};
+		console.log("Storing file in IndexedDB:", fileRecord);
 
-	await DB.close();
+
+		await dbUtils.write(db, FILE_STORE_NAME, fileRecord);
+		console.log("fileRecord", fileRecord)
+		await DB.close();
+	} catch (error) {
+		console.error("Error storing file in IndexedDB:", error);
+	}
 }
+
 
 export async function setThread(thread) {
 	const db = await DB.get();

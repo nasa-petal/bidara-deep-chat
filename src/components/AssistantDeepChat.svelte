@@ -2,6 +2,7 @@
   import { DeepChat } from 'deep-chat-dev';
   import { setOpenAIKey, cancelThreadRun } from '../utils/openaiUtils';
   import * as threadUtils from '../utils/threadUtils';
+  import { onDestroy } from "svelte";
 
   export let key = null;
   export let thread = null;
@@ -30,14 +31,73 @@
   let deepChatRef;
   let loadedMessages = false;
 
+  // async function onError(error) {
+  //   console.error(error);
+
+  //   if (threadId && currRunId) {
+  //     console.log("Cancelling thread run due to error.");
+  //     await cancelThreadRun(threadId, currRunId);
+  //   }
+  // }
+  onDestroy(async () => {
+  if (thread && thread.id) {
+    const files = await threadUtils.getThreadFiles(thread.id);
+    cleanupThreadFiles(files); // Revoke Blob URLs
+  }
+  });
+
+  function cleanupThreadFiles(files) {
+    files.forEach(file => {
+      if (file.fileUrl) {
+        URL.revokeObjectURL(file.fileUrl); // Revoke Blob URL
+      }
+    });
+  }
+
+  async function loadThreadFiles(threadId) {
+  if (!threadId) return;
+  console.time("IndexedDB File Retrieval");
+
+  const files = await threadUtils.getThreadFiles(threadId);
+  console.timeEnd("IndexedDB File Retrieval");
+
+  console.log("Files for rendering:", files);
+
+  files.forEach(file => {
+    console.log(file.file instanceof Blob); // Should log `true` for each file.
+    if (file.file instanceof Blob) {
+      const newBlobUrl = URL.createObjectURL(file.file);
+      file.fileUrl = newBlobUrl;
+      console.log("Generated new Blob URL:", newBlobUrl);
+
+      const imgElement = document.createElement("img");
+      imgElement.src = newBlobUrl; // Use Blob URL
+      imgElement.alt = file.name || "Image";
+      console.log("Appending image:", file.fileUrl);
+
+      deepChatRef.appendChild(imgElement); // Append image to chat interface
+    } else {
+      console.error("File URL missing for file:", file);
+
+    }
+  });
+}
+
   async function onError(error) {
-    console.error(error);
+    console.error("Error occurred:", error);
 
     if (threadId && currRunId) {
       console.log("Cancelling thread run due to error.");
       await cancelThreadRun(threadId, currRunId);
     }
-  }
+
+    // Add fallback or notification to the user
+    deepChatRef.addMessage({
+      role: "system",
+      text: "An error occurred while processing your request. Please try again.",
+    });
+}
+
 
   async function loadMessages(threadToLoad) {
     if (loadedMessages || !threadToLoad || !threadToLoad?.id) {
@@ -63,18 +123,16 @@
     if (!deepChatRef || message.isInitial) {
       return
     }
-
+  // Rename thread on first message or after clearing the thread
     if (thread.length === 0 || thread.length === asst.history + 1) {
       const maxCharLen = 50;
       let words = message.message.text?.split(/\s+/);
-      if(!words) {
-        // first user message is a file upload.
-        words = message.message.files?.[0]?.name?.split(/\s+/);
-      }
-      if(!words) {
-        // first user message is an image upload.
-        words = message.message.files?.[0]?.ref?.name?.split(/\s+/);
-      }
+      if (!words) {
+      // First user message is a file upload or image upload.
+      words = message.message.files?.[0]?.name?.split(/\s+/) ||
+              message.message.files?.[0]?.ref?.name?.split(/\s+/);
+    }
+
 
       let name = "";
 
@@ -113,22 +171,61 @@
     }
   }
 
+  // async function onComponentRender() {
+  //   console.log("Rendering component with threadId:", threadId);
+
+  //   deepChatRef = document.getElementById("chat-element");
+
+  //   if (deepChatRef) {
+  //     setDeepChatKeyboardSupport();
+  //   }
+  //   // save key to localStorage.
+  //   // The event occurs before key is set, and again, after key is set.
+  //   if (!key && this._activeService.key) {
+  //     // if key set through UI or in URL variable, save it to localStorage.
+  //     setOpenAIKey(this._activeService.key);
+  //     await loginHandler();
+  //   }
+
+  //   await loadMessages(thread)
+  //   await loadThreadFiles(thread?.id);
+  // }
   async function onComponentRender() {
-    deepChatRef = document.getElementById("chat-element");
+    console.log("Rendering component with threadId:", threadId);
 
-    if (deepChatRef) {
-      setDeepChatKeyboardSupport();
-    }
-    // save key to localStorage.
-    // The event occurs before key is set, and again, after key is set.
-    if (!key && this._activeService.key) {
-      // if key set through UI or in URL variable, save it to localStorage.
-      setOpenAIKey(this._activeService.key);
-      await loginHandler();
-    }
+    try {
+        // Assign the DeepChat reference
+        deepChatRef = document.getElementById("chat-element");
 
-    await loadMessages(thread)
-  }
+        if (deepChatRef) {
+            setDeepChatKeyboardSupport();
+        } else {
+            console.error("DeepChat element not found.");
+            return;
+        }
+
+        // Save OpenAI key to localStorage if available
+        if (!key && this._activeService.key) {
+            console.log("Saving OpenAI key to localStorage...");
+            setOpenAIKey(this._activeService.key);
+            await loginHandler();
+        }
+
+        // Load thread messages
+        if (thread?.id) {
+            console.log(`Loading messages for thread: ${thread.id}`);
+            await loadMessages(thread);
+
+            console.log(`Loading files for thread: ${thread.id}`);
+            await loadThreadFiles(thread.id);
+        } else {
+            console.warn("Thread ID is not defined. Messages and files cannot be loaded.");
+        }
+    } catch (error) {
+        console.error("Error during component render:", error);
+    }
+}
+
 
   async function processImageCallback(imageFile) {
     shouldProcessImages = true;
@@ -139,11 +236,16 @@
     let fileTool = "code_interpreter";
     if (Array.isArray(fileNames) && fileNames.length > 0) {
       let fileType = threadUtils.getFileTypeByName(fileNames[0]);
-      if (fileType == "image") {
-        fileTool = "images";
-      }
-      else if (["txt","powerpoint","pdf","word"].indexOf(fileType) !== -1) {
-        fileTool = "file_search";
+      // if (fileType == "image") {
+      //   fileTool = "images";
+      // }
+      // else if (["txt","powerpoint","pdf","word"].indexOf(fileType) !== -1) {
+      //   fileTool = "file_search";
+      // }
+      if (fileType.startsWith("image/")) {
+        fileTool = "images"; // Use the image tool
+      } else if (["txt", "powerpoint", "pdf", "word"].includes(fileType)) {
+        fileTool = "file_search"; // Use the file search tool for documents
       }
     }
     return fileTool;
@@ -158,34 +260,120 @@
     return await asst.funcCalling(functionDetails, context);
   }
 
-  async function handleFileUploads(fileIds, fileUploads) {
-    let newFiles;
+  // async function handleFileUploads(fileIds, fileUploads) {
+  //   let newFiles;
 
-    if (!fileUploads || fileUploads.length < 1) {
-      const files = await threadUtils.retrieveFiles(lastMessageId, fileIds);
-      newFiles = files.list;
+  //   if (!fileUploads || fileUploads.length < 1) {
+  //     const files = await threadUtils.retrieveFiles(lastMessageId, fileIds);
+  //     newFiles = files.list;
 
-    } else {
-      newFiles = fileUploads.map((file, i) => {
-        const fileId = fileIds[i];
-        const name = file.ref?.name ? file.ref.name : file.name;
-        const newFile = {
-          fileId: fileId,
-          threadId: lastMessageId, 
-          name,
-          type: file.type,
-          src: file.src
-        }
+  //   } else {
+  //     newFiles = fileUploads.map((file, i) => {
+  //       const fileId = fileIds[i];
+  //       const name = file.ref?.name ? file.ref.name : file.name;
+  //       const newFile = {
+  //         fileId: fileId,
+  //         threadId: lastMessageId, 
+  //         name,
+  //         type: file.type,
+  //         src: file.src
+  //       }
 
-        return newFile;
-      })
-    }
+  //       return newFile;
+  //     })
+  //   }
 
-    await threadUtils.pushFiles(newFiles);
+  //   await threadUtils.pushFiles(newFiles);
 
-    newFileUploads = [];
-    newFileIds = [];
+  //   newFileUploads = [];
+  //   newFileIds = [];
+  // }
+
+//   async function handleFileUploads(fileIds, fileUploads) {
+//   let newFiles;
+
+//   if (!fileUploads || fileUploads.length < 1) {
+//     // Retrieve files from backend or IndexedDB
+//     const files = await threadUtils.retrieveFiles(lastMessageId, fileIds);
+//     newFiles = files.list;
+//   } else {
+//     // Process new file uploads
+//     newFiles = fileUploads.map((file, i) => {
+//       const fileId = fileIds[i];
+//       const name = file.ref?.name || file.name;
+//       const newFile = {
+//         fileId: fileId,
+//         threadId: lastMessageId, 
+//         name,
+//         type: file.type,
+//         data: file.src, // Raw file data (Blob or base64)
+//       };
+//       // return newFile;
+//     });
+//   }
+
+//   // Save files to IndexedDB
+//   await threadUtils.pushFiles(newFiles);
+
+//   // Render files in the chat
+//   newFiles.forEach(file => {
+//     if (file.type.startsWith("image/")) {
+//       // Create Object URL for image and render
+//       const imageBlob = new Blob([file.data], { type: file.type });
+//       const imageUrl = URL.createObjectURL(imageBlob);
+//       const imgElement = document.createElement("img");
+//       imgElement.src = imageUrl;
+//       imgElement.alt = file.name;
+//       deepChatRef.appendChild(imgElement); // Append to chat UI
+//     }
+//   });
+
+//   newFileUploads = [];
+//   newFileIds = [];
+// }
+
+async function handleFileUploads(fileIds, fileUploads) {
+  let newFiles;
+
+  if (!fileUploads || fileUploads.length < 1) {
+    // Retrieve files from backend or IndexedDB
+    const files = await threadUtils.retrieveFiles(lastMessageId, fileIds);
+    newFiles = files.list;
+  } else {
+    // Process new file uploads
+    newFiles = fileUploads.map((file, i) => {
+      const fileId = fileIds[i];
+      const name = file.ref?.name || file.name;
+      return {
+        fileId: fileId,
+        threadId: lastMessageId,
+        name,
+        type: file.type,
+        data: file.src, // Raw file data (Blob or base64)
+      };
+    });
   }
+
+  // Save files to IndexedDB
+  await threadUtils.pushFiles(newFiles);
+
+  // Render files in the chat
+  newFiles.forEach(file => {
+    if (file.type.startsWith("image/")) {
+      const imageBlob = new Blob([file.data], { type: file.type });
+      const imageUrl = URL.createObjectURL(imageBlob);
+      const imgElement = document.createElement("img");
+      imgElement.src = imageUrl;
+      imgElement.alt = file.name;
+      deepChatRef.appendChild(imgElement); // Append to chat UI
+    }
+  });
+
+  newFileUploads = [];
+  newFileIds = [];
+}
+
+
 
   async function responseInterceptor(response) {
     if (response.id && response.object === "thread.run") {

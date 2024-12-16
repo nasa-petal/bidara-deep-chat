@@ -91,11 +91,34 @@ export async function getThreadImages(id) {
   return imageSources 
 }
 
-export async function getThreadFiles(id) {
-  const files = await bidaraDB.getThreadFiles(id);
+// export async function getThreadFiles(id) {
+//   const files = await bidaraDB.getThreadFiles(id);
 
-  return files;
+//   return files;
+// }
+
+export async function getThreadFiles(threadId) {
+  // const db = await bidaraDB.DB.getThreadFiles(threadId); // Use bidaraDB's DB instance
+
+  const files = await bidaraDB.getThreadFiles(threadId); // Call the appropriate function from bidaraDB
+
+  // await bidaraDB.DB.close(); // Close the database connection
+
+  if (files) {
+    return files.map(file => {
+      if (file.file instanceof Blob) {
+        // Regenerate object URL for rendering
+        file.fileUrl = URL.createObjectURL(file.file);
+        console.log("In threadUtils, Generated Blob URL:", file.fileUrl);
+
+      }
+      return file;
+    });
+  }
+
+  return [];
 }
+
 
 export async function getFileByFileId(id) {
   const file = await bidaraDB.getFileById(id);

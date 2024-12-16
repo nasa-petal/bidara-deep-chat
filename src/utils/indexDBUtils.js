@@ -242,13 +242,63 @@ export async function readFirstByIndex(db, storeName, storeIndex, reversed, tran
 	});
 
 }
-
+/**
+ * Generates a unique id for the image record
+ * @param {*} file 
+ */
+function handleImageUpload(file) {
+	const reader = new FileReader();
+	reader.onload = async (event) => {
+	  const imageBlob = new Blob([event.target.result], { type: file.type });
+	  const imageRecord = {
+		id: generateUniqueId(),
+		image: imageBlob,
+		// Additional metadata to be added
+	  };
+	  await write(db, 'images', imageRecord);
+	};
+	reader.readAsArrayBuffer(file);
+  }
+/**
+ *  Retrieves the image from the database by its id
+ * @param {*} db 
+ * @param {*} imageId 
+ * @returns 
+ */
+  export async function getImageById(db, imageId) {
+	return new Promise((resolve, reject) => {
+	  const transaction = db.transaction(['images'], 'readonly');
+	  const objectStore = transaction.objectStore('images');
+	  const getRequest = objectStore.get(imageId);
+  
+	  getRequest.onsuccess = (event) => {
+		const result = event.target.result;
+		if (result && result.image instanceof Blob) {
+		  const imageUrl = URL.createObjectURL(result.image);
+		  resolve(imageUrl);
+		} else {
+		  resolve(null);
+		}
+	  };
+  
+	  getRequest.onerror = (event) => {
+		const error = event.target.error;
+		reject(error);
+	  };
+	});
+  }
+  
 export async function write(db, storeName, value, transaction = null, callback = null) {
 	return new Promise((resolve, reject) => {
 		if (!transaction) {
 			transaction = db.transaction([storeName], 'readwrite');
 		}
 		const objectStore = transaction.objectStore(storeName);
+
+		// Check if value contains Blob data
+		if (value.image && value.image instanceof Blob) {
+		// No additional handling needed; Blobs can be stored directly
+		}
 
 		const now = Date.now();
 		if (!value?.created_time) {
