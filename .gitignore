@@ -10,4 +10,4 @@
 !.vscode/extensions.json
 !.vscode/tasks.json
 .conda.env
-.env
+.env.env
