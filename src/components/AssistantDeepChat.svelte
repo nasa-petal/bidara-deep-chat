@@ -20,7 +20,6 @@
   const threadId = thread?.id;
   const asstId = thread?.asst?.id;
   const asstConfig = asst?.config;
-
   
 
   // vars for callbacks
@@ -63,21 +62,11 @@
     }
   }
 
-
-async function onMessage(message) { 
+  async function onMessage(message) { 
     if (!deepChatRef || message.isInitial) {
       return
     }
-    if (!message.message || (!message.message.text && !message.message.files)) {
-        // logger.warn("Received message does not contain valid text or files:", message);
-        return;
-    }
-
-    // Add placeholder text for file-only messages
-    if (!message.message.text && message.message.files) {
-        // logger.info("Processing message with files but no text:", message.message.files);
-        message.message.text = "I just uploaded a file. Let me know if you got it and what tools you can use to analyze it. Wait for me to tell you what to do next with it though.";
-    }
+    
     if (thread.length === 0 || thread.length === asst.history + 1) {
       const maxCharLen = 50;
       const words = message.message.text.split(/\s+/);
@@ -119,9 +108,6 @@ async function onMessage(message) {
     }
   }
 
-
-
-
   async function onComponentRender() {
     deepChatRef = document.getElementById("chat-element");
 
@@ -153,9 +139,8 @@ async function onMessage(message) {
     return await asst.funcCalling(functionDetails, context);
   }
 
-  async function handleFileUploads(fileIds, fileUploads, requestBody) {
+  async function handleFileUploads(fileIds, fileUploads) {
     let newFiles;
-    // const placeholder = requestBody.content?.[0]?.text?.value || "";
 
     if (!fileUploads || fileUploads.length < 1) {
       const files = await threadUtils.retrieveFiles(lastMessageId, fileIds);
@@ -217,47 +202,45 @@ async function onMessage(message) {
 
     // logger.debug("Original Request Body:", JSON.stringify(body, null, 2));
     // console.log("Original Request Body:", JSON.stringify(body, null, 2));
-    // Ensure placeholder text is added for file-only requests
+    // Ensure placeholder text is added for file-only requests, or requests with empty message text.
     if (
-        body.attachments &&
-        body.attachments.length > 0 &&
-        (!body.content || !Array.isArray(body.content) || !body.content.text || body.content.length === 0)
+      'attachments' in body && 
+      Array.isArray(body.attachments) && 
+      body.attachments.length > 0 && 
+      (
+        !('content' in body) || 
+        !Array.isArray(body.content) || 
+        body.content.length === 0 || 
+        !('text' in body.content[0]) || 
+        !(typeof body.content[0].text === 'string') || 
+        body.content[0].text.trim().length === 0
+      )
     ) {
-        // logger.info("Adding placeholder text for file-only request.");
-        body.content = [
-            {
-                type: "text", 
-                text: 
-                    "I have uploaded a file. Please analyze it."
-                
-            },
-        ];
-    } else if (body.content && Array.isArray(body.content)) {
-        const firstContent = body.content[0];
-        if (
-            firstContent.text &&
-            typeof firstContent.text.value === "string" &&
-            firstContent.text.value.trim() === ""
-        ) {
-            // logger.info("Empty text detected. Adding placeholder text for existing content.");
-            firstContent.text = "I have uploaded a file. Please analyze it.";
-        }
+      // logger.info("Adding placeholder text for file-only request.");
+      body.content = [
+        {
+          type: "text", 
+          text: 
+            "I just uploaded a file. Let me know if you got it and what tools you can use to analyze it. Wait for me to tell you what to do next with it though."
+        },
+      ];
     } else {
         // logger.warn("Request body does not contain a valid content structure.");
     }
 
     // Transform attachments to include file_id
-    if (body.attachments && body.attachments.length > 0 && newFileUploads.length > 0) {
-      newFileIds = request.body.attachments.map(attachment => attachment.file_id);
-
-      handleFileUploads(newFileIds, newFileUploads);
+    if (newFileUploads.length > 0) {
+      if('attachments' in body && Array.isArray(body.attachments) && body.attachments.length > 0) {
+        newFileIds = request.body.attachments.map(attachment => attachment.file_id);
+        handleFileUploads(newFileIds, newFileUploads);
+      }
     }
 
     // Debug modified request
     // logger.debug("Final Request Body Sent to API:", JSON.stringify(body, null, 2));
 
     return request;
-}
+  }
 
 
   function setDeepChatKeyboardSupport() {

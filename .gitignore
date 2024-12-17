@@ -10,7 +10,5 @@
 !.vscode/extensions.json
 !.vscode/tasks.json
 .conda
-
 .env
-
 .pdf
