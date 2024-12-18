@@ -51,7 +51,7 @@ export async function getActiveThread(defaultAsst) {
     await setThreadAsst(thread, asst);
     thread.asst = asst;
 
-  } else if  (asst && !(await validAssistant(asst.id, asst.name))) { // asst doesn't exist, or is invalid
+  } else if  (asst && !(await validAssistant(asst.id, asst.name+'v'+asst.version))) { // asst doesn't exist, or is invalid
     asst = await getNewAsst(asst, defaultAsst);
     await setThreadAsst(thread, asst);
     thread.asst = asst;
@@ -226,16 +226,21 @@ export function getFileTypeByName(fileName) {
     "xlsx": "excel",
     "pdf": "pdf",
     "txt": "txt",
+    "pptx": "powerpoint",
+    "docx": "word",
+    "doc": "word",
     "png": "image",
     "jpg": "image",
     "jpeg": "image",
+    "webp": "image",
+    "gif": "image"
   }
 
   if (!fileName) {
     return "";
   }
 
-  const extensionMatches = /^.*\.(csv|xlsx|pdf|txt|png|jpg|jpeg)$/gm.exec(fileName);
+  const extensionMatches = /^.*\.(csv|xlsx|pdf|txt|pptx|docx|doc|png|jpg|jpeg|webp|gif)$/gm.exec(fileName);
 
   // first is whole match, second is capture group. Only one capture group can appear.
   if (!extensionMatches || extensionMatches.length !== 2) {
@@ -316,16 +321,16 @@ function handleAnnotations(content, storedFiles, newFiles, annotatedFiles) {
     const annotations = msg.text.annotations;
 
     annotations.forEach((annotation) => {
-      const fileId = annotation.file_path.file_id;
+      const fileId = annotation.file_citation.file_id;
       const replacement = annotation.text;
       const storedFile = storedFiles.get(fileId);
       const newFile = newFiles.get(fileId);
 
       if (storedFile) {
-        msgText = msgText.replaceAll(replacement, storedFile.src);
+        msgText = msgText.replaceAll(replacement, storedFile.src ? storedFile.src : "");
 
       } else if (newFile) {
-        msgText = msgText.replaceAll(replacement, newFile.src);
+        msgText = msgText.replaceAll(replacement, newFile.src ? newFile.src : "");
 
       } else {
         msgText = msgText.replaceAll(replacement, "[ Deleted File ]")

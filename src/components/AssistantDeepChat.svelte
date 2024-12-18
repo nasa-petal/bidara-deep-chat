@@ -69,7 +69,15 @@
     
     if (thread.length === 0 || thread.length === asst.history + 1) {
       const maxCharLen = 50;
-      const words = message.message.text.split(/\s+/);
+      let words = message.message.text?.split(/\s+/);
+      if(!words) {
+        // first user message is a file upload.
+        words = message.message.files?.[0]?.name?.split(/\s+/);
+      }
+      if(!words) {
+        // first user message is an image upload.
+        words = message.message.files?.[0]?.ref?.name?.split(/\s+/);
+      }
 
       let name = "";
 
@@ -128,6 +136,20 @@
   async function processImageCallback(imageFile) {
     shouldProcessImages = true;
     imagesToProcess.push(imageFile);
+  }
+
+  function fileTools(fileNames) {
+    let fileTool = "code_interpreter";
+    if (Array.isArray(fileNames) && fileNames.length > 0) {
+      let fileType = threadUtils.getFileTypeByName(fileNames[0]);
+      if (fileType == "image") {
+        fileTool = "images";
+      }
+      else if (["txt","powerpoint","pdf","word"].indexOf(fileType) !== -1) {
+        fileTool = "file_search";
+      }
+    }
+    return fileTool;
   }
 
   async function handleFuncCalling(functionDetails) {
@@ -234,6 +256,12 @@
         newFileIds = request.body.attachments.map(attachment => attachment.file_id);
         handleFileUploads(newFileIds, newFileUploads);
       }
+      else if(Array.isArray(request.body?.content) && request.body?.content.length > 0) {
+        //image uploaded
+        newFileIds = request.body.content.map(attachment => attachment.image_file?.file_id);
+        newFileIds = newFileIds.filter(item => item !== undefined); // an undefined array entry is created if an image is uploaded alongside a text message. This line removes that undefined array entry.
+        handleFileUploads(newFileIds, newFileUploads);
+      }
     }
 
     // Debug modified request
@@ -271,17 +299,19 @@
 <deep-chat
   id="chat-element"
   directConnection={{
+    //azure: {
     openAI: {
       key: key,
       validateKeyProperty: key ? false : true, // if apiKey is not null it has already been validated.
-      assistant: key ? {
-        assistant_id: asstId,
-        new_assistant: asstConfig,
-        thread_id: threadId,
-        load_thread_history: false,
-        files_tool_type: 'file_search',
-        function_handler: handleFuncCalling
-      } : null
+      //openAI: {
+        assistant: key ? {
+          assistant_id: asstId,
+          new_assistant: asstConfig,
+          thread_id: threadId,
+          load_thread_history: false,
+          files_tool_type: fileTools,
+          function_handler: handleFuncCalling
+        } : null
     }
   }}
   history={asst?.history}
@@ -295,6 +325,7 @@
   requestInterceptor={requestInterceptor}
   _insertKeyViewStyles={{displayCautionText: false}}
   demo={false}
+  displayLoadingBubble={true}
   speechToText={{
     webSpeech: "true",
     commands: {
@@ -410,9 +441,13 @@
       }
     },
     loading: {
-      shared: {
-        bubble: {
-          padding: "0.6em 0.75em 0.6em 1.3em"
+      message: {
+        styles: {
+          bubble: {
+            color: "var(--text-primary-color)",
+            backgroundColor: "var(--ai-message-background-color)",
+            padding: '0.6em 0.75em 0.6em 1.3em'
+          }
         }
       }
     }
@@ -432,6 +467,16 @@
       },
       svg: {
         content: '<svg viewBox="2 2 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3C12.2652 3 12.5196 3.10536 12.7071 3.29289L19.7071 10.2929C20.0976 10.6834 20.0976 11.3166 19.7071 11.7071C19.3166 12.0976 18.6834 12.0976 18.2929 11.7071L13 6.41421V20C13 20.5523 12.5523 21 12 21C11.4477 21 11 20.5523 11 20V6.41421L5.70711 11.7071C5.31658 12.0976 4.68342 12.0976 4.29289 11.7071C3.90237 11.3166 3.90237 10.6834 4.29289 10.2929L11.2929 3.29289C11.4804 3.10536 11.7348 3 12 3Z" fill="#ffffff" stroke="white" stroke-width="1"/></svg>'
+      }
+    },
+    loading: {
+      container: {
+        default: {
+          backgroundColor: "var(--chat-background-color)",
+        }
+      },
+      svg: {
+        content: '<svg viewBox="2 2 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3C12.2652 3 12.5196 3.10536 12.7071 3.29289L19.7071 10.2929C20.0976 10.6834 20.0976 11.3166 19.7071 11.7071C19.3166 12.0976 18.6834 12.0976 18.2929 11.7071L13 6.41421V20C13 20.5523 12.5523 21 12 21C11.4477 21 11 20.5523 11 20V6.41421L5.70711 11.7071C5.31658 12.0976 4.68342 12.0976 4.29289 11.7071C3.90237 11.3166 3.90237 10.6834 4.29289 10.2929L11.2929 3.29289C11.4804 3.10536 11.7348 3 12 3Z" fill="#b1b1b1" stroke="#b1b1b1" stroke-width="1"/></svg>'
       }
     }
   }}

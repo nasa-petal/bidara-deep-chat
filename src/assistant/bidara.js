@@ -18,6 +18,7 @@ export const ADVISORY = "**Do not share any sensitive information** in your conv
 export const GREETING = "How can I assist you today?";
 
 export const MODEL = "gpt-4o-2024-08-06";
+//export const MODEL = "gpt-4o"; // Azure Model Deployment Name
 
 const now = new Date();
 const formattedDate = now.toLocaleDateString();
