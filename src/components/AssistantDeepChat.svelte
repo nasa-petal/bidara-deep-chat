@@ -2,6 +2,8 @@
   import { DeepChat } from 'deep-chat-dev';
   import { setOpenAIKey, cancelThreadRun } from '../utils/openaiUtils';
   import * as threadUtils from '../utils/threadUtils';
+  import logger from '../utils/logger.js'; 
+
 
   export let key = null;
   export let thread = null;
@@ -18,6 +20,7 @@
   const threadId = thread?.id;
   const asstId = thread?.asst?.id;
   const asstConfig = asst?.config;
+  
 
   // vars for callbacks
   let lastMessageId;
@@ -63,7 +66,7 @@
     if (!deepChatRef || message.isInitial) {
       return
     }
-
+    
     if (thread.length === 0 || thread.length === asst.history + 1) {
       const maxCharLen = 50;
       let words = message.message.text?.split(/\s+/);
@@ -217,8 +220,39 @@
   }
 
   async function requestInterceptor(request) {
+    const body = request.body;
+
+    // logger.debug("Original Request Body:", JSON.stringify(body, null, 2));
+    // console.log("Original Request Body:", JSON.stringify(body, null, 2));
+    // Ensure placeholder text is added for file-only requests, or requests with empty message text.
+    if (
+      'attachments' in body && 
+      Array.isArray(body.attachments) && 
+      body.attachments.length > 0 && 
+      (
+        !('content' in body) || 
+        !Array.isArray(body.content) || 
+        body.content.length === 0 || 
+        !('text' in body.content[0]) || 
+        !(typeof body.content[0].text === 'string') || 
+        body.content[0].text.trim().length === 0
+      )
+    ) {
+      // logger.info("Adding placeholder text for file-only request.");
+      body.content = [
+        {
+          type: "text", 
+          text: 
+            "I just uploaded a file. Let me know if you got it and what tools you can use to analyze it. Wait for me to tell you what to do next with it though."
+        },
+      ];
+    } else {
+        // logger.warn("Request body does not contain a valid content structure.");
+    }
+
+    // Transform attachments to include file_id
     if (newFileUploads.length > 0) {
-      if(request.body.attachments) {
+      if('attachments' in body && Array.isArray(body.attachments) && body.attachments.length > 0) {
         newFileIds = request.body.attachments.map(attachment => attachment.file_id);
         handleFileUploads(newFileIds, newFileUploads);
       }
@@ -230,8 +264,12 @@
       }
     }
 
+    // Debug modified request
+    // logger.debug("Final Request Body Sent to API:", JSON.stringify(body, null, 2));
+
     return request;
   }
+
 
   function setDeepChatKeyboardSupport() {
     const shadowRoot = deepChatRef.shadowRoot;

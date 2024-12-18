@@ -551,7 +551,13 @@ export async function getChatCompletion(model, messages, tokenLimit) {
 
   return r;
 }
-
+/**
+ * 
+ * @param {*} b64Data 
+ * @param {*} fileName 
+ * @param {*} type 
+ * @returns 
+ */
 export async function uploadFile(b64Data, fileName, type) {
   if (!openaiKey) {
     throw new Error('openai key not set. cannot validate thread.');
