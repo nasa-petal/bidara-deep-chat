@@ -224,8 +224,31 @@
 
     // logger.debug("Original Request Body:", JSON.stringify(body, null, 2));
     // console.log("Original Request Body:", JSON.stringify(body, null, 2));
+    
+    
     // Ensure placeholder text is added for file-only requests, or requests with empty message text.
-    if (
+    const fileMsg = {
+      type: "text", 
+      text: 
+        "I just uploaded a file. Ask me what I'd like you to do with it."
+    }
+
+    if ( // an image was uploaded. todo: handle multiple images uploaded at once.
+      'content' in body &&
+      Array.isArray(body.content) &&
+      body.content.length > 0 &&
+      'image_file' in body.content[0]
+    ) {
+      if(body.content.length > 1) { // user included a message with the image
+        fileMsg.text = "The file_id is: " + body.content[0].image_file.file_id;
+      }
+      else { //user did not include a message with the image
+        fileMsg.text += " The file_id is: " + body.content[0].image_file.file_id;
+      }
+      body.content.push(fileMsg);
+    }
+
+    else if ( // just a file was uploaded with no text message.
       'attachments' in body && 
       Array.isArray(body.attachments) && 
       body.attachments.length > 0 && 
@@ -239,13 +262,7 @@
       )
     ) {
       // logger.info("Adding placeholder text for file-only request.");
-      body.content = [
-        {
-          type: "text", 
-          text: 
-            "I just uploaded a file. Let me know if you got it and what tools you can use to analyze it. Wait for me to tell you what to do next with it though."
-        },
-      ];
+      body.content = [fileMsg];
     } else {
         // logger.warn("Request body does not contain a valid content structure.");
     }
